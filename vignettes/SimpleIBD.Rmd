@@ -1,0 +1,68 @@
+---
+title: "SimpleIBD"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{SimpleIBD}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(polySimIBD)
+```
+
+# Justification
+Simple model because don't want to deal with levels of IBD
+
+
+#### Simulate "Base" Population
+First simulate a population of haploid samples using independent draws from a population allele frequency distribution. 
+```{r}
+
+dat <- simPopData(pos = c(sort(sample(1e5, 1e2))),
+                  nsamps = 5,
+                  p_shape1 = 0.1,
+                  p_shape2 = 0.1,
+                  propMissing = 0)
+
+```
+
+#### Make Samples IBD
+Then make two samples IBD under the `hmmIBD` model framework. Presumambly, you want to keep this in your population but you could go elsewhere...
+```{r}
+
+simIBD.dat <- simIBD(smpl1 = dat$genmat$smp1, 
+                     smpl2 = dat$genmat$smp3,
+                     pos = dat$genmat$POS,
+                     f = 0.5, k = 1, rho = 1e-5) 
+
+```
+
+#### Make Mixtures --> simVCF
+```{r}
+
+
+
+
+```
+
+##### Convert simVCFs to MIPanalyzer Object
+```{r}
+remotes::install_github("mrc-ide/MIPanalyzer")
+library(MIPanalyzer)
+
+MIPanalyzer::vcf2mipanalyzer_biallelic
+
+
+```
+
+
+
+
