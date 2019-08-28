@@ -1,0 +1,40 @@
+---
+title: "Vignette Title"
+author: "Vignette Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r, results='asis', fig.align='center', fig.width=8, fig.height=6, fig.retina=2}
+
+
+k <- 5
+rho = 1e-5
+CHROMPOS <- data.frame(CHROM = factor("chrom1"),
+                       POS = sort(floor(runif(n = 1e2, 1, 5e5))) )
+
+PLAF <- rbeta(n = nrow(CHROMPOS), shape1 = 0.5, shape2 = 0.5)
+
+sim <- polySimIBD::simulate_IBD_pop_Pedigree(chrompos = CHROMPOS, 
+                                             PLAF = PLAF, 
+                                             rho = rho, 
+                                             k = k)
+  
+
+
+plot(sim)
+
+```

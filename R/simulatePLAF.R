@@ -63,7 +63,7 @@ simPopData <- function(pos=c(sort(sample(1e5, 1e2))),
 #'
 #' @export
 
-simIBD <- function(smpl1, smpl2, f, k, rho, pos) {
+sim_hmmIBD <- function(smpl1, smpl2, f, k, rho, pos) {
 
   # draw starting state
   n <- length(pos) # abs number of loci, not pos -- this is consistent with simData below
