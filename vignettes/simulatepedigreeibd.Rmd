@@ -31,7 +31,8 @@ PLAF <- rbeta(n = nrow(CHROMPOS), shape1 = 0.5, shape2 = 0.5)
 sim <- polySimIBD::simulate_IBD_pop_Pedigree(chrompos = CHROMPOS, 
                                              PLAF = PLAF, 
                                              rho = rho, 
-                                             k = k)
+                                             k = k,
+                                             inbreeding = 0.5)
   
 
 

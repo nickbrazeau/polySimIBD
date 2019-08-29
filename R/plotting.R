@@ -37,13 +37,13 @@ plot.simulatedpedigree <- function(simulatedpedigree){
   #...........................
   # Looking at Full K
   #...........................
-  f1line <- data.frame(k = 1:simulatedpedigree$k, lineage = "F1.1")
+  f1line <- data.frame(k = 0:simulatedpedigree$k, lineage = "F1.1")
   f1line$haplobit <- purrr::map(simulatedpedigree$f1.1lineaage, "haplobit")
   f1lines2c <- lapply(f1line$haplobit, function(x){unlist(x)}) %>%
     do.call("rbind", .)
   f1line <- cbind.data.frame(f1line, f1lines2c)
 
-  f2line <- data.frame(k = 1:simulatedpedigree$k, lineage = "F1.2")
+  f2line <- data.frame(k = 0:simulatedpedigree$k, lineage = "F1.2")
   f2line$haplobit <- purrr::map(simulatedpedigree$f1.2lineaage, "haplobit")
   f2lines2c <- lapply(f2line$haplobit, function(x){unlist(x)}) %>%
     do.call("rbind", .)

@@ -119,7 +119,7 @@ simulate_IBD_pop_WF <- function(chrompos, PLAF, Nes, rho, k){
         m1 <- s1
         m2 <- s2
 
-        crossover <- makecrossover(smpl1 = s1, smpl2 = s2, recombo.block = recombo.block)
+        crossover <- makecrossover(p1 = s1, p2 = s2, recombo.block = recombo.block)
         m3 <- crossover[[1]]
         m4 <- crossover[[2]]
 
