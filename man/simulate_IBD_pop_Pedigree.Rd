@@ -4,11 +4,30 @@
 \alias{simulate_IBD_pop_Pedigree}
 \title{Simulate Pedigree IBD}
 \usage{
-simulate_IBD_pop_Pedigree(chrompos, PLAF, rho, k)
+simulate_IBD_pop_Pedigree(chrompos, PLAF, rho, k, inbreeding = NA)
 }
 \arguments{
 \item{chrompos}{matrix <factor><numeric>; the genomic coordinates for chromosome and position of the sites}
+
+\item{PLAF}{numeric vector; the population-level allele frequencies to simulate genotypes from}
+
+\item{rho}{numeric; expected recombination rate}
+
+\item{k}{numeric; number of generation to simulate forward}
+
+\item{inbreeding}{numeric; The probability of inbreeding for each generation. Backcrosses are made from the n-1 generations. The probability is bounded by 0-1.}
 }
 \description{
 Simulate Pedigree IBD
+}
+\details{
+Data is simulated under the following framework:
+\enumerate{
+\item Parental genotypes are drawn from the \code{PLAF}
+\item F1 crosses are made from parental genotypes
+\item Outgroup genotype that are unique to the parental and F1 progeny are made from the \code{PLAF}
+\item Encode haplotypes with a \emph{bit}
+\item Crossover F-progeny with outgroups unless inbreeding is specified. If the probability of inbreeding within each generation is specified,
+then either a relative or outgroup is selected following a binomial distribution: \eqn{binom(1, p_inbreeding)} for that generation's mate.
+}
 }

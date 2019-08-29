@@ -35,7 +35,7 @@ simulate_IBD_pop_WF <- function(chrompos, PLAF, Nes, rho, k){
   # loop through first generation based on WF model
   for(i in 1:length(Nes)){
     ret <- c()
-    for(j in 1:nrow(CHROMPOS)){
+    for(j in 1:nrow(chrompos)){
       ret <- append( ret, sample(x=c(0,1), size=1, prob = c(PLAF[j], 1-PLAF[j])) )
     }
     Nes[[i]]@haplogt <- ret
@@ -106,36 +106,13 @@ simulate_IBD_pop_WF <- function(chrompos, PLAF, Nes, rho, k){
       # Make Recombination Block
       # (sporozoite stage)
       #..............................
-      recombo.block <- findrecombination(chrompos = CHROMPOS)
+      recombo.block <- findrecombination(chrompos = chrompos)
 
       #..............................
-      # Did Recombination occur
-      # following assumptions of Wong 2018,
-      # Taylor/Watson 2019
+      # Recombination
       #..............................
-      if(length(unique(recombo.block)) != 1){
-        # four possible meiotic events from a tetraploid zygote
-        # to haploid meiotic products
-        m1 <- s1
-        m2 <- s2
-
-        crossover <- makecrossover(p1 = s1, p2 = s2, recombo.block = recombo.block)
-        m3 <- crossover[[1]]
-        m4 <- crossover[[2]]
-
-        hmps <- list(m1,m2,m3,m4)
-
-
-      } else{ # no recombinatino occurred
-        m1 <- m2 <- s1
-        m3 <- m4 <- s2
-        hmps <- list(m1,m2,m3,m4)
-      }
-      #..............................
-      # Sample one of the haploid
-      # meiotic products
-      #..............................
-      nedf[i,j] <- hmps[[sample(1:4, 1)]]
+      child <- makecrossover(p1 = s1, p2 = s2, rho = rho, chrompos = chrompos)
+      nedf[i,j] <- child
 
 
     }} # end nested-for loop

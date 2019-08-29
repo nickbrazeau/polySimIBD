@@ -31,19 +31,14 @@ simulate_IBD_pop_Pedigree <- function(chrompos, PLAF, rho, k,
     p1@haplogt <- sapply(PLAF, function(x){sample(x = c(0,1), size = 1, prob = c(x, 1-x))})
     p2@haplogt <- sapply(PLAF, function(x){sample(x = c(0,1), size = 1, prob = c(x, 1-x))})
   }
-  p1@haplobit <- rep("A", nrow(CHROMPOS))
-  p2@haplobit <- rep("B", nrow(CHROMPOS))
+  p1@haplobit <- rep("A", nrow(chrompos))
+  p2@haplobit <- rep("B", nrow(chrompos))
 
   #..........................
   # Simulate F1 progeny
   #..........................
-  recombo.block1 <- findrecombination(chrompos = CHROMPOS, rho = rho)
-  f1.1 <- makecrossover(p1 = p1, p2 = p2, recombo.block = recombo.block1)
-  f1.1 <- f1.1[[ sample(x = c(1,2), 1)]] # sample one of the two sister chromatids
-
-  recombo.block2 <- findrecombination(chrompos = CHROMPOS, rho = rho)
-  f1.2 <- makecrossover(p1 = p1, p2 = p2, recombo.block = recombo.block2)
-  f1.2 <- f1.2[[ sample(x = c(1,2), 1)]] # sample one of the two sister chromatids
+  f1.1 <- makecrossover(p1 = p1, p2 = p2, chrompos = chrompos, rho = rho)
+  f1.2 <- makecrossover(p1 = p1, p2 = p2, chrompos = chrompos, rho = rho)
 
 
   #..........................
@@ -89,7 +84,7 @@ simulate_IBD_pop_Pedigree <- function(chrompos, PLAF, rho, k,
 
   # now all unique
   for(i in 1:length(og)){
-    og[[i]]@haplobit <- rep( letters[i+2], nrow(CHROMPOS) )
+    og[[i]]@haplobit <- rep( letters[i+2], nrow(chrompos) )
   }
 
   #..........................
@@ -106,11 +101,9 @@ simulate_IBD_pop_Pedigree <- function(chrompos, PLAF, rho, k,
   #..........................
   # simulate through lineage 1
   for(i in 1:length(f1matings)){
-    mate.recombo <- findrecombination(chrompos = CHROMPOS, rho = rho)
-
     if(!is.na(inbreeding)){ # if user specified inbreeding
       if(runif(1) < inbreeding){ # flip weighted coin for whether it is inbred or outgroup
-        mate1 <- f1.1.ks[[ sample(1:length(f1.1.ks), 1) ]]
+        mate1 <- f1.1.ks[[ sample(1:(length(f1.1.ks)-1), 1) ]] # -1 so no selfings
       } else{
         mate1 <- f1matings[[i]]
       }
@@ -118,19 +111,15 @@ simulate_IBD_pop_Pedigree <- function(chrompos, PLAF, rho, k,
       mate1 <- f1matings[[i]]
     }
 
-    genx <- makecrossover(p1 = f1.1, p2 = mate1, recombo.block = mate.recombo)
-    f1.1 <- genx[[ 1 ]]
-    # TODO always picking the F1 haplotype -- is this fair?
+    f1.1 <- makecrossover(p1 = f1.1, p2 = mate1, chrompos = chrompos, rho = rho)
     f1.1.ks <- append(f1.1.ks, f1.1)
-  }
+  } #end for loop f1
 
   # simulate through lineage 2
   for(i in 1:length(f2matings)){
-    mate.recombo <- findrecombination(chrompos = CHROMPOS, rho = rho)
-
     if(!is.na(inbreeding)){ # if user specified inbreeding
       if(runif(1) < inbreeding){ # flip weighted coin for whether it is inbred or outgroup
-        mate2 <- f1.2.ks[[ sample(1:length(f1.2.ks), 1) ]]
+        mate2 <- f1.2.ks[[ sample(1:(length(f1.2.ks)-1), 1) ]] # -1 so no selfings
       } else{
         mate2 <- f2matings[[i]]
       }
@@ -138,11 +127,9 @@ simulate_IBD_pop_Pedigree <- function(chrompos, PLAF, rho, k,
       mate2 <- f2matings[[i]]
     }
 
-    genx <- makecrossover(p1 = f1.2, p2 = mate2, recombo.block = mate.recombo)
-    f1.2 <- genx[[ 1 ]]
-    # TODO always picking the F1 haplotype -- is this fair?
+    f1.2 <- makecrossover(p1 = f1.2, p2 = mate2, chrompos = chrompos, rho = rho)
     f1.2.ks <- append(f1.2.ks, f1.2)
-  }
+  } #end for loop f2
 
 
 
@@ -152,8 +139,8 @@ simulate_IBD_pop_Pedigree <- function(chrompos, PLAF, rho, k,
 
   ret <- list(
     k = k,
-    f1.1lineaage = f1.1.ks,
-    f1.2lineaage = f1.2.ks,
+    f1.1lineage = f1.1.ks,
+    f1.2lineage = f1.2.ks,
     kprogeny1 = f1.1,
     kprogeny2 = f1.2
     )

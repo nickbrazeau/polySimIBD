@@ -28,15 +28,15 @@ sim_hmmIBD <- function(chrompos, PLAF, f, k, rho, pos) {
   #.....................
   # Draw inds
   #.....................
-  s1 <- new("simhaplo")
-  s2 <- new("simhaplo")
-  while(identical(s1@haplogt, s2@haplogt)){ # no twins
-    s1@haplogt <- sapply(PLAF, function(x){sample(x = c(0,1), size = 1, prob = c(x, 1-x))})
-    s2@haplogt <- sapply(PLAF, function(x){sample(x = c(0,1), size = 1, prob = c(x, 1-x))})
+  p1 <- new("simhaplo")
+  p2 <- new("simhaplo")
+  while(identical(p1@haplogt, p2@haplogt)){ # no twins
+    p1@haplogt <- sapply(PLAF, function(x){sample(x = c(0,1), size = 1, prob = c(x, 1-x))})
+    p2@haplogt <- sapply(PLAF, function(x){sample(x = c(0,1), size = 1, prob = c(x, 1-x))})
   }
 
-  s1@haplobit <- rep("A", nrow(chrompos))
-  s2@haplobit <- rep("B", nrow(chrompos))
+  p1@haplobit <- rep("A", nrow(chrompos))
+  p2@haplobit <- rep("B", nrow(chrompos))
 
   #.....................
   # Draw Recombination block
@@ -62,14 +62,14 @@ sim_hmmIBD <- function(chrompos, PLAF, f, k, rho, pos) {
   #.....................
   # Apply Recombination block
   #.....................
-  cross <- s1
-  cross@haplogt[ret == 1] <- s2@haplogt[ret == 1]
-  cross@haplobit[ret == 1] <- s2@haplobit[ret == 1]
+  child <- p1
+  child@haplogt[ret == 1] <- p2@haplogt[ret == 1]
+  child@haplobit[ret == 1] <- p2@haplobit[ret == 1]
 
   ret <- list(
-    orig = s1,
-    s1 = s2,
-    s2 = cross
+    parent1 = p1,
+    parent2 = p2,
+    child = child
   )
 
   return(ret)
