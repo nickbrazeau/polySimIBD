@@ -1,0 +1,49 @@
+---
+title: "Simulate Structure Wright Fisher Forward in Time Model for IBD"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{simulatestructuredwf}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(polySimIBD)
+```
+
+
+```{r}
+
+chrompos <- data.frame(CHROM = factor("chrom1"),
+                       POS = sort(floor(runif(n = 1e2, 1, 5e5))) )
+Nes = 10 
+Noff = 1e4
+K = 5
+m = 0.1
+coi=1
+rho = 1e-5
+G <- 5
+
+start <- Sys.time()
+ret <- polySimIBD::simulate_IBD_SWF(chrompos = chrompos, 
+                                    Nes = Nes,
+                                    Noff = Noff, 
+                                    K = K,
+                                    m = m,
+                                    coi = coi,
+                                    rho = rho,
+                                    G = G)
+
+end <- Sys.time()
+end-start
+
+```
