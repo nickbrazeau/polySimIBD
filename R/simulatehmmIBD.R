@@ -30,13 +30,8 @@ sim_hmmIBD <- function(chrompos, PLAF, f, k, rho, pos) {
   #.....................
   p1 <- new("simhaplo")
   p2 <- new("simhaplo")
-  while(identical(p1@haplogt, p2@haplogt)){ # no twins
-    p1@haplogt <- sapply(PLAF, function(x){sample(x = c(0,1), size = 1, prob = c(x, 1-x))})
-    p2@haplogt <- sapply(PLAF, function(x){sample(x = c(0,1), size = 1, prob = c(x, 1-x))})
-  }
-
-  p1@haplobit <- rep("A", nrow(chrompos))
-  p2@haplobit <- rep("B", nrow(chrompos))
+  p1@haploint <- rep(1, nrow(chrompos))
+  p2@haploint <- rep(2, nrow(chrompos))
 
   #.....................
   # Draw Recombination block
@@ -63,8 +58,7 @@ sim_hmmIBD <- function(chrompos, PLAF, f, k, rho, pos) {
   # Apply Recombination block
   #.....................
   child <- p1
-  child@haplogt[ret == 1] <- p2@haplogt[ret == 1]
-  child@haplobit[ret == 1] <- p2@haplobit[ret == 1]
+  child@haploint[ret == 1] <- p2@haploint[ret == 1]
 
   ret <- list(
     parent1 = p1,

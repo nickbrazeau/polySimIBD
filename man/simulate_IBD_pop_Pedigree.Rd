@@ -4,18 +4,18 @@
 \alias{simulate_IBD_pop_Pedigree}
 \title{Simulate Pedigree IBD}
 \usage{
-simulate_IBD_pop_Pedigree(chrompos, PLAF, rho, k, inbreeding = NA)
+simulate_IBD_pop_Pedigree(chrompos, rho, k, inbreeding = NA)
 }
 \arguments{
 \item{chrompos}{matrix <factor><numeric>; the genomic coordinates for chromosome and position of the sites}
-
-\item{PLAF}{numeric vector; the population-level allele frequencies to simulate genotypes from}
 
 \item{rho}{numeric; expected recombination rate}
 
 \item{k}{numeric; number of generation to simulate forward}
 
 \item{inbreeding}{numeric; The probability of inbreeding for each generation. Backcrosses are made from the n-1 generations. The probability is bounded by 0-1.}
+
+\item{PLAF}{numeric vector; the population-level allele frequencies to simulate genotypes from}
 }
 \description{
 Simulate Pedigree IBD

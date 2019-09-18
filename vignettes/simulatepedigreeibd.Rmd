@@ -26,16 +26,13 @@ rho = 1e-5
 chrompos <- data.frame(CHROM = factor("chrom1"),
                        POS = sort(floor(runif(n = 1e2, 1, 5e5))) )
 
-PLAF <- rbeta(n = nrow(chrompos), shape1 = 0.5, shape2 = 0.5)
 
 sim <- polySimIBD::simulate_IBD_pop_Pedigree(chrompos = chrompos, 
-                                             PLAF = PLAF, 
                                              rho = rho, 
                                              k = k
                                            #  ,inbreeding = 0.5
                                              )
   
-
 
 plot_between_lineages_simulatedpedigree(sim)
 plot_within_lineage_simulatedpedigree(sim, lineage = 1)

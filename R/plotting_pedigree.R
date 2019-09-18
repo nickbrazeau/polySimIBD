@@ -12,17 +12,17 @@ plot_between_lineages_simulatedpedigree <- function(simulatedpedigree){
   # Looking at result prog
   #...........................
   progf1k <- data.frame(lineage = "F1.1_K",
-                        loci = 1:length(unlist(simulatedpedigree$kprogeny1@haplobit)),
-                        haplobit1 = unlist(simulatedpedigree$kprogeny1@haplobit)
+                        loci = 1:length(unlist(simulatedpedigree$kprogeny1@haploint)),
+                        haploint1 = unlist(simulatedpedigree$kprogeny1@haploint)
   )
   progf2k <- data.frame(lineage = "F1.2_K",
-                        loci = 1:length(unlist(simulatedpedigree$kprogeny2@haplobit)),
-                        haplobit2 = unlist(simulatedpedigree$kprogeny2@haplobit)
+                        loci = 1:length(unlist(simulatedpedigree$kprogeny2@haploint)),
+                        haploint2 = unlist(simulatedpedigree$kprogeny2@haploint)
   )
 
   progfk <- dplyr::left_join(progf1k, progf2k, by = "loci")
-  progfk$IBD <- mapply(identical, as.character(progfk$haplobit1),
-                            as.character(progfk$haplobit2))
+  progfk$IBD <- mapply(identical, as.character(progfk$haploint1),
+                            as.character(progfk$haploint2))
 
   plotObj1 <- progfk %>%
     ggplot() +
@@ -40,24 +40,24 @@ plot_between_lineages_simulatedpedigree <- function(simulatedpedigree){
   # Looking at Full K
   #...........................
   f1line <- tibble::tibble(k = 0:simulatedpedigree$k, lineage = "F1.1_K")
-  f1line$haplobit <- purrr::map(simulatedpedigree$f1.1lineage, "haplobit")
-  f1line <- unnest(f1line) %>%
+  f1line$haploint <- purrr::map(simulatedpedigree$f1.1lineage, "haploint")
+  f1line <- tidyr::unnest(f1line) %>%
     dplyr::group_by(k) %>%
-    dplyr::mutate( loci = 1:length(simulatedpedigree$f1.1lineage[[1]]@haplogt)) # just find number of sites
+    dplyr::mutate( loci = 1:length(simulatedpedigree$f1.1lineage[[1]]@haploint)) # just find number of sites
 
 
   f2line <- tibble::tibble(k = 0:simulatedpedigree$k, lineage = "F1.2_K")
-  f2line$haplobit <- purrr::map(simulatedpedigree$f1.2lineage, "haplobit")
-  f2line <- unnest(f2line) %>%
+  f2line$haploint <- purrr::map(simulatedpedigree$f1.2lineage, "haploint")
+  f2line <- tidyr::unnest(f2line) %>%
     dplyr::group_by(k) %>%
-    dplyr::mutate( loci = 1:length(simulatedpedigree$f1.2lineage[[1]]@haplogt)) # just find number of sites
+    dplyr::mutate( loci = 1:length(simulatedpedigree$f1.2lineage[[1]]@haploint)) # just find number of sites
 
 
   plotObj2 <- rbind.data.frame(f1line, f2line) %>%
     ggplot() +
-    geom_tile(aes(x=loci, y = factor(k), fill = factor(haplobit))) +
+    geom_tile(aes(x=loci, y = factor(k), fill = factor(haploint))) +
     facet_grid(~lineage) +
-    scale_fill_viridis_d("Haplotype-Bit") +
+    scale_fill_viridis_d("Haplotype-Int") +
     scale_y_discrete("K", breaks = 0:max(f1line$k)) +
     theme_classic() +
     theme(strip.background = element_blank(),
@@ -82,23 +82,23 @@ plot_within_lineage_simulatedpedigree <- function(sim, lineage){
   # assert lineage is 1 or 2
   if(lineage == 1){
     ret <- tibble::tibble(k = 0:(length(sim$f1.1lineage)-1))
-    ret$lineage <- purrr::map(sim$f1.1lineage, "haplobit")
-    ret <- unnest(ret) %>%
+    ret$lineage <- purrr::map(sim$f1.1lineage, "haploint")
+    ret <- tidyr::unnest(ret) %>%
       dplyr::group_by(k) %>%
-      dplyr::mutate(loci = 1:length(sim$f1.1lineage[[1]]@haplogt))
+      dplyr::mutate(loci = 1:length(sim$f1.1lineage[[1]]@haploint))
   } else if(lineage == 2){
     ret <- tibble::tibble(k = 0:(length(sim$f1.2lineage)-1))
-    ret$lineage <- purrr::map(sim$f1.2lineage, "haplobit")
-    ret <- unnest(ret) %>%
+    ret$lineage <- purrr::map(sim$f1.2lineage, "haploint")
+    ret <- tidyr::unnest(ret) %>%
       dplyr::group_by(k) %>%
-      dplyr::mutate(loci = 1:length(sim$f1.2lineage[[1]]@haplogt))
+      dplyr::mutate(loci = 1:length(sim$f1.2lineage[[1]]@haploint))
   }
 
 
   plotObj2 <- ret %>%
     ggplot() +
     geom_tile(aes(x=loci, y=factor(k), fill=factor(lineage))) +
-    scale_fill_viridis_d("Haplotype-Bit") +
+    scale_fill_viridis_d("Haplotype-Int") +
     scale_y_discrete("K", breaks = 0:max(ret$k)) +
     theme_classic()
 
