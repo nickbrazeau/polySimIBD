@@ -106,6 +106,19 @@ assert_numeric <- function(x, message = "%s must be numeric", name = deparse(sub
   return(TRUE)
 }
 
+
+
+#------------------------------------------------
+# x is numeric
+#' @noRd
+assert_numeric_or_NA <- function(x, message = "%s must be numeric or NA", name = deparse(substitute(x))) {
+  if (!is.numeric(x) & !is.na(x)) {
+    stop(sprintf(message, name), call. = FALSE)
+  }
+  return(TRUE)
+}
+
+
 #------------------------------------------------
 # x is single numeric
 #' @noRd

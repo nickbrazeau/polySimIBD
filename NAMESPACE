@@ -2,9 +2,7 @@
 
 export(plot_between_lineages_simulatedpedigree)
 export(plot_within_lineage_simulatedpedigree)
-export(sim_hmmIBD)
-export(simulate_IBD_SWF)
-export(simulate_IBD_WF)
+export(sim_structured_WF)
 export(simulate_IBD_pop_Pedigree)
 import(ggplot2)
 importFrom(magrittr,"%>%")

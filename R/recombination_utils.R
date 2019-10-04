@@ -1,50 +1,44 @@
 
+#' @title Make child seuqence from two parent sequence, e.g. a chimeric sequence
+#' @param p1 index
+#' @param p2 index
+#' @param chrompos
+#' @param rho
+#' @param interference numeric; probability that double crossover occurs
+#' @noRd
+#' @noMd
+#' @details Internal Function
 
-makecrossover <- function(p1, p2, chrompos, rho){
+recombine <- function(p1, p2, rho, pos) {
 
-  # TODO do this allow too much "backcrossing" ?
+  # special case - no recombination
+  L <- length(pos)
+  if (identical(p1, p2)) {
+    return(rep(p1, L))
+  }
 
-  breakpoint <- rexp(1, rho)
+  # draw number of recombination events that occur over the genome
+  n_breaks <- rpois(1, rho*pos[L])
 
-  if(breakpoint > max(chrompos$POS)){ # recombination doesn't happen
-    m1 <- p1
-    m2  <- p2
+  # special case if no recombination - all originate from one parent
+  if (n_breaks == 0) {
+    current_i <- sample(c(p1, p2), 1)
+    ret <- rep(current_i, L)
+    return(ret)
+  }
 
-  } else {
-    m1 <- new("simhaplo")
-    m2 <- new("simhaplo")
-    recombo.block <- chrompos$POS <= breakpoint
-    # sample starting parent
-    start <- sample(x=c(p1,p2), 1)[[1]]
-    # determine end parent
-    if(identical(p1, start)){
-      end <- p2
-    } else{
-      end <- p1
-    }
-    # make m1 child
-    m1@haploint[recombo.block] <- start@haploint[recombo.block]
-    m1@haploint[!recombo.block] <- end@haploint[!recombo.block]
-
-    # make m2 child
-    m2@haploint[recombo.block] <- end@haploint[recombo.block]
-    m2@haploint[!recombo.block] <- start@haploint[!recombo.block]
-
-
-
-    # redraw breakpoint to see if we do back crossover
-    newbreakpoint <- breakpoint + rexp(1, rho)
-    if(newbreakpoint < max(chrompos$POS)){ # we cross back over
-      offset <- runif(1, breakpoint, newbreakpoint) # need to offset to allow cross back over
-      # start now "re-starts"
-      backcross.block <- newbreakpoint <= chrompos$POS
-      # back cross m1
-      m1@haploint[backcross.block] <- start@haploint[backcross.block]
-      # back cross m2
-      m2@haploint[backcross.block] <- end@haploint[backcross.block]
-    }
-
-  } # end recombination ifelse
-  children <- list(m1 =m1, m2=m2)
-  return(children)
+  # draw parents over recombination blocks
+  breakpoints <- sort(runif(n_breaks, 0, pos[L]))
+  recombo_block <- (findInterval(pos, breakpoints) %% 2) + 1
+  ret <- c(p1, p2)[recombo_block]
+  return(ret)
 }
+
+
+
+
+
+
+
+
+

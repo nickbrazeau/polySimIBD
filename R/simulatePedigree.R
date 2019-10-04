@@ -1,5 +1,7 @@
+
+
 #' @title Simulate Pedigree IBD
-#' @param chrompos matrix <factor><numeric>; the genomic coordinates for chromosome and position of the sites
+#' @param pos numeric vector; the genomic coordinates for chromosome and position of the sites
 #' @param PLAF numeric vector; the population-level allele frequencies to simulate genotypes from
 #' @param rho numeric; expected recombination rate
 #' @param k numeric; number of generation to simulate forward
@@ -17,34 +19,38 @@
 #'
 #' @export
 
-simulate_IBD_pop_Pedigree <- function(chrompos, rho, k,
-                                      inbreeding = NA){
+simulate_IBD_pop_Pedigree <- function(pos, rho, k,
+                                      inbreeding = 0){
 
-  # assert that inbreeding is not =<0 or 1=<
-  #
+
+  #..........................
+  # Assertions
+  #..........................
+  #assert_matrix(chrompos)
+  assert_numeric(pos)
+  assert_numeric(rho)
+  assert_numeric(k)
+  assert_single_bounded(inbreeding, left = 0, right = 1, inclusive_left = T, inclusive_right = T)
+
+
   #..........................
   # Simulate Parents in Pedigree
   #..........................
-  p1 <- new("simhaplo")
-  p2 <- new("simhaplo")
-  p1@haploint <- rep(1, nrow(chrompos))
-  p2@haploint <- rep(2, nrow(chrompos))
+  p1 <- rep(1, length(pos))
+  p2 <- rep(2, length(pos))
 
   #..........................
   # Simulate F1 progeny
   #..........................
-  f1.1 <- makecrossover(p1 = p1, p2 = p2, chrompos = chrompos, rho = rho)[[1]] # just grab first child
-  f1.2 <- makecrossover(p1 = p1, p2 = p2, chrompos = chrompos, rho = rho)[[1]] # just grab first child
+  f1.1 <- recombine(p1 = unique(p1), p2 = unique(p2), pos = pos, rho = rho)
+  f1.2 <- recombine(p1 = unique(p1), p2 = unique(p2), pos = pos, rho = rho)
 
 
   #..........................
   # Simulate Mixing of Outgroups only
   # for each F1 progeny
   #..........................
-  og <- lapply(1:((k-1)*2), function(x) return(new("simhaplo")) )
-  for(i in 1:length(og)){
-    og[[i]]@haploint <- rep( i+2 , nrow(chrompos) ) # 1,2 taken by parents
-  }
+  og <- 1:((k-1)*2) + 2 # for parent index
 
   #..........................
   # Create potential outgroup matings
@@ -53,25 +59,25 @@ simulate_IBD_pop_Pedigree <- function(chrompos, rho, k,
   f2matings <- og[(length(og)/2 + 1):length(og)]
 
   f1.1.ks <- list(p1, f1.1)
-  f1.2.ks <- list(p1, f1.2)
+  f1.2.ks <- list(p2, f1.2)
 
   #..........................
   # Simualte Matings
   #..........................
   # simulate through lineage 1
   for(i in 1:length(f1matings)){
-    if(!is.na(inbreeding)){ # if user specified inbreeding
-      if(runif(1) < inbreeding){ # flip weighted coin for whether it is inbred or outgroup
-        mate1 <- f1.1.ks[[ sample(1:(length(f1.1.ks)-1), 1) ]] # -1 so no selfings
-      } else{
-        mate1 <- f1matings[[i]]
-      }
-    } else { # no user specified inbreeding
+
+    if(runif(1) < inbreeding){ # flip weighted coin for whether it is inbred or outgroup
+      mate1 <- f1.1.ks[[ sample(1:(length(f1.1.ks)-1), 1) ]] # -1 so no selfings
+    } else{
       mate1 <- f1matings[[i]]
     }
 
-    f1.1 <- makecrossover(p1 = f1.1, p2 = mate1, chrompos = chrompos, rho = rho)[[1]] # just grab fist child
-    f1.1.ks <- append(f1.1.ks, f1.1)
+
+    f1.1_new <- recombine(p1 = 1, p2 = mate1, pos = pos, rho = rho)
+    # get haploint back
+    f1.1 <- ifelse(f1.1_new == 1, f1.1, mate1)
+    f1.1.ks <- append(f1.1.ks, list(f1.1))
   } #end for loop f1
 
   # simulate through lineage 2
@@ -86,8 +92,10 @@ simulate_IBD_pop_Pedigree <- function(chrompos, rho, k,
       mate2 <- f2matings[[i]]
     }
 
-    f1.2 <- makecrossover(p1 = f1.2, p2 = mate2, chrompos = chrompos, rho = rho)[[1]] # just grab first child
-    f1.2.ks <- append(f1.2.ks, f1.2)
+    f1.2_new <- recombine(p1 = 2, p2 = mate2, pos = pos, rho = rho)
+    # get haploint back
+    f1.2 <- ifelse(f1.2_new == 2, f1.2, mate2)
+    f1.2.ks <- append(f1.2.ks, list(f1.2))
   } #end for loop f2
 
 

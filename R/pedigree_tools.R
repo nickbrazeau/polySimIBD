@@ -12,12 +12,12 @@ plot_between_lineages_simulatedpedigree <- function(simulatedpedigree){
   # Looking at result prog
   #...........................
   progf1k <- data.frame(lineage = "F1.1_K",
-                        loci = 1:length(unlist(simulatedpedigree$kprogeny1@haploint)),
-                        haploint1 = unlist(simulatedpedigree$kprogeny1@haploint)
+                        loci = 1:length(unlist(simulatedpedigree$kprogeny1)),
+                        haploint1 = unlist(simulatedpedigree$kprogeny1)
   )
   progf2k <- data.frame(lineage = "F1.2_K",
-                        loci = 1:length(unlist(simulatedpedigree$kprogeny2@haploint)),
-                        haploint2 = unlist(simulatedpedigree$kprogeny2@haploint)
+                        loci = 1:length(unlist(simulatedpedigree$kprogeny2)),
+                        haploint2 = unlist(simulatedpedigree$kprogeny2)
   )
 
   progfk <- dplyr::left_join(progf1k, progf2k, by = "loci")
@@ -27,10 +27,11 @@ plot_between_lineages_simulatedpedigree <- function(simulatedpedigree){
   plotObj1 <- progfk %>%
     ggplot() +
     geom_tile(aes(x=loci, y=lineage.x, fill=factor(IBD))) +
-    scale_fill_viridis_d("Between-Lineages IBD \n at Generation K") +
+    scale_fill_viridis_d("Between-Lineages IBD \n at Generation K (Final K)") +
     theme_classic() +
     theme(axis.title = element_blank(),
-          axis.text = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
           legend.position = "top")
 
 
@@ -40,17 +41,19 @@ plot_between_lineages_simulatedpedigree <- function(simulatedpedigree){
   # Looking at Full K
   #...........................
   f1line <- tibble::tibble(k = 0:simulatedpedigree$k, lineage = "F1.1_K")
-  f1line$haploint <- purrr::map(simulatedpedigree$f1.1lineage, "haploint")
-  f1line <- tidyr::unnest(f1line) %>%
+  f1line$haploint <- simulatedpedigree$f1.1lineage
+  f1line <- f1line %>%
+    tidyr::unnest(col = haploint) %>%
     dplyr::group_by(k) %>%
-    dplyr::mutate( loci = 1:length(simulatedpedigree$f1.1lineage[[1]]@haploint)) # just find number of sites
+    dplyr::mutate( loci = 1:length(simulatedpedigree$f1.1lineage[[1]])) # just find number of sites
 
 
   f2line <- tibble::tibble(k = 0:simulatedpedigree$k, lineage = "F1.2_K")
-  f2line$haploint <- purrr::map(simulatedpedigree$f1.2lineage, "haploint")
-  f2line <- tidyr::unnest(f2line) %>%
+  f2line$haploint <- simulatedpedigree$f1.2lineage
+  f2line <- f2line %>%
+    tidyr::unnest(col = haploint) %>%
     dplyr::group_by(k) %>%
-    dplyr::mutate( loci = 1:length(simulatedpedigree$f1.2lineage[[1]]@haploint)) # just find number of sites
+    dplyr::mutate( loci = 1:length(simulatedpedigree$f1.2lineage[[1]])) # just find number of sites
 
 
   plotObj2 <- rbind.data.frame(f1line, f2line) %>%
@@ -82,16 +85,18 @@ plot_within_lineage_simulatedpedigree <- function(sim, lineage){
   # assert lineage is 1 or 2
   if(lineage == 1){
     ret <- tibble::tibble(k = 0:(length(sim$f1.1lineage)-1))
-    ret$lineage <- purrr::map(sim$f1.1lineage, "haploint")
-    ret <- tidyr::unnest(ret) %>%
+    ret$lineage <- sim$f1.1lineage
+    ret <- ret %>%
+      tidyr::unnest(col = lineage) %>%
       dplyr::group_by(k) %>%
-      dplyr::mutate(loci = 1:length(sim$f1.1lineage[[1]]@haploint))
+      dplyr::mutate(loci = 1:length(sim$f1.1lineage[[1]]))
   } else if(lineage == 2){
     ret <- tibble::tibble(k = 0:(length(sim$f1.2lineage)-1))
-    ret$lineage <- purrr::map(sim$f1.2lineage, "haploint")
-    ret <- tidyr::unnest(ret) %>%
+    ret$lineage <-sim$f1.2lineage
+    ret <- ret %>%
+      tidyr::unnest(col = lineage) %>%
       dplyr::group_by(k) %>%
-      dplyr::mutate(loci = 1:length(sim$f1.2lineage[[1]]@haploint))
+      dplyr::mutate(loci = 1:length(sim$f1.2lineage[[1]]))
   }
 
 

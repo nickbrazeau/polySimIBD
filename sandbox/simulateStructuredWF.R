@@ -13,6 +13,7 @@
 #' @param coi numeric; The lambda of a right-shifted Poisson process, \eqn{1 + Pos(lambda)} representing the average COI of an individual deme
 #' @param rho numeric; expected recombination rate
 #' @param G numeric; number of generation to simulate forward
+#' @param interference numeric; probability of a double crossover
 #'
 #'@details Data is simulated under the following framework:
 #'   \enumerate{
@@ -32,7 +33,7 @@
 #'
 #' @export
 
-simulate_IBD_SWF <- function(chrompos, Nes, Noff, K, m, coi, rho, G){
+simulate_IBD_SWF <- function(chrompos, Nes, Noff, K, m, coi, rho, G, interference = 0){
 
   #.........................
   # assertions
@@ -46,87 +47,87 @@ simulate_IBD_SWF <- function(chrompos, Nes, Noff, K, m, coi, rho, G){
   assert_numeric(rho)
   assert_numeric(G)
 
+  #..........................................................
+  # Initial Generation
+  #..........................................................
+  current <- lapply(1:K, function(x) return(list()))
+  dim(current) <- c(1, K)
+  # initial COIs
+  coi.int <- 1 + rpois(n = K, lambda = coi)
 
-  #.........................
-  # setup
-  #.........................
-  # setup haplos
+  # get haplos
   Nes.haplos <- lapply(1:Nes, function(x) return( new("simhaplo") ))
-  # loop through effective pop
+  # loop through effective pop to make init haplo objects
   for(i in 1:length(Nes.haplos)){
     Nes.haplos[[i]]@haploint <- rep(i, nrow(chrompos))
+    Nes.haplos[[i]]@GA <- matrix(NA, nrow = G, ncol = nrow(chrompos))
+    Nes.haplos[[i]]@GA[1, ] <- i # self
   }
-  # setup matrix timeframes
 
-  wf.dem <- lapply(1:(G*K), function(x) return(list()))
-  dim(wf.dem) <- c(G, K)
-
-  #.........................
-  # initialize
-  #.........................
-  coi.int <- 1 + rpois(n = K, lambda = coi)
-  haplos <- Nes.haplos[sample(x = 1:length(Nes.haplos), size = sum(coi.int), replace = T)]
-
-  # partition samples init
-  # and fill in first row (parental row) of WF model
-  smpl <- c(0, cumsum(coi.int))
-  for(i in 1:length(coi.int)){
-    wf.dem[1, i] <- list( haplos[smpl[i]:smpl[i+1]] )
-  }; cat("First Generation Population Set \n")
+  # fill demes
+  for(k in 1:K){
+    current[[k]] <- sample(Nes.haplos, coi.int[k], replace = T)
+  }
 
 
   #..........................................................
-  # MAIN
+  # Subsequent Generations
   #..........................................................
   for(g in 2:G){
+    proposed <- lapply(1:K, function(x) return(list()))
+    dim(proposed) <- c(1, K)
 
     #.........................
     # Perform recombination
     #.........................
-    recomb.dem <- wf.dem[g-1, ]
-
     for(k in 1:K){ # for each deme
-      # need to initialize list
-      parents <- sample(recomb.dem[[k]], size = 2, replace = T)
-      child <- makecrossover(p1 = parents[[1]], p2 = parents[[2]], chrompos = chrompos, rho = rho)
-      recomb.dem[[k]] <- child
+      for(c in 1:coi.int[[k]]){
+        for(n in 1:Noff){ # make this many recombinants
+        parents <- sample(current[[k]], size = 2, replace = T)
+        child <- makecrossover(p1 = parents[[1]], p2 = parents[[2]], chrompos = chrompos, rho = rho, interference = interference)[[1]]
 
-      for(n in 2:Noff){ # make this many recombinants
-        parents <- sample(recomb.dem[[k]], size = 2, replace = T)
-        child <- makecrossover(p1 = parents[[1]], p2 = parents[[2]], chrompos = chrompos, rho = rho)
-        recomb.dem[[k]] <- append(recomb.dem[[k]], child)
+        # child inherits topology, G1- from parent under assumption parent lineage exchangeable
+        # child has their new topology, G, from crossover
+        child@GA <- parents[[1]]@GA
+        child@GA[g,] <- child@haploint
+
+        # append child to deme
+        proposed[[k]] <- append(proposed[[k]], child)
+        }
       }
     }
 
     #.........................
     # iterate through migration
     #.........................
-    migr.dem <- recomb.dem # note, we make a copy because we don't want to allow an individual to emmigrate twice in one generation. You can imagine this happeneing if an individual from deme 1 emmigrated to deme 5 and then as we were looping through, we gave it a chance to emmigrate again (as K is moving up k++). Instead append it at the end and use the recombo lengths to keep emmigration to (potentially) one per sample one per generation
+    dem.init.size <- sapply(proposed, length) # note, we track deme size as we do not want to allow an individual to emmigrate twice in one generation. You can imagine this happeneing if an individual from deme 1 emmigrated to deme 5 and then as we were looping through, we gave it a chance to emmigrate again (as K is moving up k++). Instead append it at the end and use the recombo lengths to keep emmigration to (potentially) one per sample one per generation
     for(k in 1:K){ # for each deme
         emigrators <- c() # track who emigrates
-        for(p in 1:length(recomb.dem[[k]])){ # for each haplotype/chromosome in a given deme
+        for(p in 1:dem.init.size[k]){ # for each haplotype/chromosome in a given deme
           if(rbinom(1, 1, m)){
             destination <- sample(1:K, size = 1) # find destination
-            migr.dem[[destination]] <- append(migr.dem[[destination]], migr.dem[[k]][[p]]) # append haplotype to list
+            proposed[[destination]] <- append(proposed[[destination]], proposed[[k]][[p]]) # append haplotype to list
             emigrators <- c(emigrators, p)
           }
         }
-        migr.dem[[k]] <- migr.dem[[k]][! 1:length(migr.dem[[k]]) %in% emigrators ] # remove haplotype that has emigrated
-      }
-    }; cat("Migration completed for Generation ", g, "\n")
+        proposed[[k]] <- proposed[[k]][! 1:length(proposed[[k]]) %in% emigrators ] # remove haplotypes that have emigrated
+      }; cat("Migration completed for Generation ", g, "\n")
 
 
     #.........................
-    # UPDATE and store
+    # UPDATE and store new ancestors
     #.........................
     coi.int <- 1 + rpois(n = K, lambda = coi)
 
     # partition samples and fill in matrix
     for(k in 1:length(coi.int)){
-        wf.dem[g, k] <- list( sample(migr.dem[[k]], size = coi.int[[k]]) )
+        current[k] <- list( sample(proposed[[k]], size = coi.int[[k]]) )
     }
 
-  return(wf.dem)
+  } # end of Generations loop
+
+
+  return(current)
 
 }
 

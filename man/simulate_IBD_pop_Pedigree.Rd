@@ -4,10 +4,10 @@
 \alias{simulate_IBD_pop_Pedigree}
 \title{Simulate Pedigree IBD}
 \usage{
-simulate_IBD_pop_Pedigree(chrompos, rho, k, inbreeding = NA)
+simulate_IBD_pop_Pedigree(pos, rho, k, inbreeding = 0)
 }
 \arguments{
-\item{chrompos}{matrix <factor><numeric>; the genomic coordinates for chromosome and position of the sites}
+\item{pos}{numeric vector; the genomic coordinates for chromosome and position of the sites}
 
 \item{rho}{numeric; expected recombination rate}
 

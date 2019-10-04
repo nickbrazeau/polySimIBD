@@ -14,32 +14,48 @@ editor_options:
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  results='hide', 
+  fig.align='center', fig.width=8, fig.height=6, fig.retina=2
 )
 ```
 
 ```{r}
 library(polySimIBD)
 ```
+**Note recombination follows [Figure 1A](https://www.biorxiv.org/content/biorxiv/early/2019/06/18/674440.full.pdf) -- this was our thought but nice figure**
 
-```{r, results='asis', fig.align='center', fig.width=8, fig.height=6, fig.retina=2}
 
+```{r}
 
 k <- 5
 rho = 1e-5
-chrompos <- data.frame(CHROM = factor("chrom1"),
-                       POS = sort(floor(runif(n = 1e2, 1, 5e5))) )
+pos <- seq(0,1e6,1e5)
 
-
-sim <- polySimIBD::simulate_IBD_pop_Pedigree(chrompos = chrompos, 
+sim <- polySimIBD::simulate_IBD_pop_Pedigree(pos = pos, 
                                              rho = rho, 
-                                             k = k
-                                           #  ,inbreeding = 0.5
+                                             k = k,
+                                             inbreeding = 0
                                              )
   
-
 plot_between_lineages_simulatedpedigree(sim)
 plot_within_lineage_simulatedpedigree(sim, lineage = 1)
+plot_within_lineage_simulatedpedigree(sim, lineage = 2)
 
+```
 
+#### Between Lineages
+
+```{r, results='asis'}
+plot_between_lineages_simulatedpedigree(sim)
+```
+
+#### Lineage 1 
+```{r, results='asis'}
+plot_within_lineage_simulatedpedigree(sim, lineage = 1)
+```
+
+#### Lineage 2
+```{r, results='asis'}
+plot_within_lineage_simulatedpedigree(sim, lineage = 2)
 ```

@@ -22,28 +22,26 @@ library(polySimIBD)
 
 
 ```{r}
+set.seed(1)
+# define parameters
+mean_coi <- 3
+K <- 5
+pos <- seq(0,1e6,1e5)
+m <- 0.1
+rho <- 1e-6
 
-chrompos <- data.frame(CHROM = factor("chrom1"),
-                       POS = sort(floor(runif(n = 1e2, 1, 5e5))) )
-Nes = 10 
-Noff = 1e4
-K = 5
-m = 0.1
-coi=1
-rho = 1e-5
-G <- 5
 
 start <- Sys.time()
-ret <- polySimIBD::simulate_IBD_SWF(chrompos = chrompos, 
-                                    Nes = Nes,
-                                    Noff = Noff, 
-                                    K = K,
-                                    m = m,
-                                    coi = coi,
-                                    rho = rho,
-                                    G = G)
+ret <- sim_structured_WF(pos = pos,
+                         K = K, 
+                         m = m,
+                         rho = rho, 
+                         mean_coi
+                         )
 
 end <- Sys.time()
 end-start
+
+ret[[2]][[2]]
 
 ```
