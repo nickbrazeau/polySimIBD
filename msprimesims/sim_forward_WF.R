@@ -15,15 +15,16 @@ pos <- seq(0,1e3,1e2)
 rho <- 1e-4
 
 
-paramsdf <- tibble::as_tibble(
+paramsdf <- tibble::tibble(
   mean_coi = mean_coi,
   K = K,
   m = m,
-  pos = pos,
+  pos = list(pos),
   rho = rep(rho, 5e4) # did 1e3 reps for msprime but doing more here for stochasticity we are entering in for geometric process
 )
 
 
+pmap(paramsdf, sim_structured_WF)
 
 
 
@@ -37,7 +38,7 @@ sjob <- rslurm::slurm_apply(f = sim_structured_WF,
                             nodes = ntry,
                             cpus_per_node = 1,
                             submit = T,
-                            slurm_options = list(mem = 16000,
+                            slurm_options = list(mem = 32000,
                                                  array = sprintf("0-%d%%%d",
                                                                  ntry,
                                                                  128),
