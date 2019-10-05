@@ -42,7 +42,7 @@ sjob <- rslurm::slurm_apply(f = sim_structured_WF,
                                                  array = sprintf("0-%d%%%d",
                                                                  ntry,
                                                                  128),
-                                                 'cpus-per-task' = 8,
+                                                 'cpus-per-task' = 1,
                                                  error =  "%A_%a.err",
                                                  output = "%A_%a.out",
                                                  time = "1:00:00"))
