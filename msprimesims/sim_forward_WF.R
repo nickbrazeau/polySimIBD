@@ -24,8 +24,6 @@ paramsdf <- tibble::tibble(
 )
 
 
-pmap(paramsdf, sim_structured_WF)
-
 
 
 outdir <- "/pine/scr/n/f/nfb/Projects/polySimIBD/msprimesims/"
