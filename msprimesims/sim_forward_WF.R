@@ -28,7 +28,7 @@ paramsdf <- tibble::tibble(
 
 outdir <- "/pine/scr/n/f/nfb/Projects/polySimIBD/msprimesims/"
 dir.create(outdir, recursive = T)
-setwd("outdir")
+setwd(outdir)
 ntry <- 1028 # max number of nodes we can ask for on LL
 sjob <- rslurm::slurm_apply(f = sim_structured_WF,
                             params = paramsdf,
