@@ -24,24 +24,22 @@ library(polySimIBD)
 ```{r}
 set.seed(1)
 # define parameters
-mean_coi <- 3
-K <- 5
-pos <- seq(0,1e6,1e5)
-m <- 0.1
-rho <- 1e-6
 
+# start <- Sys.time()
+# end <- Sys.time()
+# end-start
 
-start <- Sys.time()
-ret <- sim_structured_WF(pos = pos,
-                         K = K, 
-                         m = m,
-                         rho = rho, 
-                         mean_coi
+swf <- sim_structured_WF(pos = seq(1,1e6,1e5),
+                         K = 2, 
+                         m = 0.1,
+                         rho = 1e-6, 
+                         mean_coi = 3
                          )
 
-end <- Sys.time()
-end-start
 
-ret[[2]][[2]]
+
+ARG <- get_ARG(swf)
+plot_coalescence_trees(ARG, loci = 1)
+
 
 ```

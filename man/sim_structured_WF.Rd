@@ -17,6 +17,11 @@ sim_structured_WF(pos, K, m, rho, mean_coi)
 
 \item{mean_coi}{numeric; The lambda of a right-shifted Poisson process, \eqn{1 + Pos(lambda)} representing the average COI of an individual deme}
 }
+\value{
+Returns a list of length G (the number of generations it took for all lineages to coalesce). Each
+list item is a matrix with n x L dimensions where n is the number of parasites considered and L is loci.
+Parasites are then indexed into demes (individuals) based on the COI distribution.
+}
 \description{
 Simulate a population forwards with recombination that approximates the Structured Wright Fisher Process
 and tracks haplotype identity by descent where individuals represent demes, such that within
@@ -25,17 +30,12 @@ a deme individual-level COI is considered
 \details{
 Data is simulated under the following framework:
 \enumerate{
-\item Haploid genotypes are drawn from the \code{Nes}
-\item Haploid genotypes are repeated based on the census size, \code{Nc}
-\item Encode haplotypes with a \emph{int}
 \item ... TODO>..
 }
+}
+\examples{
+\dontrun{
 
-The forward in time simulation is performed by randomly drawing two strains from the previous generation,
-where strains can either be homologous or heterologous haplotypes depending on the haplotype frequencies,
-and allowing for mating to occur. Within the formed zygote, recombination events occur at a rate proportional
-to the recombination rate and distance along the genome: \eqn{1-e^{-rho*d}}. This process is modeled with a
-transition matrix and determines whether two samples enter a state of IBD or not. Once the recombination block
-has been determined, the four potential haploid meiotic products are created.
-TODO We then randomly pick one of the four which may not be ideal
+}
+
 }
