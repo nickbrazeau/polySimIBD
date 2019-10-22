@@ -29,11 +29,11 @@ set.seed(1)
 # end <- Sys.time()
 # end-start
 
-swf <- sim_structured_WF(pos = seq(1,1e6,1e5),
-                         K = 2, 
-                         m = 0.1,
-                         rho = 1e-6, 
-                         mean_coi = 3
+swf <- sim_structured_WF(pos = seq(1,1e3,1e2),
+                         K = 1, 
+                         m = 1,
+                         rho = 1e-4, 
+                         mean_coi = 5e2
                          )
 
 

@@ -6,6 +6,7 @@ setClass("bvtree",
 
 #' Find Coalescence
 #' @param swf S4 object;
+#' @importFrom magrittr %>%
 #' @export
 get_ARG <- function(swf){
 
@@ -15,6 +16,7 @@ get_ARG <- function(swf){
   coi <- swf$coi
 
   ARG <- lapply(1:L, function(x) return(new("bvtree")))
+  coaltime.squaremat <- lapply(1:L, function(x) return(matrix(NA, nrow = sum(coi), ncol = sum(coi))))
 
   #...................
   # get t and c
@@ -91,56 +93,40 @@ get_ARG <- function(swf){
     }
     # end section for Z fill in
 
+    #...................
+    # get coal time square matrix
+    #...................
+    coaltime.squaremat[[l]] <-  pairs %>%
+      tidyr::spread(., key = "Var2", value = "coaltime") %>%
+      dplyr::select(-c("Var1")) %>%
+      as.dist(.)
+
   } #end for loop for loci
 
-  class(ARG) <- "ARGsim"
 
-  return(ARG)
+  ARGlist <- list(ARG = ARG,
+                  coal_times = coaltime.squaremat)
+
+  class(ARGlist) <- "ARGsim"
+
+  return(ARGlist)
 }
 
 
 
-# # trace coalescent times back from the ancestry matrix
-# ind1 <- 1
-# haplo1 <- 3
-# ind2 <- 2
-# haplo2 <- 2
-#
-# row1 <- sum(coi[1:ind1]) - coi[ind1] + haplo1
-# row2 <- sum(coi[1:ind2]) - coi[ind2] + haplo2
-#
-# pointer1 <- rep(row1, L)
-# pointer2 <- rep(row2, L)
-#
-# has_coalesced <- rep(NA, L)
-# for (g in length(anc):1) {
-#   pointer1 <- anc[[g]][cbind(pointer1, 1:L)]
-#   pointer2 <- anc[[g]][cbind(pointer2, 1:L)]
-#
-#   for (l in 1:L) {
-#     if (is.na(has_coalesced[l])) {
-#       if (pointer1[l] == pointer2[l]) {
-#         has_coalesced[l] <- length(anc)-g + 1 # 1-based
-#       }
-#     }
-#   }
-#
-# }
-#
-# plot(pos, has_coalesced, type = 's', ylim = c(1, (max(has_coalesced)+5)))
-# has_coalesced
 
 
 #' plot the bvtrees
 #' @param ARGsim S4 object;
 #' @param loci numeric vector; loci which we want to plot
+#' @importFrom magrittr %>%
 #' @return ggplot object of geom_segments
 #' @export
 
 plot_coalescence_trees <- function(ARGsim, loci){
   assert_custom_class(x = ARGsim, c = "ARGsim")
 
-  ARGsim <- ARGsim[loci]
+  ARGsim <- ARGsim$ARG[loci]
 
   # make this into a tidy dataframe for ggplot
   ARGsimdf <- tibble::tibble(loci = loci)

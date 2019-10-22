@@ -20,17 +20,31 @@ paramsdf <- tibble::tibble(
   K = K,
   m = m,
   pos = list(pos),
-  rho = rep(rho, 1e4) # did 1e3 reps for msprime but doing more here for stochasticity we are entering in for geometric process
+  rho = rep(rho, 5e3) # did 1e3 reps for msprime but doing more here for stochasticity we are entering in for geometric process
 )
 
 
+simwrapper <- function(pos, K, m, rho, mean_coi){
+  swf <- sim_structured_WF(pos = pos,
+                           K = K,
+                           m = m,
+                           rho = rho,
+                           mean_coi = mean_coi)
+  ARG <- get_ARG(swf)
+
+  ret <- list(swf = swf,
+              ARG = ARG)
+  return(ret)
+
+}
 
 
-outdir <- "/pine/scr/n/f/nfb/Projects/polySimIBD/msprimesims_sWF/"
+
+outdir <- "/pine/scr/n/f/nfb/Projects/polySimIBD/"
 dir.create(outdir, recursive = T)
 setwd(outdir)
 ntry <- 1028 # max number of nodes we can ask for on LL
-sjob <- rslurm::slurm_apply(f = sim_structured_WF,
+sjob <- rslurm::slurm_apply(f = simwrapper,
                             params = paramsdf,
                             jobname = 'sim_Forward_sWF_runs',
                             nodes = ntry,
@@ -43,4 +57,4 @@ sjob <- rslurm::slurm_apply(f = sim_structured_WF,
                                                  'cpus-per-task' = 1,
                                                  error =  "%A_%a.err",
                                                  output = "%A_%a.out",
-                                                 time = "2-00:00:00"))
+                                                 time = "24:00:00"))
