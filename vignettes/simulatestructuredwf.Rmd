@@ -29,7 +29,7 @@ swf <- sim_structured_WF(pos = seq(1,1e3,1e2),
                          K = 1, 
                          m = 1,
                          rho = 1e-4, 
-                         mean_coi = 5e2
+                         mean_coi = 2
                          )
 
 start <- Sys.time()

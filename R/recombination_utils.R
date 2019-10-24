@@ -1,10 +1,9 @@
 
 #' @title Make child seuqence from two parent sequence, e.g. a chimeric sequence
-#' @param p1 index
-#' @param p2 index
-#' @param chrompos
-#' @param rho
-#' @param interference numeric; probability that double crossover occurs
+#' @param p1 nuermic; first parental index
+#' @param p2 nuermic; econdparental index
+#' @param pos numeric vector; chromosomal positions
+#' @param rho numeric; recombination rate
 #' @noRd
 #' @noMd
 #' @details Internal Function

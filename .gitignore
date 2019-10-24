@@ -3,7 +3,13 @@
 .Rproj.user
 inst/doc
 
+# cpp files
+*.o
+*.so
+*.dll
+
+
 # extra user files from me
-# sandbox/
+sandbox/
 .DS_Store
 
