@@ -20,21 +20,23 @@ paramsdf <- tibble::tibble(
   K = K,
   m = m,
   pos = list(pos),
-  rho = rep(rho, 5e3) # did 1e3 reps for msprime but doing more here for stochasticity we are entering in for geometric process
+  rho = rep(rho, 1e3),
+  sample_size = c(2,3,5)
 )
 
 
-simwrapper <- function(pos, K, m, rho, mean_coi){
+simwrapper <- function(pos, K, m, rho, mean_coi, sample_size){
   swf <- sim_structured_WF(pos = pos,
                            K = K,
                            m = m,
                            rho = rho,
                            mean_coi = mean_coi)
-  ARG <- get_ARG(swf)
 
-  ret <- list(swf = swf,
-              ARG = ARG)
-  return(ret)
+  # temp
+  nodes <- 1:sample_size
+  ARG <- get_ARG(swf, nodes = nodes)
+
+  return(ARG)
 
 }
 

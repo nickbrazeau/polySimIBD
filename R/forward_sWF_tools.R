@@ -8,21 +8,26 @@ setClass("bvtree",
 #' @param swf S4 object;
 #' @importFrom magrittr %>%
 #' @export
-get_ARG <- function(swf){
+get_ARG <- function(swf, nodes = NULL){
 
   assert_custom_class(x = swf, c = "sWFsim")
   L <- length(swf$pos)
   anc <- swf$anc
-  coi <- swf$coi
+  coi <- sum(swf$coi)
+
+  if(is.null(nodes)){
+    nodes <- 1:coi
+  }
+
 
   ARG <- lapply(1:L, function(x) return(new("bvtree")))
-  coaltime.squaremat <- lapply(1:L, function(x) return(matrix(NA, nrow = sum(coi), ncol = sum(coi))))
+  coaltime.squaremat <- lapply(1:L, function(x) return(matrix(NA, nrow = length(nodes), ncol = length(nodes))))
 
   #...................
   # get t and c
   #...................
   for(l in 1:L){ # for each loci find time that pair coalesces
-    pairs <- as.data.frame( expand.grid(1:sum(coi), 1:sum(coi)) )
+    pairs <- as.data.frame( expand.grid(nodes, nodes) )
     pairs <- pairs[pairs[,1] != pairs[,2], ]
     pairs$coaltime <- rep(NA, nrow(pairs))
     for(i in 1:nrow(pairs)){ # find when each pair coalesces
@@ -42,8 +47,6 @@ get_ARG <- function(swf){
     } # end for loop for pairs
 
     # extract lightweight infromation for bvtree
-    nodes <- sort( unique(pairs[,1]) )
-
     # make connections for nodes always go right
     for(i in 1:(length(nodes)-1)){
       mintime <- min( pairs[ pairs$Var1 == nodes[i] & pairs$Var2 > i, ]$coaltime )
@@ -74,8 +77,8 @@ get_ARG <- function(swf){
     }
 
     # note last node must always be root (if we are always going right)
-    ARG[[l]]@c[nodes[length(nodes)]] <- -1
-    ARG[[l]]@t[nodes[length(nodes)]] <- -1
+    ARG[[l]]@c[length(nodes)] <- -1
+    ARG[[l]]@t[length(nodes)] <- -1
 
 
     #...................
@@ -123,7 +126,7 @@ get_ARG <- function(swf){
 #' @return ggplot object of geom_segments
 #' @export
 
-plot_coalescence_trees <- function(ARGsim, loci){
+plot_coalescence_trees <- function(ARGsim, loci, nodes){
   assert_custom_class(x = ARGsim, c = "ARGsim")
 
   ARGsim <- ARGsim$ARG[loci]
@@ -133,7 +136,7 @@ plot_coalescence_trees <- function(ARGsim, loci){
   ARGsimdf$con <- purrr::map(ARGsim, "c")
   ARGsimdf$time <-  purrr::map(ARGsim, "t")
   # add in node information
-  ARGsimdf$nodes <- list( 1:length(ARGsim[[1]]@c) )
+  ARGsimdf$nodes <- nodes #TODO if we want to add a name to bvtrees
 
   ARGsimdf <- ARGsimdf %>%
     tidyr::unnest(cols = c("loci", "nodes", "con", "time")) %>%
