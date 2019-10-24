@@ -20,8 +20,8 @@ paramsdf <- tibble::tibble(
   K = K,
   m = m,
   pos = list(pos),
-  rho = rep(rho, 1e3), # do 1e3 replicates again
-  sample_size = c(2,3,5)
+  rho = rep(rho, 3e3), # do 1e3 replicates again
+  sample_size = rep(c(2,3,5), 1e3)
 )
 
 
