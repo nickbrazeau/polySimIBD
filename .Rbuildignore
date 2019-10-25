@@ -1,6 +1,6 @@
 ^polySimIBD\.Rproj$
 ^\.Rproj\.user$
+
+# files for future manuscript
 ^sandbox$
-^sim_approaches\.pptx$
-^msprimesims$
-^eda_polySimIBD$
+^simulations$

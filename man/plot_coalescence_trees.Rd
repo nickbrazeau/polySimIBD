@@ -4,7 +4,7 @@
 \alias{plot_coalescence_trees}
 \title{plot the bvtrees}
 \usage{
-plot_coalescence_trees(ARGsim, loci)
+plot_coalescence_trees(ARGsim, loci, nodes)
 }
 \arguments{
 \item{ARGsim}{S4 object;}

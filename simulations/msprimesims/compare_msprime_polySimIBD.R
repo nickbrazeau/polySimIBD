@@ -4,7 +4,7 @@ library(tidyverse)
 #....................................
 # Read in msprimes and manipulate
 #....................................
-msprimesims <- readRDS("msprimesims/simdata/msprimesims.rds")
+msprimesims <- readRDS("simulations/msprimesims/simdata/msprimesims.rds")
 msprimesims <- unlist(msprimesims, recursive = F)
 
 msprimesims$`discrete wright fisher.2` <- # overwrite t1 name for easier bind
@@ -29,7 +29,7 @@ msprimesims.df <- msprimesims.df %>%
 #....................................
 # Read in polysimibd
 #....................................
-polySimIBDsims.df <- readRDS("msprimesims/simdata/polySimIBD_sims.RDS") %>%
+polySimIBDsims.df <- readRDS("simulations/msprimesims/simdata/polySimIBD_sims.RDS") %>%
   dplyr::select(-c("intvl")) %>%
   dplyr::mutate(model = "polySimIBD")
 
@@ -53,7 +53,7 @@ simdfplotObj <- simdf %>%
   facet_grid(coaltime ~ Tn)
 
 
-jpeg("msprimesims/compare_polysim_mpsrime.jpg", width = 11, height = 8, res = 300, units = "in")
+jpeg("simulations/msprimesims/compare_polysim_mpsrime.jpg", width = 11, height = 8, res = 300, units = "in")
 plot(simdfplotObj)
 graphics.off()
 

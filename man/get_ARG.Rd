@@ -4,7 +4,7 @@
 \alias{get_ARG}
 \title{Find Coalescence}
 \usage{
-get_ARG(swf)
+get_ARG(swf, nodes = NULL)
 }
 \arguments{
 \item{swf}{S4 object;}

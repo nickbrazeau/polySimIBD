@@ -18,15 +18,15 @@ read_msprime_sims <- function(path){
 #....................................
 # discrete wf from msprime
 #....................................
-wfsmpl2 <- list.files("msprimesims/simdata/msprimesims/discreteWF/smplsize2/", full.names = T)
+wfsmpl2 <- list.files("simulations/msprimesims/simdata/msprimesims/discreteWF/smplsize2/", full.names = T)
 wfsmpl2 <- lapply(wfsmpl2, read_msprime_sims) %>%
   dplyr::bind_rows()
 
-wfsmpl3 <- list.files("msprimesims/simdata/msprimesims/discreteWF/smplsize3/", full.names = T)
+wfsmpl3 <- list.files("simulations/msprimesims/simdata/msprimesims/discreteWF/smplsize3/", full.names = T)
 wfsmpl3 <- lapply(wfsmpl3, read_msprime_sims) %>%
   dplyr::bind_rows()
 
-wfsmpl5 <- list.files("msprimesims/simdata/msprimesims/discreteWF/smplsize5/", full.names = T)
+wfsmpl5 <- list.files("simulations/msprimesims/simdata/msprimesims/discreteWF/smplsize5/", full.names = T)
 wfsmpl5 <- lapply(wfsmpl5, read_msprime_sims) %>%
   dplyr::bind_rows()
 
@@ -148,5 +148,5 @@ msprimeoutput <- get_output(dat_raw = msprocessed,
 #....................................
 # write out
 #....................................
-saveRDS(msprimeoutput, file = "msprimesims/simdata/msprimesims.rds")
+saveRDS(msprimeoutput, file = "simulations/msprimesims/simdata/msprimesims.rds")
 

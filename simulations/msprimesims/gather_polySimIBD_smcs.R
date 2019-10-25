@@ -72,7 +72,7 @@ params <- params %>%
   dplyr::select(c("sample_size", "simsposexp")) %>%
   tidyr::unnest(cols = simsposexp)
 
-saveRDS(params, file = "msprimesims/simdata/polySimIBD_sims.RDS")
+saveRDS(params, file = "simulations/msprimesims/simdata/polySimIBD_sims.RDS")
 
 
 

@@ -6,4 +6,4 @@
 #SBATCH --mail-type=all
 #SBATCH --mail-user=nbrazeau@med.unc.edu
 
-Rscript -e 'setwd("/proj/ideel/meshnick/users/NickB/Projects/polySimIBD"); source("eda_polySimIBD/sim_forward_WF_eda.R")'
+Rscript -e 'setwd("/proj/ideel/meshnick/users/NickB/Projects/polySimIBD"); source("simulations/eda_polySimIBD/sim_forward_WF_eda.R")'
