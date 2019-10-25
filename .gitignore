@@ -4,6 +4,10 @@
 inst/doc
 
 # extra user files from me
-# sandbox/
-.DS_Store
+sandbox/
+simdata/
+*.jpg
+*.svg
 
+# mac files
+.DS_Store
