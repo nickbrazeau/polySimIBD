@@ -30,7 +30,8 @@ paramsdf$rho <- rho
 iters <- nrow(paramsdf)
 sample_size = c(2,3,5)
 
-paramsdf <- lapply(1:length(sample_size), function(x) return(paramsdf))
+paramsdf <- lapply(1:length(sample_size), function(x) return(paramsdf)) %>%
+  dplyr::bind_rows()
 paramsdf$sample_size <- rep(sample_size, iters)
 
 
