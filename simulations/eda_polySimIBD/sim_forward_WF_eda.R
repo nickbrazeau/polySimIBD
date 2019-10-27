@@ -12,13 +12,13 @@ remotes::install_github("nickbrazeau/polySimIBD"); library(polySimIBD)
 mean_coi <- c(10, 50, 1e2, 5e2, 1e3)
 K <- seq(from = 0, to = 100, by = 10) # one deme
 K[1] <- 1
-m <- seq(from = 0, to = 1, by = 0.05)
+m <- seq(from = 0, to = 1, by = 0.2)
 m[1] <- 0.01
 pos <- seq(0,1e3,1e2)
 rho <- 1e-4
 
 paramsdf <- expand.grid(mean_coi, K, m)
-paramsdf <- lapply(1:5e2, function(x) return(paramsdf)) %>%
+paramsdf <- lapply(1:1e2, function(x) return(paramsdf)) %>%
   dplyr::bind_rows() %>%
   magrittr::set_colnames(c("mean_coi", "K", "m"))
 
@@ -64,10 +64,7 @@ sjob <- rslurm::slurm_apply(f = simwrapper,
                             cpus_per_node = 1,
                             submit = T,
                             slurm_options = list(mem = 32000,
-                                                 array = sprintf("0-%d%%%d",
-                                                                 ntry,
-                                                                 128),
                                                  'cpus-per-task' = 1,
                                                  error =  "%A_%a.err",
                                                  output = "%A_%a.out",
-                                                 time = "24:00:00"))
+                                                 time = "5:00:00"))
