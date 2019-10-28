@@ -9,6 +9,7 @@
 #' @param m numeric; Probability of migration where m represents the probability of moving from \eqn{deme_{origin}} to  \eqn{deme_{new}} by \eqn{m*(1-1/K)}
 #' @param mean_coi numeric; The lambda of a right-shifted Poisson process, \eqn{1 + Pos(lambda)} representing the average COI of an individual deme
 #' @param rho numeric; expected recombination rate
+#' @param tlim numeric; the maximum number of generations to consider before exitting gracefully if all samples have not coalesced
 #'
 #'@details Data is simulated under the following framework:
 #'   \enumerate{
@@ -28,10 +29,24 @@
 #' @export
 
 
-sim_structured_WF <- function(pos, K, m, rho, mean_coi){
+sim_structured_WF <- function(pos, K, m, rho, mean_coi, tlim){
 
-  # TODO Catch if we set M to 0 and K > 1, we never have coalescence of all demes
+  # assertions
+  assert_vector(pos)
+  assert_bounded(K, left = 1, right = Inf)
+  assert_bounded(m, left = 0, right = 1)
+  assert_bounded(rho, left = 0, right = 1, inclusive_left = F, inclusive_right = F)
 
+  # warnings
+  if(m == 0 & K > 1){
+    warning("You have set the migration rate to 0 but have more than one deme. As a result, all of your samples can never coalesce and this simulation will be limited by the tlim argument")
+  }
+  if(m==1){
+    warning("With the migration rate set to 1, you have essentially created a panmictic population.")
+  }
+
+
+  # start
   L <- length(pos)
 
   # draw initial COIs
@@ -45,7 +60,8 @@ sim_structured_WF <- function(pos, K, m, rho, mean_coi){
   # loop through generations
   g <- 1
   uniques <- 2
-  while (uniques != 1) {
+  iter = 0
+  while (uniques != 1 & iter != tlim) {
     g <- g + 1
 
     # draw COIs
@@ -86,6 +102,9 @@ sim_structured_WF <- function(pos, K, m, rho, mean_coi){
 
     # check if we can break loop by get number of unique haploints
     uniques <- length(unique(split(haploint, 1:nrow(haploint))))
+
+    # check if we should exit gracefully
+    iter <- iter + 1
   }
 
   # return out

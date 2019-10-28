@@ -16,6 +16,7 @@ m <- seq(from = 0, to = 0.5, by = 0.1)
 m[1] <- 0.01
 pos <- seq(0,1e3,1e2)
 rho <- 1e-4
+tlim <- 1e4
 
 paramsdf <- expand.grid(mean_coi, K, m)
 paramsdf <- lapply(1:1e2, function(x) return(paramsdf)) %>%
@@ -25,6 +26,7 @@ paramsdf <- lapply(1:1e2, function(x) return(paramsdf)) %>%
 # add in details
 paramsdf$pos <- list(pos)
 paramsdf$rho <- rho
+paramsdf$tlim <- tlim
 
 # now expand out again for sample size
 iters <- nrow(paramsdf)
@@ -42,7 +44,8 @@ simwrapper <- function(pos, K, m, rho, mean_coi, sample_size){
                            K = K,
                            m = m,
                            rho = rho,
-                           mean_coi = mean_coi)
+                           mean_coi = mean_coi,
+                           tlim = tlim)
 
   nodes <- 1:sample_size
   ARG <- get_ARG(swf, nodes = nodes)
