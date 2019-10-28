@@ -13,7 +13,7 @@ K <- 1 # one deme
 m <- 1 # panmictic
 pos <- seq(0,1e3,1e2)
 rho <- 1e-4
-
+tlim <- 1e9 # set to something high since we want these to finish on own
 
 paramsdf <- tibble::tibble(
   mean_coi = mean_coi,
@@ -21,7 +21,8 @@ paramsdf <- tibble::tibble(
   m = m,
   pos = list(pos),
   rho = rep(rho, 3e3), # do 1e3 replicates again
-  sample_size = rep(c(2,3,5), 1e3)
+  sample_size = rep(c(2,3,5), 1e3),
+  tlim = tlim
 )
 
 
@@ -30,7 +31,8 @@ simwrapper <- function(pos, K, m, rho, mean_coi, sample_size, tlim){
                            K = K,
                            m = m,
                            rho = rho,
-                           mean_coi = mean_coi)
+                           mean_coi = mean_coi,
+                           tlim = tlim)
 
   # temp
   nodes <- 1:sample_size
