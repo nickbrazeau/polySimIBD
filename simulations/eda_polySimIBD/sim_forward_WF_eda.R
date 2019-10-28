@@ -12,7 +12,7 @@ remotes::install_github("nickbrazeau/polySimIBD"); library(polySimIBD)
 mean_coi <- c(10, 50, 1e2, 5e2, 1e3)
 K <- seq(from = 0, to = 100, by = 10) # one deme
 K[1] <- 1
-m <- seq(from = 0, to = 1, by = 0.2)
+m <- seq(from = 0, to = 0.5, by = 0.1)
 m[1] <- 0.01
 pos <- seq(0,1e3,1e2)
 rho <- 1e-4
