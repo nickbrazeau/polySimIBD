@@ -25,7 +25,7 @@ paramsdf <- tibble::tibble(
 )
 
 
-simwrapper <- function(pos, K, m, rho, mean_coi, sample_size){
+simwrapper <- function(pos, K, m, rho, mean_coi, sample_size, tlim){
   swf <- sim_structured_WF(pos = pos,
                            K = K,
                            m = m,
