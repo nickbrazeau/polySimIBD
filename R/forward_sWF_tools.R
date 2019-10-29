@@ -8,9 +8,18 @@ setClass("bvtree",
 #' @param swf S4 object;
 #' @importFrom magrittr %>%
 #' @export
+
 get_ARG <- function(swf, nodes = NULL){
 
+  # graceful exits
+  if(sum(swf$coi) == 1){
+    stop("Your simulation returned one parasite among all hosts (did you run N = 1 and a low mean_moi?). As such, no pairwise comparisons can be made.")
+  }
+
+  # assertions
   assert_custom_class(x = swf, c = "sWFsim")
+
+  # tidy up params
   L <- length(swf$pos)
   anc <- swf$anc
   coi <- sum(swf$coi)
@@ -45,6 +54,13 @@ get_ARG <- function(swf, nodes = NULL){
         }
       } # end for loop for g
     } # end for loop for pairs
+
+    # if pairs do not have a common ancestor, then set to tlim
+    if(any(is.na(pairs$coaltime))){
+      pairs$coaltime[is.na(pairs$coaltime)] <- length(anc)
+      warning("Your simulation did not fully coalesce. Pairs that did not reach a common ancestor have been set to the t-limit specified in the sWF simulation.")
+    }
+
 
     # extract lightweight infromation for bvtree
     # make connections for nodes always go right
@@ -122,11 +138,13 @@ get_ARG <- function(swf, nodes = NULL){
 #' plot the bvtrees
 #' @param ARGsim S4 object;
 #' @param loci numeric vector; loci which we want to plot
+#' @param nodes numeric vecotr;
 #' @importFrom magrittr %>%
 #' @return ggplot object of geom_segments
 #' @export
 
 plot_coalescence_trees <- function(ARGsim, loci, nodes){
+
   assert_custom_class(x = ARGsim, c = "ARGsim")
 
   ARGsim <- ARGsim$ARG[loci]
@@ -135,14 +153,16 @@ plot_coalescence_trees <- function(ARGsim, loci, nodes){
   ARGsimdf <- tibble::tibble(loci = loci)
   ARGsimdf$con <- purrr::map(ARGsim, "c")
   ARGsimdf$time <-  purrr::map(ARGsim, "t")
+
   # add in node information
-  ARGsimdf$nodes <- nodes #TODO if we want to add a name to bvtrees
+  assert_same_length(ARGsimdf$time[[1]], nodes)
+  ARGsimdf$nodes <- list(nodes)
 
   ARGsimdf <- ARGsimdf %>%
     tidyr::unnest(cols = c("loci", "nodes", "con", "time")) %>%
     dplyr::group_by(loci) %>%
     dplyr::mutate(time = ifelse(time == -1, max(time) + 5, time),
-                  con = ifelse(con == -1, nodes, con))
+                  con = ifelse(con == -1, max(nodes), con))
 
   # make vertical lines
   plotObj <- ggplot(data = ARGsimdf) +
@@ -157,7 +177,8 @@ plot_coalescence_trees <- function(ARGsim, loci, nodes){
     scale_x_continuous(breaks = 1:max(ARGsimdf$nodes)) +
     scale_color_viridis_d() +
     theme(axis.title = element_text(family = "Helvetica", face = "bold"),
-          axis.text = element_text(family = "Helvetica", face = "bold"),
+          axis.text.x = element_blank(),
+          axis.text.y = element_text(family = "Helvetica", face = "bold"),
           legend.position = "none",
           panel.grid = element_blank(),
           panel.border = element_blank(),

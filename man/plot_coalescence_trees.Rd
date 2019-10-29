@@ -10,6 +10,8 @@ plot_coalescence_trees(ARGsim, loci, nodes)
 \item{ARGsim}{S4 object;}
 
 \item{loci}{numeric vector; loci which we want to plot}
+
+\item{nodes}{numeric vecotr;}
 }
 \value{
 ggplot object of geom_segments
