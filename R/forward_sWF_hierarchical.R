@@ -5,9 +5,9 @@
 #' a deme individual-level COI is considered
 #'
 #' @param pos dataframe <factor><numeric>; the genomic coordinates for chromosome and position of the sites
-#' @param K numeric; The number of individuals (e.g. demes) to consider
-#' @param m numeric; Probability of migration where m represents the probability of moving from \eqn{deme_{origin}} to  \eqn{deme_{new}} by \eqn{m*(1-1/K)}
-#' @param mean_coi numeric; The lambda of a right-shifted Poisson process, \eqn{1 + Pos(lambda)} representing the average COI of an individual deme
+#' @param N numeric; The number of individuals to consider
+#' @param m numeric; Probability of migration where m represents the probability of a parasite moving from one individual to another individual
+#' @param mean_coi numeric; The lambda of a zero-truncated Poisson process, representing the average COI among inviduals
 #' @param rho numeric; expected recombination rate
 #' @param tlim numeric; the maximum number of generations to consider before exitting gracefully if all samples have not coalesced
 #'
@@ -29,17 +29,17 @@
 #' @export
 
 
-sim_structured_WF <- function(pos, K, m, rho, mean_coi, tlim){
+sim_hierarchical_structured_WF <- function(pos, N, MM, m, rho, mean_coi, tlim){
 
   # assertions
   assert_vector(pos)
-  assert_bounded(K, left = 1, right = Inf)
+  assert_bounded(N, left = 1, right = Inf)
   assert_bounded(m, left = 0, right = 1)
   assert_bounded(rho, left = 0, right = 1, inclusive_left = F, inclusive_right = F)
 
   # warnings
-  if(m == 0 & K > 1){
-    warning("You have set the migration rate to 0 but have more than one deme. As a result, all of your samples can never coalesce and this simulation will be limited by the tlim argument")
+  if(m == 0 & N > 1){
+    warning("You have set the migration rate to 0 but have more than one individual As a result, all of your samples can never coalesce and this simulation will be limited by the tlim argument")
   }
   if(m==1){
     warning("With the migration rate set to 1, you have essentially created a panmictic population.")
@@ -50,7 +50,7 @@ sim_structured_WF <- function(pos, K, m, rho, mean_coi, tlim){
   L <- length(pos)
 
   # draw initial COIs
-  coi_prev <- rpois(K, mean_coi) + 1
+  coi_prev <- rpois(N, mean_coi) + 1
 
   # create ancestry array
   anc <- list()
@@ -65,7 +65,7 @@ sim_structured_WF <- function(pos, K, m, rho, mean_coi, tlim){
     g <- g + 1
 
     # draw COIs
-    coi <- rpois(K, mean_coi) + 1
+    coi <- rpois(N, mean_coi) + 1
 
     # initialize haploints
     haploint <- matrix(NA, sum(coi), L)
@@ -75,16 +75,16 @@ sim_structured_WF <- function(pos, K, m, rho, mean_coi, tlim){
 
     # loop through demes and haplotypes within demes
     i <- 0
-    for (k in 1:K) {
-      for (j in 1:coi[k]) {
+    for (n in 1:N) {
+      for (j in 1:coi[n]) {
         i <- i + 1
 
         # choose parental demes and parental haplotypes from those demes
-        parent_deme1 <- ifelse(rbinom(1, 1, m), sample(1:K, 1), k)
+        parent_deme1 <- ifelse(rbinom(1, 1, m), sample(1:N, 1), n)
         parent_haplo1 <- sample(coi_prev[parent_deme1], 1)
         parent_index1 <- sum(coi_prev[1:parent_deme1]) - coi_prev[parent_deme1] + parent_haplo1
 
-        parent_deme2 <- ifelse(rbinom(1, 1, m), sample(1:K, 1), k)
+        parent_deme2 <- ifelse(rbinom(1, 1, m), sample(1:N, 1), n)
         parent_haplo2 <- sample(coi_prev[parent_deme2], 1)
         parent_index2 <- sum(coi_prev[1:parent_deme2]) - coi_prev[parent_deme2] + parent_haplo2
 
@@ -115,3 +115,6 @@ sim_structured_WF <- function(pos, K, m, rho, mean_coi, tlim){
 
 
 }
+
+
+

@@ -16,7 +16,7 @@ m <- seq(from = 0, to = 0.5, by = 0.1)
 m[1] <- 0.01
 pos <- seq(0,1e3,1e2)
 rho <- 1e-4
-tlim <- 1e4
+tlim <- 5e2
 
 paramsdf <- expand.grid(mean_coi, K, m)
 paramsdf <- lapply(1:1e2, function(x) return(paramsdf)) %>%

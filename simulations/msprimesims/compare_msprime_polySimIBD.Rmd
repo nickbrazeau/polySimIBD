@@ -1,10 +1,28 @@
-library(tidyverse)
+---
+title: "_msprime_ and _polySimIBD_ Comparison"
 
+output: 
+  html_document:
+    highlight: textmate
+    theme: lumen
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T, warning = F, message = F, eval = T, results = 'hide',
+                      fig.align = 'center', fig.width = 8, fig.height = 8)
+```
+
+## Model Formulation
+As a sanity check, our `polySimIBD` model was tested against the `msprime` simulator. To make the simulator comparable, we considered `polySimIBD` with 1 deme (one indiviudal) with migration rate set to 1 (panmictic) and a mean COI of 1e3 (haploid). The `msprime` simulator was set to 5e2 indivduals (simulator params are in: `msprime_sims_forSWF.sh`). 
+
+```{r}
+library(tidyverse)
 
 #....................................
 # Read in msprimes and manipulate
 #....................................
-msprimesims <- readRDS("simulations/msprimesims/simdata/msprimesims.rds")
+msprimesims <- readRDS("~/Documents/GitHub/polySimIBD/simulations/msprimesims/simdata/msprimesims.rds")
 msprimesims <- unlist(msprimesims, recursive = F)
 
 msprimesims$`discrete wright fisher.2` <- # overwrite t1 name for easier bind
@@ -31,11 +49,19 @@ msprimesims.df$pos <- 1:1001
 #....................................
 # Read in polysimibd
 #....................................
-polySimIBDsims.df <- readRDS("simulations/msprimesims/simdata/polySimIBD_sims.RDS") %>%
+polySimIBDsims.df <- readRDS("~/Documents/GitHub/polySimIBD/simulations/msprimesims/simdata/polySimIBD_sims.RDS") %>%
   dplyr::mutate(model = "polySimIBD") %>%
   dplyr::select(-c("intvl"))
 polySimIBDsims.df$pos <- 1:1001
 
+
+```
+
+
+## Comparisons
+### Continuous
+Considering `msprime` with continuous sequencing/intervals. 
+```{r}
 #################################################################################
 ###################                Comparisons                ###################
 ##################################################################################
@@ -65,11 +91,19 @@ simdfplotObj <- simdf %>%
   theme(axis.text.x = element_text(angle = 90))
 
 
-jpeg("simulations/msprimesims/compare_polysim_mpsrime_cont.jpg", width = 11, height = 8, res = 300, units = "in")
+jpeg("~/Documents/GitHub/polySimIBD/simulations/msprimesims/compare_polysim_mpsrime_cont.jpg", width = 11, height = 8, res = 300, units = "in")
 plot(simdfplotObj)
 graphics.off()
 
 
+
+```
+
+```{r, results='asis'}
+plot(simdfplotObj)
+```
+
+```{r, results='asis'}
 
 simdf.summary <- simdf %>%
   dplyr::group_by(model, Tn) %>%
@@ -82,6 +116,17 @@ simdf.summary <- simdf %>%
   ) %>%
   dplyr::arrange(., Tn)
 
+simdf.summary %>% 
+  kableExtra::kable(format = "html", escape = F) %>%
+  kableExtra::kable_styling("striped", full_width = F) 
+
+
+```
+
+### Discrete
+Considering `msprime` with discretized sequencing/loci. 
+
+```{r}
 
 
 #....................................
@@ -101,16 +146,25 @@ simdfplotObj <- simdf %>%
   geom_density(aes(x = coaltime, y = stat(count),
                    color = factor(model), fill = factor(model)), alpha = 0.1) +
   facet_wrap(Tn~.) +
-  theme_classic()
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90))
 
 
-jpeg("simulations/msprimesims/compare_polysim_mpsrime_discrete.jpg", width = 11, height = 8, res = 300, units = "in")
+
+jpeg("~/Documents/GitHub/polySimIBD/simulations/msprimesims/compare_polysim_mpsrime_discrete.jpg", width = 11, height = 8, res = 300, units = "in")
 plot(simdfplotObj)
 graphics.off()
 
 
 
+```
 
+
+```{r, results='asis'}
+plot(simdfplotObj)
+```
+
+```{r, results='asis'}
 
 simdf.summary <- simdf %>%
   dplyr::filter(discreterows) %>%
@@ -124,6 +178,10 @@ simdf.summary <- simdf %>%
   ) %>%
   dplyr::arrange(., Tn)
 
+simdf.summary %>% 
+  kableExtra::kable(format = "html", escape = F) %>%
+  kableExtra::kable_styling("striped", full_width = F) 
+```
 
 
 
