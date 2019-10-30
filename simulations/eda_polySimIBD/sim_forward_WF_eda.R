@@ -10,18 +10,18 @@ remotes::install_github("nickbrazeau/polySimIBD"); library(polySimIBD)
 
 # define parameters
 mean_coi <- c(10, 50, 1e2, 5e2, 1e3)
-K <- seq(from = 0, to = 100, by = 10) # one deme
-K[1] <- 1
+N <- seq(from = 0, to = 100, by = 10) # one deme
+N[1] <- 1
 m <- seq(from = 0, to = 0.5, by = 0.1)
 m[1] <- 0.01
 pos <- seq(0,1e3,1e2)
 rho <- 1e-4
-tlim <- 5e2
+tlim <- 5e1
 
-paramsdf <- expand.grid(mean_coi, K, m)
+paramsdf <- expand.grid(mean_coi, N, m)
 paramsdf <- lapply(1:1e2, function(x) return(paramsdf)) %>%
   dplyr::bind_rows() %>%
-  magrittr::set_colnames(c("mean_coi", "K", "m"))
+  magrittr::set_colnames(c("mean_coi", "N", "m"))
 
 # add in details
 paramsdf$pos <- list(pos)
@@ -38,10 +38,9 @@ paramsdf$sample_size <- rep(sample_size, iters)
 
 
 # sim wrapper
-
-simwrapper <- function(pos, K, m, rho, mean_coi, sample_size, tlim){
+simwrapper <- function(pos, N, m, rho, mean_coi, sample_size, tlim){
   swf <- sim_structured_WF(pos = pos,
-                           K = K,
+                           N = N,
                            m = m,
                            rho = rho,
                            mean_coi = mean_coi,
@@ -53,7 +52,6 @@ simwrapper <- function(pos, K, m, rho, mean_coi, sample_size, tlim){
   return(ARG)
 
 }
-
 
 
 outdir <- "/pine/scr/n/f/nfb/Projects/polySimIBD/"

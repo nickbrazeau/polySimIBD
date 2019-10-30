@@ -9,7 +9,7 @@ remotes::install_github("nickbrazeau/polySimIBD"); library(polySimIBD)
 
 # define parameters
 mean_coi <- 1e3 # note, for msprime we used 5e2, but that was diploid. here we are haploid
-K <- 1 # one deme
+N <- 1 # one ind/deme
 m <- 1 # panmictic
 pos <- seq(0,1e3,1e2)
 rho <- 1e-4
@@ -17,7 +17,7 @@ tlim <- 1e9 # set to something high since we want these to finish on own
 
 paramsdf <- tibble::tibble(
   mean_coi = mean_coi,
-  K = K,
+  N = N,
   m = m,
   pos = list(pos),
   rho = rep(rho, 3e3), # do 1e3 replicates again
@@ -26,9 +26,9 @@ paramsdf <- tibble::tibble(
 )
 
 
-simwrapper <- function(pos, K, m, rho, mean_coi, sample_size, tlim){
+simwrapper <- function(pos, N, m, rho, mean_coi, sample_size, tlim){
   swf <- sim_structured_WF(pos = pos,
-                           K = K,
+                           N = N,
                            m = m,
                            rho = rho,
                            mean_coi = mean_coi,
