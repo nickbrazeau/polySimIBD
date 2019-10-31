@@ -28,8 +28,8 @@ pos <- seq(1,1e3,1e2)
 N <- 3
 m <- 0.1
 rho <- 1e-4 
-mean_coi <- 1e3
-tlim = 10
+mean_coi <- 3
+tlim = 1e3
 
 start <- Sys.time()
 swf <- sim_structured_WF(pos = pos,
@@ -44,7 +44,7 @@ swf <- sim_structured_WF(pos = pos,
 end <- Sys.time()
 end-start
 
-ARG <- get_ARG(swf, nodes = c(1, 4, 9))
+ARG <- get_ARG(swf, nodes = c(1, 2, 3))
 ARG
 plot_coalescence_trees(ARG, loci = 1,  nodes = c(1, 4, 9))
 

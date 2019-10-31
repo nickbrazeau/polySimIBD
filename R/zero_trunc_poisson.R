@@ -1,3 +1,10 @@
+#' Zero Truncated Poisson Model
+#' @param n numeric; number of draws to consider
+#' @param lambda numeric; the lambda parameter in a poisson distribtuion
+#'
+#' @return integer vector of sucesses
+#' @export
+
 zero_trunc_poisson <- function(n, lambda){
   # giocc.com/zero_truncated_poisson_sampling_algorithm.html
   ret <- rep(NA, n)
@@ -17,5 +24,3 @@ zero_trunc_poisson <- function(n, lambda){
   return(ret)
 }
 
-rpois(n=100, lambda = 1e-4)
-zero_trunc_poisson(n=100, 1e-4)

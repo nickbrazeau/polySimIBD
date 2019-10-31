@@ -11,6 +11,8 @@
 #' @param rho numeric; expected recombination rate
 #' @param tlim numeric; the maximum number of generations to consider before exitting gracefully if all samples have not coalesced
 #'
+#' @description if mean_coi > 10, then we say the zero-trunc approximates the pois
+#'
 #'@details Data is simulated under the following framework:
 #'   \enumerate{
 #'        \item ... TODO>..
@@ -50,7 +52,11 @@ sim_structured_WF <- function(pos, N, m, rho, mean_coi, tlim){
   L <- length(pos)
 
   # draw initial COIs
-  coi_prev <- rpois(N, mean_coi) + 1
+  if(mean_coi > 10){
+    coi_prev <- rpois(N, mean_coi)
+  } else {
+    coi_prev <- zero_trunc_poisson(N, mean_coi)
+  }
 
   # create ancestry array
   anc <- list()
@@ -65,7 +71,12 @@ sim_structured_WF <- function(pos, N, m, rho, mean_coi, tlim){
     g <- g + 1
 
     # draw COIs
-    coi <- rpois(N, mean_coi) + 1
+    if(mean_coi > 10){
+      coi <- rpois(N, mean_coi)
+    } else {
+      coi <- zero_trunc_poisson(N, mean_coi)
+    }
+
 
     # initialize haploints
     haploint <- matrix(NA, sum(coi), L)

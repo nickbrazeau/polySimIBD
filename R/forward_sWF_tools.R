@@ -124,7 +124,8 @@ get_ARG <- function(swf, nodes = NULL){
 
 
   ARGlist <- list(ARG = ARG,
-                  coal_times = coaltime.squaremat)
+                  coal_times = coaltime.squaremat.,
+                  coi = swf$coi)
 
   class(ARGlist) <- "ARGsim"
 
