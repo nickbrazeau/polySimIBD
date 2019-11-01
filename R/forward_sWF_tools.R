@@ -13,7 +13,8 @@ get_ARG <- function(swf, nodes = NULL){
 
   # graceful exits
   if(sum(swf$coi) == 1){
-    stop("Your simulation returned one parasite among all hosts (did you run N = 1 and a low mean_moi?). As such, no pairwise comparisons can be made.")
+    warning("Your simulation returned one parasite among all hosts (did you run N = 1 and a low mean_moi?). As such, no pairwise comparisons can be made.")
+    return(-9999)
   }
 
   # assertions

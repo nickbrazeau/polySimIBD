@@ -9,8 +9,9 @@ remotes::install_github("nickbrazeau/polySimIBD"); library(polySimIBD)
 
 
 # define parameters
-mean_coi <- c(10, 50, 1e2, 5e2, 1e3)
-N <- seq(from = 0, to = 100, by = 10) # one deme
+mean_coi <- c(1, 2, 5, 10, 25, 50, 1e2)
+N <- c(seq(from = 0, to = 100, by = 10), seq(from = 100, to = 1e3, by = 1e2))
+N <- unique(N)
 N[1] <- 1
 m <- seq(from = 0, to = 0.5, by = 0.1)
 m[1] <- 0.01
@@ -30,11 +31,13 @@ paramsdf$tlim <- tlim
 
 # now expand out again for sample size
 iters <- nrow(paramsdf)
-sample_size = c(2,3,5)
+sample_size = c(1,1,2,3,5,10,15)
 
 paramsdf <- lapply(1:length(sample_size), function(x) return(paramsdf)) %>%
   dplyr::bind_rows()
 paramsdf$sample_size <- rep(sample_size, iters)
+
+# remove 1 deme, mean coi of 1 (no pairwise to be made)
 
 
 # sim wrapper
