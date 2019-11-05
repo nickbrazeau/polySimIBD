@@ -31,7 +31,7 @@ paramsdf$tlim <- tlim
 
 # now expand out again for sample size
 iters <- nrow(paramsdf)
-sample_size = c(1,1,2,3,5,10,15)
+sample_size = c(2,2,2,3,5,10,15)
 
 paramsdf <- lapply(1:length(sample_size), function(x) return(paramsdf)) %>%
   dplyr::bind_rows()
