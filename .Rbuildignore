@@ -4,3 +4,9 @@
 # files for future manuscript
 ^sandbox$
 ^simulations$
+^\.travis\.yml$
+^codecov\.yml$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^appveyor\.yml$

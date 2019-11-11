@@ -6,7 +6,7 @@ setClass("bvtree",
 
 #' Find Coalescence
 #' @param swf S4 object;
-#' @importFrom magrittr %>%
+#' @param nodes int vector;
 #' @export
 
 get_ARG <- function(swf, nodes = NULL){
@@ -141,7 +141,7 @@ get_ARG <- function(swf, nodes = NULL){
 #' @param ARGsim S4 object;
 #' @param loci numeric vector; loci which we want to plot
 #' @param nodes numeric vecotr;
-#' @importFrom magrittr %>%
+#' @import ggplot2
 #' @return ggplot object of geom_segments
 #' @export
 

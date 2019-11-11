@@ -74,7 +74,7 @@ simdf <- rbind.data.frame(msprimesims.df, polySimIBDsims.df)
 simdf <- simdf %>%
   dplyr::select(c("sample_size", "pos", "model", dplyr::everything())) %>%
   tidyr::gather(., key = "Tn", value = "coaltime", 4:ncol(.)) %>%
-  dplyr::filter(!is.na(coaltime))
+  dplyr::filter(!is.na(coaltime)) 
 
 
 
@@ -85,11 +85,12 @@ simdfplotObj <- simdf %>%
   dplyr::filter(rows) %>%
   ggplot() +
   geom_density(aes(x = coaltime, y = stat(count),
-                   color = factor(model), fill = factor(model)), alpha = 0.1) +
-  facet_wrap(Tn~.) +
+                  fill = factor(model)), alpha = 0.1, color = NA) +
+  xlab("Coalescence Time") +
+  scale_fill_viridis_d("Model") +
   theme_classic() +
-  theme(axis.text.x = element_text(angle = 90))
-
+  theme(axis.text.x = element_text(angle = 90),
+        axis.title.y = element_blank())
 
 jpeg("~/Documents/GitHub/polySimIBD/simulations/msprimesims/compare_polysim_mpsrime_cont.jpg", width = 11, height = 8, res = 300, units = "in")
 plot(simdfplotObj)
@@ -144,10 +145,13 @@ simdfplotObj <- simdf %>%
   dplyr::filter(discreterows) %>%
   ggplot() +
   geom_density(aes(x = coaltime, y = stat(count),
-                   color = factor(model), fill = factor(model)), alpha = 0.1) +
+                  fill = factor(model)), color = NA, alpha = 0.1) +
   facet_wrap(Tn~.) +
+  xlab("Coalescence Time") +
+  scale_fill_viridis_d("Model") +
   theme_classic() +
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90),
+        axis.title.y = element_blank())
 
 
 

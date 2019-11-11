@@ -8,6 +8,8 @@ get_ARG(swf, nodes = NULL)
 }
 \arguments{
 \item{swf}{S4 object;}
+
+\item{nodes}{int vector;}
 }
 \description{
 Find Coalescence

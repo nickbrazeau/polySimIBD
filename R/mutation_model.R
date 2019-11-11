@@ -2,7 +2,6 @@
 #' @param ARGsim S4 object;
 #' @param mutationrate numeric; the genome-wide per-generation mutation rate
 #'
-#' @importFrom magrittr %>%
 #'
 #' @return GTmatrix numeric matrix;
 #' @export
@@ -61,7 +60,9 @@ layer_mutations_on_ARG <- function(mutationrate, ARGsim){
     } # end for loop for mutations
 
     # fill in hap matrix
-    if (max(brkpts) == t) {
+    if (is.null(brkpts)) { # same tree throughout
+      hapmat[1:nrow(hapmat), ] <- gt_l
+    } else if (max(brkpts) == t) {
       hapmat[t:nrow(hapmat), ] <- gt_l
     } else {
       hapmat[t: brkpts[ which(t == c(1, brkpts)) ], ] <- gt_l # note, we temporarily include beginning of next block, is immediately overwritten in next gen

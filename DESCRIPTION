@@ -13,11 +13,14 @@ LazyData: true
 URL: https://github.com/nickbrazeau/polySimIBD
 BugReports: https://github.com/nickbrazeau/polySimIBD/issues
 Imports:
-  ggplot2
+  ggplot2,
+  magrittr,
+  tidyr,
+  dplyr
 Suggests: 
     knitr,
     rmarkdown,
-    testthat
+    covr
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1.9000
