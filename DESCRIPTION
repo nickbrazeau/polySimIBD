@@ -19,7 +19,8 @@ Imports:
   ggplot2,
   magrittr,
   tidyr,
-  dplyr
+  dplyr,
+  broom
 Suggests: 
     knitr,
     rmarkdown,

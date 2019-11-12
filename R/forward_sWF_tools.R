@@ -121,7 +121,7 @@ get_ARG <- function(swf, parasites = NULL){
     coaltime.squaremat[[l]] <-  pairs %>%
       tidyr::spread(., key = "Var2", value = "coaltime") %>%
       dplyr::select(-c("Var1")) %>%
-      as.dist(.)
+      stats::as.dist()
 
   } #end for loop for loci
 

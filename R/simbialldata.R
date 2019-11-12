@@ -2,8 +2,7 @@
 #' @title Simulate biallelic data
 #'
 #' @description Simulate biallelic data from a simple statistical model. Inputs
-#'   include the complexity of infection (COI), population-level allele
-#'   frequencies (PLAF) and some parameters dicating skew and error
+#'   include the complexity of infection (COI) and some parameters dicating skew and error
 #'   distributions. Outputs include the phased haplotypes and the un-phased read
 #'   count and coverage data.
 #'
@@ -26,7 +25,6 @@
 #'     distribution is binomial, rather than beta-binomial.
 #'   }
 #'
-#' @param PLAF vector of population-level allele frequencies at each locus.
 #' @param haplotypematrix matrix of haplotypes that correspond to within individual COI.
 #' @param coverage coverage at each locus. If a single value then the same
 #'   coverage is applied over all loci.
@@ -38,7 +36,6 @@
 #'   \code{(1-p)/overdispersion}.
 #' @param epsilon the probability of a single read being mis-called as the other
 #'   allele. Applies in both directions.
-#'
 #' @export
 
 sim_biallelic <- function(haplotypematrix = matrix(1, 2, 2),

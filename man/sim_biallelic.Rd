@@ -23,13 +23,10 @@ the beta distribution having shape parameters \code{p/overdispersion} and
 
 \item{epsilon}{the probability of a single read being mis-called as the other
 allele. Applies in both directions.}
-
-\item{PLAF}{vector of population-level allele frequencies at each locus.}
 }
 \description{
 Simulate biallelic data from a simple statistical model. Inputs
-include the complexity of infection (COI), population-level allele
-frequencies (PLAF) and some parameters dicating skew and error
+include the complexity of infection (COI) and some parameters dicating skew and error
 distributions. Outputs include the phased haplotypes and the un-phased read
 count and coverage data.
 }
