@@ -8,6 +8,7 @@ sandbox/
 simdata/
 *.jpg
 *.svg
+*.html
 
 # mac files
 .DS_Store

@@ -10,3 +10,4 @@
 ^docs$
 ^pkgdown$
 ^appveyor\.yml$
+^R_ignore$
