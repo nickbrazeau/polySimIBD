@@ -33,7 +33,7 @@ In a similar framework, hosts can then be infected with monoclonal or polyclonal
 2. A single infectious bite transferring multiple haplotypes (Co-Transmission)
 
 <p align="center">
-![Schematic of the DL-DT sWF Malaria Model](https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/cotrans_superinfxn.png){width=500px}
+![Schematic of the DL-DT sWF Malaria Model](https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/cotransmission_superinfxn.png){width=500px}
 </p>   
   
 
