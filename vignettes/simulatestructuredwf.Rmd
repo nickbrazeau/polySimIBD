@@ -1,5 +1,5 @@
 ---
-title: "sDTWF Model Overview"
+title: "Structured DTWF Malaria Simulator Overview"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{simulatestructuredwf}
@@ -96,7 +96,7 @@ ARG <- get_ARG(swfsim, parasites = c(1,2,3,4))
 # Visualizing the Simulation
 Here, we will visualize the maringal tree for each loci. Users are able to specify which loci to visualize. Of note, you will only be able to visualize the marginal trees for the parasites that you created the ARG for in the previous section.
 
-```{r}
+```{r, fig.align = 'center', fig.width = 6, fig.height = 4, fig.retina = 5}
 plot_coalescence_trees(ARG, loci = 1)
 ```
 
