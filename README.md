@@ -22,4 +22,6 @@ This project is under active development. The Master branch will remain stable a
 
 
 ## Examples
-Please see our Vignettes and [Package Site]() for getting started.
+Please see our Vignettes tab and [Package Site](https://nickbrazeau.github.io/polySimIBD/) for examples on how to get started. 
+
+

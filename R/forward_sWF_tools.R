@@ -5,16 +5,18 @@ setClass("bvtree",
 
 
 #' Find Coalescence
-#' @param swf S4 object;
-#' @param nodes int vector;
+#' @param swf S4 object; A discrete-loci, discrete-time structured Wright Fisher Simulation
+#'            called from `sim_structured_WF`.
+#' @param parasites int vector; Terminal nodes, or parasites from the Structured Wright Fisher
+#'        Simulation for consideration.
 #' @export
 
-get_ARG <- function(swf, nodes = NULL){
+get_ARG <- function(swf, parasites = NULL){
 
   # graceful exits
   if(sum(swf$coi) == 1){
     warning("Your simulation returned one parasite among all hosts (did you run N = 1 and a low mean_moi?). As such, no pairwise comparisons can be made.")
-    return(-9999)
+    return("Only one parasite, no inference can be made")
   }
 
   # assertions
@@ -25,19 +27,19 @@ get_ARG <- function(swf, nodes = NULL){
   anc <- swf$anc
   coi <- sum(swf$coi)
 
-  if(is.null(nodes)){
-    nodes <- 1:coi
+  if(is.null(parasites)){
+    parasites <- 1:coi
   }
 
 
   ARG <- lapply(1:L, function(x) return(new("bvtree")))
-  coaltime.squaremat <- lapply(1:L, function(x) return(matrix(NA, nrow = length(nodes), ncol = length(nodes))))
+  coaltime.squaremat <- lapply(1:L, function(x) return(matrix(NA, nrow = length(parasites), ncol = length(parasites))))
 
   #...................
   # get t and c
   #...................
   for(l in 1:L){ # for each loci find time that pair coalesces
-    pairs <- as.data.frame( expand.grid(nodes, nodes) )
+    pairs <- as.data.frame( expand.grid(parasites, parasites) )
     pairs <- pairs[pairs[,1] != pairs[,2], ]
     pairs$coaltime <- rep(NA, nrow(pairs))
     for(i in 1:nrow(pairs)){ # find when each pair coalesces
@@ -58,29 +60,29 @@ get_ARG <- function(swf, nodes = NULL){
 
     # if pairs do not have a common ancestor, then set to tlim
     if(any(is.na(pairs$coaltime))){
-      pairs$coaltime[is.na(pairs$coaltime)] <- length(anc)
-      warning("Your simulation did not fully coalesce. Pairs that did not reach a common ancestor have been set to the t-limit specified in the sWF simulation.")
+      pairs$coaltime[is.na(pairs$coaltime)] <- -1
+      warning("Your simulation did not fully coalesce. Pairs that did not reach a common ancestor have been set to the t-limit of -1.")
     }
 
 
     # extract lightweight infromation for bvtree
-    # make connections for nodes always go right
-    for(i in 1:(length(nodes)-1)){
-      mintime <- min( pairs[ pairs$Var1 == nodes[i] & pairs$Var2 > i, ]$coaltime )
+    # make connections for parasites always go right
+    for(i in 1:(length(parasites)-1)){
+      mintime <- min( pairs[ pairs$Var1 == parasites[i] & pairs$Var2 > i, ]$coaltime )
 
       # only do look ahead when we aren't one right of root
-      if(i == length(nodes)-1){
+      if(i == length(parasites)-1){
         mintime.forward <- Inf
       } else {
         # loop through all pairs ahead
         mintime.ahead <- c()
-        for(j in (i+1):(length(nodes)-1)){
-          mintime.ahead <- c(mintime.ahead, min( pairs[ pairs$Var1 == nodes[j] & pairs$Var2 > j, ]$coaltime ))
+        for(j in (i+1):(length(parasites)-1)){
+          mintime.ahead <- c(mintime.ahead, min( pairs[ pairs$Var1 == parasites[j] & pairs$Var2 > j, ]$coaltime ))
         }
         mintime.ahead <- min(mintime.ahead)
       }
 
-      lineage <- pairs$Var2[ pairs$Var1 == nodes[i] & pairs$coaltime == mintime & pairs$Var2 > i ] # always make trees look "right" via pairs$Var2 > i
+      lineage <- pairs$Var2[ pairs$Var1 == parasites[i] & pairs$coaltime == mintime & pairs$Var2 > i ] # always make trees look "right" via pairs$Var2 > i
 
       if(length(lineage) > 1){ # multiple coal
         if(mintime >= mintime.ahead){ # look ahead to make sure we don't block future branches
@@ -94,8 +96,8 @@ get_ARG <- function(swf, nodes = NULL){
     }
 
     # note last node must always be root (if we are always going right)
-    ARG[[l]]@c[length(nodes)] <- -1
-    ARG[[l]]@t[length(nodes)] <- -1
+    ARG[[l]]@c[length(parasites)] <- -1
+    ARG[[l]]@t[length(parasites)] <- -1
 
 
     #...................
@@ -126,7 +128,8 @@ get_ARG <- function(swf, nodes = NULL){
 
   ARGlist <- list(ARG = ARG,
                   coal_times = coaltime.squaremat,
-                  coi = swf$coi)
+                  coi = swf$coi,
+                  parasites = parasites)
 
   class(ARGlist) <- "ARGsim"
 
@@ -138,17 +141,19 @@ get_ARG <- function(swf, nodes = NULL){
 
 
 #' plot the bvtrees
-#' @param ARGsim S4 object;
-#' @param loci numeric vector; loci which we want to plot
-#' @param nodes numeric vecotr;
+#' @param ARGsim S4 object; The ARGsim object that was created from a structured Wright
+#'        Fisher Simulation via `sim_structured_WF`` and then processed with `get_ARG`.
+#' @param loci numeric vector; Loci to plot
 #' @import ggplot2
 #' @return ggplot object of geom_segments
 #' @export
 
-plot_coalescence_trees <- function(ARGsim, loci, nodes){
+plot_coalescence_trees <- function(ARGsim, loci){
 
   assert_custom_class(x = ARGsim, c = "ARGsim")
 
+  # extract needed objects
+  parasites <- ARGsim$parasites
   ARGsim <- ARGsim$ARG[loci]
 
   # make this into a tidy dataframe for ggplot
@@ -157,26 +162,26 @@ plot_coalescence_trees <- function(ARGsim, loci, nodes){
   ARGsimdf$time <-  purrr::map(ARGsim, "t")
 
   # add in node information
-  assert_same_length(ARGsimdf$time[[1]], nodes)
-  ARGsimdf$nodes <- list(nodes)
+  assert_same_length(ARGsimdf$time[[1]], parasites)
+  ARGsimdf$parasites <- list(parasites)
 
   ARGsimdf <- ARGsimdf %>%
-    tidyr::unnest(cols = c("loci", "nodes", "con", "time")) %>%
+    tidyr::unnest(cols = c("loci", "parasites", "con", "time")) %>%
     dplyr::group_by(loci) %>%
     dplyr::mutate(time = ifelse(time == -1, max(time) + 5, time),
-                  con = ifelse(con == -1, max(nodes), con))
+                  con = ifelse(con == -1, max(parasites), con))
 
   # make vertical lines
   plotObj <- ggplot(data = ARGsimdf) +
-    geom_segment(aes(x = nodes-0.02, xend = con,
+    geom_segment(aes(x = parasites-0.02, xend = con,
                      y = time, yend = time), # horizontal lines
                  size = 1.1) +
-    geom_segment(aes(x = nodes, xend = nodes,
-                     y = 0, yend = time, color = factor(nodes)), size = 1.1) +  # veritical lines
+    geom_segment(aes(x = parasites, xend = parasites,
+                     y = 0, yend = time, color = factor(parasites)), size = 1.1) +  # veritical lines
     facet_wrap(facets = loci, scales = "free_y") +
-    xlab("Nodes") + ylab("Generations") +
+    xlab("Parasites") + ylab("Generations") +
     theme_bw() +
-    scale_x_continuous(breaks = 1:max(ARGsimdf$nodes)) +
+    scale_x_continuous(breaks = 1:max(ARGsimdf$parasites)) +
     scale_color_viridis_d() +
     theme(axis.title = element_text(family = "Helvetica", face = "bold"),
           axis.text.x = element_blank(),

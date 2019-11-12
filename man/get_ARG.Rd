@@ -4,12 +4,14 @@
 \alias{get_ARG}
 \title{Find Coalescence}
 \usage{
-get_ARG(swf, nodes = NULL)
+get_ARG(swf, parasites = NULL)
 }
 \arguments{
-\item{swf}{S4 object;}
+\item{swf}{S4 object; A discrete-loci, discrete-time structured Wright Fisher Simulation
+called from \code{sim_structured_WF}.}
 
-\item{nodes}{int vector;}
+\item{parasites}{int vector; Terminal nodes, or parasites from the Structured Wright Fisher
+Simulation for consideration.}
 }
 \description{
 Find Coalescence

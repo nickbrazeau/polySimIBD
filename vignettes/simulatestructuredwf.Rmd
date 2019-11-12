@@ -24,7 +24,7 @@ library(polySimIBD)
 # Purpose 
 The purpose of the `polySimIBD` package is to perform forwards in-time simulation of malaria population genetics. The model uses a discrete-time, discrete-loci structured Wright Fisher approximation to account for (simplified) malaria transmission dynamics.   
 
-# Brief Primer on Malaria Genetics 
+# A Brief Primer on Malaria Genetics 
 The need for a malaria-specific simulator is primarily due to the complex life-cycle of malaria and the phenomenon of multiple strains potentially infecting a single human host ("Complexity of Infection, or Multiplicity of Infection"). As part of the malaria life-cycle, parasite ploidy switches from haploid in the human host to diploid in the mosquito vector midgut. It is during this diploid stage that recombination occurs between parasites. However, not all recombination results in unique progeny, or unique haplotypes. For example, if only a single haplotype is present in the mosquite midgut (i.e. a monoclonal infection), all recombination events will "look" the same, as there is no variation for recombination to act upon. In contrast, if more than one haplotype is present in the mosquite midgut (i.e. a polyclonal infection), recombination will produce unique progeny.     
   
 In a similar framework, hosts can then be infected with monoclonal or polyclonal infections depending on the number of infectious bites they receive and the number of unique haplotypes within the mosquito vector at the time of the infectious bite. Polyclonal infections can result either from:   
@@ -38,9 +38,18 @@ In a similar framework, hosts can then be infected with monoclonal or polyclonal
   
 
 
+# A **very, very** Brief Primer on the Coalescent  
+Coalescent theory is one of the central pillars of population genetics and is a vast subject (see  Wakeley's classic textbook, Coalescent Theory: An Introduction). Essentially, coalescent theory provides a framework for how loci (genes, individuals, etc.) have been derived from a common ancestor backwards in time, classically using the assumptions of the Wright-Fisher model. One of the main assumptions of the coalescence, is that loci are independent and that no recombination is occuring between loci. To relax this assumption, we must consider the coalescence with recombination. In this framework, a single coalescent tree is no longer representative of gene (NB: gene has now been extended to genome on an interval [0, L], see [Griffiths & Marjoram 1996](http://lamastex.org/recomb/ima.pdf) for further details). Instead, each loci in the gene interval has a marignal tree due recombination resulting in different genealogical histories of loci. The collection of these trees with respect to recombination breakpoints among loci in the gene interval is termed the Ancestral Recombination Graph (ARG). 
+
+
+<p align="center">
+![ARG for Three Samples with Two Discrete Loci](https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/arg.png){width=500px}
+</p>   
+ 
+
 
 # Model Formulation
-The full mathematical formulation of the model can be found in the Supplementary Section of [Verity, Aydemic, Brazeau _et al._ 2019, Nat Comms](). As a brief lay summary, we assume that each individual host can be represented by a deme, or a subpopulation within a large population ($i \in N$, where $i$ is an individual host and $N$ is the total host population). We then allow the $J$ parasites (that reside within the host population) to mate at random with the previous generation of parasites ($t_{1-}$) and produce a large number of parasite progeny. During mating, genetic recombination has the potential to occur based on the length of the genome and the recombination rate, $\rho$. Progeny are then allowed to migrate to a new or the same host with a probability of $\frac{m}{N}$. Progeny are then culled down to a smaller number of parasites per host by drawing from a Poisson distribution with a mean COI (schematic below).
+The full mathematical formulation of the model can be found in the Supplementary Section of [Verity, Aydemic, Brazeau _et al._ 2019, Biorxiv](https://www.biorxiv.org/content/10.1101/656561v1). As a brief lay summary, we assume that each individual host can be represented by a deme, or a subpopulation within a large population ($i \in N$, where $i$ is an individual host and $N$ is the total host population). We then allow the $J$ parasites (that reside within the host population) to mate at random with the previous generation of parasites ($t_{1-}$) and produce a large number of parasite progeny. During mating, genetic recombination has the potential to occur based on the length of the genome and the recombination rate, $\rho$. Progeny are then allowed to migrate to a new or the same host with a probability of $\frac{m}{N}$. Progeny are then culled down to a smaller number of parasites per host by drawing from a Poisson distribution with a mean COI (schematic below).
 
 <p align="center">
 ![Schematic of the DL-DT sWF Malaria Model](https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/sWFmodelframework.png){width=500px}
@@ -72,3 +81,35 @@ swfsim <- sim_structured_WF(pos = pos,
 ```
   
 The discrete-loci, discrete-time structured Wright Fisher simulation outputs three objets: 
+1. A vector of COIs, where each item in the vector is the number of parasites within that host 
+2. A list that contains two matrices that correspond to the Ancestries for each parasite
+3. A vector of loci positions
+
+
+# Getting the ARG 
+Using the ancestry matrices, we can derive the most recent common ancestor (MRCA) and the time of MRCA coalescent event for each parasite ("terminal node") at each discrete loci. By deriving the MRCA and the timing of each coalescent event at each discrete loci, we are able to recreate the marginal tree for each loci and store the entire ancestral recombination graph. 
+
+```{r}
+ARG <- get_ARG(swfsim, parasites = c(1,2,3,4))
+```
+
+# Visualizing the Simulation
+Here, we will visualize the maringal tree for each loci. Users are able to specify which loci to visualize. Of note, you will only be able to visualize the marginal trees for the parasites that you created the ARG for in the previous section.
+
+```{r}
+plot_coalescence_trees(ARG, loci = 1)
+```
+
+
+# Adding Mutations 
+Finally, we can layer mutations on to each marginal tree (and the overall ARG) based on the total branch length of the coalescent tree and the user specificed per-recombination block mutation rate.
+```{r}
+hapmat <- polySimIBD::layer_mutations_on_ARG(ARG, mutationrate = 0.1)
+hapmat <- cbind(POS = swfsim$pos, hapmat)
+colnames(hapmat) <- c("POS", paste0("parasite", ARG$parasites))
+knitr::kable(hapmat)
+```
+
+
+## Closing Digressions
+You may have noticed that our coalescent trees (`bvtree` class) always coalesce "right". This is intentional and an approach to optimize looping through ancestries to get the ARG. As a result, remember that not every intersection is a true node (e.g. lines can "jump" over other lines).
