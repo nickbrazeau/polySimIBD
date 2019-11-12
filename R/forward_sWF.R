@@ -71,12 +71,7 @@ sim_structured_WF <- function(pos, N, m, rho, mean_coi, tlim){
     g <- g + 1
 
     # draw COIs
-    if(mean_coi > 10){
-      coi <- rpois(N, mean_coi)
-    } else {
-      coi <- zero_trunc_poisson(N, mean_coi)
-    }
-
+    coi <- zero_trunc_poisson(N, mean_coi)
 
     # initialize haploints
     haploint <- matrix(NA, sum(coi), L)

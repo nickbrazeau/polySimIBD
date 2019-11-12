@@ -1,5 +1,5 @@
 ---
-title: "Simulate Structure Wright Fisher Forward in Time Model for IBD"
+title: "sDTWF Model Overview"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{simulatestructuredwf}
@@ -21,6 +21,39 @@ library(polySimIBD)
 ```
 
 
+# Purpose 
+The purpose of the `polySimIBD` package is to perform forwards in-time simulation of malaria population genetics. The model uses a discrete-time, discrete-loci structured Wright Fisher approximation to account for (simplified) malaria transmission dynamics.   
+
+# Brief Primer on Malaria Genetics 
+The need for a malaria-specific simulator is primarily due to the complex life-cycle of malaria and the phenomenon of multiple strains potentially infecting a single human host ("Complexity of Infection, or Multiplicity of Infection"). As part of the malaria life-cycle, parasite ploidy switches from haploid in the human host to diploid in the mosquito vector midgut. It is during this diploid stage that recombination occurs between parasites. However, not all recombination results in unique progeny, or unique haplotypes. For example, if only a single haplotype is present in the mosquite midgut (i.e. a monoclonal infection), all recombination events will "look" the same, as there is no variation for recombination to act upon. In contrast, if more than one haplotype is present in the mosquite midgut (i.e. a polyclonal infection), recombination will produce unique progeny.     
+  
+In a similar framework, hosts can then be infected with monoclonal or polyclonal infections depending on the number of infectious bites they receive and the number of unique haplotypes within the mosquito vector at the time of the infectious bite. Polyclonal infections can result either from:   
+  
+1. Multiple infectious bites transferring unique haplotypes (Superinfection)
+2. A single infectious bite transferring multiple haplotypes (Co-Transmission)
+
+<p align="center">
+![Schematic of the DL-DT sWF Malaria Model](https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/cotrans_superinfxn.png){width=500px}
+</p>   
+  
+
+
+
+# Model Formulation
+The full mathematical formulation of the model can be found in the Supplementary Section of [Verity, Aydemic, Brazeau _et al._ 2019, Nat Comms](). As a brief lay summary, we assume that each individual host can be represented by a deme, or a subpopulation within a large population ($i \in N$, where $i$ is an individual host and $N$ is the total host population). We then allow the $J$ parasites (that reside within the host population) to mate at random with the previous generation of parasites ($t_{1-}$) and produce a large number of parasite progeny. During mating, genetic recombination has the potential to occur based on the length of the genome and the recombination rate, $\rho$. Progeny are then allowed to migrate to a new or the same host with a probability of $\frac{m}{N}$. Progeny are then culled down to a smaller number of parasites per host by drawing from a Poisson distribution with a mean COI (schematic below).
+
+<p align="center">
+![Schematic of the DL-DT sWF Malaria Model](https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/sWFmodelframework.png){width=500px}
+</p>
+
+
+  
+As can be seen from the schematic, the user-specified probability of migration, $m$, has an effect on whether or not the transmission dynamic favors Superinfection ("panmictic") or Contransmission ("independent") setting.   
+
+  
+# Simulating Data 
+Users are able to specify loci positions, `pos`, the number of Hosts in the population, `N`, the probability of migration, `m`, the recombination rate, `rho`, and the Mean COI for host parasite burden (culling of the progeny), `mean_coi`. Finally, users have the option to let the model run forwards in time until all parasites have coalesced to a single common ancestor (`tlim = Inf`), or can set a limit on the number of generations that we simulate (`tlim = <integer>`). 
+
 ```{r}
 set.seed(1)
 # define parameters
@@ -29,27 +62,13 @@ N <- 10
 m <- 0.5
 rho <- 1e-3
 mean_coi <- 3
-tlim = 1e3
 
-start <- Sys.time()
-swf <- sim_structured_WF(pos = pos,
-                         N = N, 
-                         m = m,
-                         rho = rho, 
-                         mean_coi = mean_coi,
-                         tlim = tlim
-                         )
-
-# ARG <- get_ARG(swf, nodes = c(1,3))
-end <- Sys.time()
-end-start
-
-ARG <- get_ARG(swf, nodes = c(1,2,3,4))
-ARG
-plot_coalescence_trees(ARG, loci = 1,  nodes = c(1,2,3,4))
-
-layer_mutations_on_ARG(mutationrate = 10, ARG)
-
-
-
+swfsim <- sim_structured_WF(pos = pos,
+                            N = N, 
+                            m = m,
+                            rho = rho, 
+                            mean_coi = mean_coi,
+                            tlim = Inf)
 ```
+  
+The discrete-loci, discrete-time structured Wright Fisher simulation outputs three objets: 

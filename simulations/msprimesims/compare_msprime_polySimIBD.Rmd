@@ -1,11 +1,12 @@
 ---
 title: "_msprime_ and _polySimIBD_ Comparison"
-
 output: 
   html_document:
     highlight: textmate
     theme: lumen
     code_folding: hide
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -85,7 +86,8 @@ simdfplotObj <- simdf %>%
   dplyr::filter(rows) %>%
   ggplot() +
   geom_density(aes(x = coaltime, y = stat(count),
-                  fill = factor(model)), alpha = 0.1, color = NA) +
+                  fill = factor(model)), alpha = 0.5, color = NA) +
+  facet_wrap(Tn~.) +
   xlab("Coalescence Time") +
   scale_fill_viridis_d("Model") +
   theme_classic() +
@@ -103,6 +105,36 @@ graphics.off()
 ```{r, results='asis'}
 plot(simdfplotObj)
 ```
+
+```{r}
+
+# drop rows for reasonable plot
+rows <- sample(1:nrow(simdf), size = 1e4)
+rows <- c( 1:nrow(simdf) %in% sort(rows) )
+simdfplotObj <- simdf %>%
+  dplyr::filter(rows) %>%
+  ggplot() +
+  ggridges::geom_density_ridges(aes(x = coaltime, y = factor(model),
+                  fill = factor(model)), color = NA) +
+  facet_wrap(Tn~.) +
+  xlab("Coalescence Time") +
+  scale_fill_viridis_d("Model") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, face = "bold"),
+        axis.title.y = element_blank())
+
+jpeg("~/Documents/GitHub/polySimIBD/simulations/msprimesims/compare_polysim_mpsrime_cont_ggridges.jpg", width = 11, height = 8, res = 300, units = "in")
+plot(simdfplotObj)
+graphics.off()
+
+```
+
+```{r, results='asis'}
+plot(simdfplotObj)
+```
+
+
+
 
 ```{r, results='asis'}
 
@@ -123,6 +155,8 @@ simdf.summary %>%
 
 
 ```
+
+
 
 ### Discrete
 Considering `msprime` with discretized sequencing/loci. 
@@ -145,7 +179,7 @@ simdfplotObj <- simdf %>%
   dplyr::filter(discreterows) %>%
   ggplot() +
   geom_density(aes(x = coaltime, y = stat(count),
-                  fill = factor(model)), color = NA, alpha = 0.1) +
+                  fill = factor(model)), color = NA, alpha = 0.5) +
   facet_wrap(Tn~.) +
   xlab("Coalescence Time") +
   scale_fill_viridis_d("Model") +
@@ -167,6 +201,37 @@ graphics.off()
 ```{r, results='asis'}
 plot(simdfplotObj)
 ```
+
+
+```{r}
+
+
+# drop rows for reasonable plot
+rows <- sample(1:nrow(simdf), size = 1e4)
+rows <- c( 1:nrow(simdf) %in% sort(rows) )
+simdfplotObj <- simdf %>%
+  dplyr::filter(rows) %>%
+  ggplot() +
+  ggridges::geom_density_ridges(aes(x = coaltime, y = factor(model),
+                  fill = factor(model)), color = NA) +
+  facet_wrap(Tn~.) +
+  xlab("Coalescence Time") +
+  scale_fill_viridis_d("Model") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, face = "bold"),
+        axis.title.y = element_blank())
+
+jpeg("~/Documents/GitHub/polySimIBD/simulations/msprimesims/compare_polysim_mpsrime_disc_ggridges.jpg", width = 11, height = 8, res = 300, units = "in")
+plot(simdfplotObj)
+graphics.off()
+
+```
+
+```{r, results='asis'}
+plot(simdfplotObj)
+```
+
+
 
 ```{r, results='asis'}
 
