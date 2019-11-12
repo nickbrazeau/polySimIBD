@@ -1,13 +1,16 @@
 Package: polySimIBD
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
-Authors@R: 
-    person(given = "First",
-           family = "Last",
-           role = c("aut", "cre"),
-           email = "first.last@example.com")
-Description: What the package does (one paragraph).
-License: What license it uses
+Type: Package
+Title: Structured Wright Fisher Simulator for Malarai Genetics
+Version: 0.1.0
+Authors@R: as.person(c(
+    "Nick Brazeau <nbrazeau@med.unc.edu> [aut, cre]", 
+    "Bob Verity <r.verity@imperial.ac.uk> [aut]"
+  ))
+Description: Unique features of the malaria life-cycle and transmission dynamics requires extensions 
+             of typical population genetic simulators. Using a discrete-loci, discrete-time structured 
+             Wright Fisher framework, we simulate malaria population genetics forwards in time. Users
+             are then able to capture the full Ancestral Recombination Graph.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/nickbrazeau/polySimIBD
