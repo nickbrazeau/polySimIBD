@@ -20,7 +20,8 @@ Imports:
   magrittr,
   tidyr,
   dplyr,
-  broom
+  broom,
+  cowplot
 Suggests: 
     knitr,
     rmarkdown,

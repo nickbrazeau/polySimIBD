@@ -21,6 +21,7 @@ get_ARG <- function(swf, parasites = NULL){
 
   # assertions
   assert_custom_class(x = swf, c = "sWFsim")
+  assert_gr(length(parasites), 1, message = "Parasites must be a vector of terminal nodes for consideration that is longer than 1.")
 
   # tidy up params
   L <- length(swf$pos)
@@ -171,28 +172,37 @@ plot_coalescence_trees <- function(ARGsim, loci){
     dplyr::mutate(time = ifelse(time == -1, max(time) + 5, time),
                   con = ifelse(con == -1, max(parasites), con))
 
-  # make vertical lines
-  plotObj <- ggplot(data = ARGsimdf) +
-    geom_segment(aes(x = parasites-0.02, xend = con,
-                     y = time, yend = time), # horizontal lines
-                 size = 1.1) +
-    geom_segment(aes(x = parasites, xend = parasites,
-                     y = 0, yend = time, color = factor(parasites)), size = 1.1) +  # veritical lines
-    facet_wrap(facets = loci, scales = "free_y") +
-    xlab("Parasites") + ylab("Generations") +
-    theme_bw() +
-    scale_x_continuous(breaks = 1:max(ARGsimdf$parasites)) +
-    scale_color_viridis_d() +
-    theme(axis.title = element_text(family = "Helvetica", face = "bold"),
-          axis.text.x = element_blank(),
-          axis.text.y = element_text(family = "Helvetica", face = "bold"),
-          legend.position = "none",
-          panel.grid = element_blank(),
-          panel.border = element_blank(),
-          axis.line = element_line(color = "#bdbdbd", size = 0.8)
-    )
+  # take back to mapdf
+  ARGsimdf.plotdf <- ARGsimdf %>%
+    dplyr::group_by(loci) %>%
+    tidyr::nest()
 
-  return(plotObj)
+  make_marginal_tree_plot <- function(x){
+    plotObj <- ggplot(data = x) +
+      geom_segment(aes(x = parasites-0.02, xend = con,
+                       y = time, yend = time), # horizontal lines
+                   size = 2) +
+      geom_segment(aes(x = parasites, xend = parasites,
+                       y = 0, yend = time, color = factor(parasites)),
+                   size = 2) +  # veritical lines
+      xlab("Parasites") + ylab("Generations") +
+      theme_bw() +
+      scale_x_continuous(breaks = 1:max(ARGsimdf$parasites)) +
+      scale_color_viridis_d() +
+      theme(axis.title = element_text(family = "Helvetica", face = "bold", size = 16),
+            axis.text.x = element_blank(),
+            axis.text.y = element_text(family = "Helvetica", face = "bold", size = 16),
+            legend.position = "none",
+            panel.grid = element_blank(),
+            panel.border = element_blank(),
+            axis.line = element_line(color = "#bdbdbd", size = 1.1)
+      )
+    return(plotObj)
+  }
 
+  ARGsimdf.plotdf$plots <- purrr::map(ARGsimdf.plotdf$data, make_marginal_tree_plot)
+
+  ret <- cowplot::plot_grid(plotlist = ARGsimdf.plotdf$plots, align = "v")
+  return(ret)
 
 }
