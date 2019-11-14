@@ -2,5 +2,6 @@ pandoc: 2.7.3
 pkgdown: 1.4.1
 pkgdown_sha: ~
 articles:
-  simulatestructuredwf: simulatestructuredwf.html
+  modframework_dldtstructuredwf: modframework_dldtstructuredwf.html
+  simdata: simdata.html
 

@@ -36,10 +36,19 @@ layer_mutations_on_ARG <- function(mutationrate, ARGsim){
 
     # branch lengths, make root equal to max
     brnchlngth <- coalbvtree@t
-    brnchlngth[brnchlngth == -1] <- max(brnchlngth)
+
+    # catch if no coalescence (all roots)
+    if (max(brnchlngth) == -1 ) {
+      alltreesbrnchlngth <- unlist( purrr::map(ARGsim$ARG, "t") )
+      brnchlngth[brnchlngth == -1] <- max(alltreesbrnchlngth) # just set to max time in simulation
+
+    } else {
+      brnchlngth[brnchlngth == -1] <- max(brnchlngth)
+    }
 
     Tbrnchlngth <- sum(brnchlngth) # total branch length
     mutn <- rpois(n = 1, lambda = mutationrate*Tbrnchlngth) # number of mutations
+
     if (mutn > 0){
 
       mutg <-  sort( runif(n=mutn, min = 0, max = Tbrnchlngth ) )  # need runif for infinite allele model

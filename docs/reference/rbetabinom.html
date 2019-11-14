@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Layer Mutations onto the ARG for Each Loci — layer_mutations_on_ARG • polySimIBD</title>
+<title>Draw from Beta-binomial distribution — rbetabinom • polySimIBD</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Layer Mutations onto the ARG for Each Loci — layer_mutations_on_ARG" />
-<meta property="og:description" content="Layer Mutations onto the ARG for Each Loci" />
+<meta property="og:title" content="Draw from Beta-binomial distribution — rbetabinom" />
+<meta property="og:description" content="Draw from Beta-binomial distribution." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -120,40 +120,44 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Layer Mutations onto the ARG for Each Loci</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nickbrazeau/polySimIBD/blob/master/R/mutation_model.R'><code>R/mutation_model.R</code></a></small>
-    <div class="hidden name"><code>layer_mutations_on_ARG.Rd</code></div>
+    <h1>Draw from Beta-binomial distribution</h1>
+    <small class="dont-index">Source: <a href='https://github.com/nickbrazeau/polySimIBD/blob/master/R/probability_v1.R'><code>R/probability_v1.R</code></a></small>
+    <div class="hidden name"><code>rbetabinom.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Layer Mutations onto the ARG for Each Loci</p>
+    <p>Draw from Beta-binomial distribution.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>layer_mutations_on_ARG</span>(<span class='no'>mutationrate</span>, <span class='no'>ARGsim</span>)</pre>
+    <pre class="usage"><span class='fu'>rbetabinom</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>beta</span> <span class='kw'>=</span> <span class='fl'>1</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>mutationrate</th>
-      <td><p>numeric; the genome-wide per-generation mutation rate</p></td>
+      <th>n</th>
+      <td><p>number of draws.</p></td>
     </tr>
     <tr>
-      <th>ARGsim</th>
-      <td><p>S4 object;</p></td>
+      <th>k</th>
+      <td><p>number of binomial trials.</p></td>
+    </tr>
+    <tr>
+      <th>alpha</th>
+      <td><p>first shape parameter of beta distribution.</p></td>
+    </tr>
+    <tr>
+      <th>beta</th>
+      <td><p>second shape parameter of beta distribution.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>GTmatrix numeric matrix;</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
     </ul>
 
   </div>

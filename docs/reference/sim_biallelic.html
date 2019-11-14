@@ -37,8 +37,7 @@
 
 <meta property="og:title" content="Simulate biallelic data — sim_biallelic" />
 <meta property="og:description" content="Simulate biallelic data from a simple statistical model. Inputs
-include the complexity of infection (COI), population-level allele
-frequencies (PLAF) and some parameters dicating skew and error
+include the complexity of infection (COI) and some parameters dicating skew and error
 distributions. Outputs include the phased haplotypes and the un-phased read
 count and coverage data." />
 <meta name="twitter:card" content="summary" />
@@ -96,7 +95,10 @@ count and coverage data." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/simulatestructuredwf.html">Structured DTWF Malaria Simulator Overview</a>
+      <a href="../articles/modframework_dldtstructuredwf.html">Structured DTWF Malaria Model Overview</a>
+    </li>
+    <li>
+      <a href="../articles/simdata.html">Simulating Data</a>
     </li>
   </ul>
 </li>
@@ -128,18 +130,21 @@ count and coverage data." />
 
     <div class="ref-description">
     <p>Simulate biallelic data from a simple statistical model. Inputs
-include the complexity of infection (COI), population-level allele
-frequencies (PLAF) and some parameters dicating skew and error
+include the complexity of infection (COI) and some parameters dicating skew and error
 distributions. Outputs include the phased haplotypes and the un-phased read
 count and coverage data.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sim_biallelic</span>(<span class='kw'>haplotypematrix</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>2</span>), <span class='kw'>coverage</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>overdispersion</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>epsilon</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
+    <pre class="usage"><span class='fu'>sim_biallelic</span>(<span class='kw'>COIs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>1</span>), <span class='kw'>haplotypematrix</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>2</span>),
+  <span class='kw'>coverage</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>overdispersion</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>epsilon</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>COIs</th>
+      <td><p>integer vector of the number of haplotypes within each sample.</p></td>
+    </tr>
     <tr>
       <th>haplotypematrix</th>
       <td><p>matrix of haplotypes that correspond to within individual COI.</p></td>
@@ -166,12 +171,12 @@ the beta distribution having shape parameters <code>p/overdispersion</code> and
       <td><p>the probability of a single read being mis-called as the other
 allele. Applies in both directions.</p></td>
     </tr>
-    <tr>
-      <th>PLAF</th>
-      <td><p>vector of population-level allele frequencies at each locus.</p></td>
-    </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>List of non-referent within-sample allele frequency dataframe (unphased) and phased vectors
+of non-referent within-sample allele counts, overall coverage, strain proportions, and the biallelic haplotype matrix.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Simulated data are drawn from a simple statistical model:</p><ol>
@@ -198,6 +203,7 @@ distribution is binomial, rather than beta-binomial.</p></li>
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
       <li><a href="#details">Details</a></li>
     </ul>
 

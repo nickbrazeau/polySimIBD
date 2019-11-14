@@ -1,5 +1,5 @@
 ---
-title: "Structured DTWF Malaria Simulator Overview"
+title: "Structured DTWF Malaria Model Overview"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{simulatestructuredwf}
@@ -60,7 +60,7 @@ The full mathematical formulation of the model can be found in the Supplementary
 As can be seen from the schematic, the user-specified probability of migration, $m$, has an effect on whether or not the transmission dynamic favors Superinfection ("panmictic") or Contransmission ("independent") setting.   
 
   
-# Simulating Data 
+# Understanding the Simulator  
 Users are able to specify loci positions, `pos`, the number of Hosts in the population, `N`, the probability of migration, `m`, the recombination rate, `rho`, and the Mean COI for host parasite burden (culling of the progeny), `mean_coi`. Finally, users have the option to let the model run forwards in time until all parasites have coalesced to a single common ancestor (`tlim = Inf`), or can set a limit on the number of generations that we simulate (`tlim = <integer>`). 
 
 ```{r}
@@ -100,7 +100,6 @@ Here, we will visualize the maringal tree for each loci. Users are able to speci
 plot_coalescence_trees(ARG, loci = c(1, 3, 5, 10))
 ```
 
-
 # Adding Mutations 
 Finally, we can layer mutations on to each marginal tree (and the overall ARG) based on the total branch length of the coalescent tree and the user specificed per-recombination block mutation rate.
 ```{r}
@@ -111,5 +110,7 @@ knitr::kable(hapmat)
 ```
 
 
-## Closing Digressions
+# Conclusion
+Up until this point, we have ignored within host COI and have only analyzed parasites as independent infections. In the next vignette [Simulating Data])(https://nickbrazeau.github.io/polySimIBD/articles/simdata.html), we will explore how to convert our marginal tree and forward model into genomic data.   
+  
 You may have noticed that our coalescent trees (`bvtree` class) always coalesce "right". This is intentional and an approach to optimize looping through ancestries to get the ARG. As a result, remember that not every intersection is a true node (e.g. lines can "jump" over other lines).

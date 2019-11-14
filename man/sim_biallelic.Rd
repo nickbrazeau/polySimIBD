@@ -4,10 +4,12 @@
 \alias{sim_biallelic}
 \title{Simulate biallelic data}
 \usage{
-sim_biallelic(haplotypematrix = matrix(1, 2, 2), coverage = 100,
-  alpha = 1, overdispersion = 0, epsilon = 0)
+sim_biallelic(COIs = c(1, 1), haplotypematrix = matrix(1, 2, 2),
+  coverage = 100, alpha = 1, overdispersion = 0, epsilon = 0)
 }
 \arguments{
+\item{COIs}{integer vector of the number of haplotypes within each sample.}
+
 \item{haplotypematrix}{matrix of haplotypes that correspond to within individual COI.}
 
 \item{coverage}{coverage at each locus. If a single value then the same
@@ -23,6 +25,10 @@ the beta distribution having shape parameters \code{p/overdispersion} and
 
 \item{epsilon}{the probability of a single read being mis-called as the other
 allele. Applies in both directions.}
+}
+\value{
+List of non-referent within-sample allele frequency dataframe (unphased) and phased vectors
+of non-referent within-sample allele counts, overall coverage, strain proportions, and the biallelic haplotype matrix.
 }
 \description{
 Simulate biallelic data from a simple statistical model. Inputs
