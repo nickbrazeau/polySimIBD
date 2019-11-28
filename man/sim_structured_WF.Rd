@@ -27,7 +27,7 @@ Parasites are then indexed into demes (individuals) based on the COI distributio
 \description{
 Simulate a population forwards with recombination that approximates the Structured Wright Fisher Process
 and tracks haplotype identity by descent where individuals represent demes, such that within
-a deme individual-level COI is considered
+a deme individual-level COI is considered.
 
 if mean_coi > 10, then we say the zero-trunc approximates the pois
 }

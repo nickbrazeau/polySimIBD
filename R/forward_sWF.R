@@ -2,7 +2,7 @@
 #'
 #' @description Simulate a population forwards with recombination that approximates the Structured Wright Fisher Process
 #' and tracks haplotype identity by descent where individuals represent demes, such that within
-#' a deme individual-level COI is considered
+#' a deme individual-level COI is considered.
 #'
 #' @param pos dataframe <factor><numeric>; the genomic coordinates for chromosome and position of the sites
 #' @param N numeric; The number of individuals to consider
