@@ -121,3 +121,42 @@ sim_structured_WF <- function(pos, N, m, rho, mean_coi, tlim){
 
 
 }
+
+#------------------------------------------------
+#' @title TODO
+#'
+#' @description TODO.
+#'
+#' @param x TODO
+#'
+#' @export
+
+sim_swf <- function(pos, N, m, rho, mean_coi, tlim){
+
+  # assertions
+  assert_vector(pos)
+  assert_numeric(pos)
+  assert_single_pos_int(N, zero_allowed = FALSE)
+  assert_bounded(m, left = 0, right = 1)
+  assert_bounded(rho, left = 0, right = 1, inclusive_left = FALSE, inclusive_right = FALSE)
+  assert_single_pos(mean_coi, zero_allowed = FALSE)
+  assert_single_pos_int(tlim, zero_allowed = FALSE)
+
+  # warnings
+  if (m == 0 & N > 1) {
+    warning("You have set the migration rate to 0 but have more than one deme. As a result, all of your samples can never coalesce and this simulation will be limited by the tlim argument")
+  }
+
+  # define argument list
+  args <- list(pos = pos,
+               N = N,
+               m = m,
+               rho = rho,
+               mean_coi = mean_coi,
+               tlim = tlim)
+
+  # run efficient C++ function
+  output_raw <- sim_swf_cpp(args)
+
+  return(output_raw)
+}
