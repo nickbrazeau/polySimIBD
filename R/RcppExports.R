@@ -2,6 +2,6 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 sim_swf_cpp <- function(args) {
-    .Call('_polySimIBD_sim_swf_cpp', PACKAGE = 'polySimIBD', args)
+    .Call(`_polySimIBD_sim_swf_cpp`, args)
 }
 

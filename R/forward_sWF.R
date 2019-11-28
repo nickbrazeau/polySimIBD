@@ -146,15 +146,20 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim){
   if (m == 0 & N > 1) {
     warning("You have set the migration rate to 0 but have more than one deme. As a result, all of your samples can never coalesce and this simulation will be limited by the tlim argument")
   }
-
+  
+  # precalculate probability of an odd number of recombination events between
+  # any interval
+  odd_prob <- exp(-rho*diff(pos))*sinh(rho*diff(pos))
+  
   # define argument list
   args <- list(pos = pos,
                N = N,
                m = m,
                rho = rho,
                mean_coi = mean_coi,
-               tlim = tlim)
-
+               tlim = tlim,
+               odd_prob = odd_prob)
+  
   # run efficient C++ function
   output_raw <- sim_swf_cpp(args)
 
