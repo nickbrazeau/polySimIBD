@@ -27,6 +27,10 @@
 #'
 #' @param COIs integer vector of the number of haplotypes within each sample.
 #' @param haplotypematrix matrix of haplotypes that correspond to within individual COI.
+#' @param shape1 the alpha value for the beta binomial distribution, which the population-allele frequency
+#' for each allele is drawn from.
+#' @param shape2 the beta value for the beta binomial distribution, which the population-allele frequency
+#' for each allele is drawn from.
 #' @param coverage coverage at each locus. If a single value then the same
 #'   coverage is applied over all loci.
 #' @param alpha shape parameter of the symmetric Dirichlet prior on strain
@@ -44,6 +48,8 @@
 
 sim_biallelic <- function(COIs = c(1,1),
                           haplotypematrix = matrix(1, 2, 2),
+                          shape1 = 1, 
+                          shape2  = 1, 
                           coverage = 100,
                           alpha = 1,
                           overdispersion = 0,
@@ -63,20 +69,23 @@ sim_biallelic <- function(COIs = c(1,1),
   assert_single_pos(overdispersion, zero_allowed = TRUE)
   assert_single_pos(epsilon, zero_allowed = TRUE)
   assert_bounded(epsilon)
-
   assert_eq(x = sum(COIs), y = ncol(haplotypematrix),
             message = "The COIsum must be equal to the number of columns in your haplotype matrix")
 
 
 
   # generate biallelic table from PLAF of haplotype
+  PLAF <- rbeta(n = nrow(m), shape1 = shape1, shape2 = shape2)
+  
   m <- haplotypematrix
   for(i in 1:nrow(m)){
     uniqueAllele <- unique( m[i, ] )
 
     if (!all(uniqueAllele %in% c(0,1))) {
-      # multiallelic (multiallelic to biallelic 50-50 for now)
-      liftoverAlleles <- sample(x = c(0,1), size = length(uniqueAllele[! uniqueAllele %in% c(0,1)]), replace = T)
+      liftoverAlleles <- sample(x = c(0,1), 
+                                size = length(uniqueAllele[! uniqueAllele %in% c(0,1)]),
+                                prob = c(PLAF[i], (1-PLAF[i])), 
+                                replace = T)
       names(liftoverAlleles) <- uniqueAllele[! uniqueAllele %in% c(0,1)]
     }
     for (j in 1:length(liftoverAlleles)) {
@@ -85,59 +94,53 @@ sim_biallelic <- function(COIs = c(1,1),
     }
   }
 
-  # get COI matrices
-  start <- c(1, (COIs+1)[1:(length(COIs)-1)])
-  end <- cumsum(COIs)
-  COIsplitter <- cbind(start, end)
-  COIsplitter <- apply(COIsplitter, 1, function(x){return(x[1]:x[2])})
-  smpls.list <- lapply(COIsplitter, function(x){
-    return(m[,x])
-  })
+  # split the haplotype matrix into individual (host) matrices 
+  splitter <- rep(1:length(COIs), times = COIs)
+  hosts.haplotypes <- NULL
+  for (i in 1:length(unique(splitter))) {
+    hosthap <- m[, c( splitter == i )]
+    hosts.haplotypes <- c(hosts.haplotypes, list(hosthap))
+  }
+  
 
-  # generate strain proportions
+  # generate strain proportions by drawing from dirichlet
   w <- polySimIBD::rdirichlet(rep(alpha, sum(COIs)))
-  w.list <- lapply(COIsplitter, function(x){
-    return(w[x])
-  })
+  # make this a list that corresponds to within host COIs from above
+  w.list <- split(w, factor(splitter))
+  w.list <- lapply(w.list, function(x){x/sum(unlist(x))})
 
 
   # true WSAF levels by summing binomial draws over strain proportions
-  get_p_levels <- function(m, w, L){
-
-    if(length(m) == L) { # COI of 1
-      p_levels <- m * w
+  get_wsaf <- function(x, y){
+    if(length(y) == 1){
+      ret <- x * y
     } else {
-      p_levels <- rowSums(sweep(m, 2, w, "*"))
-
+      ret <- rowSums(sweep(x, 2, y, "*"))
     }
-
-    return(p_levels)
   }
-
-  p_levels.list <- mapply(m = smpls.list, w = w.list, L = L, get_p_levels)
-
-  # add in genotyping error
-  addgenotype_error <- function(p_levels, epsilon){
-    p_error <- p_levels*(1-epsilon) + (1-p_levels)*epsilon
-    return(p_error)
-  }
-
-  p_error.list <- mapply(p_levels = p_levels.list, epsilon = epsilon, addgenotype_error)
+  host.wsaf <- mapply(get_wsaf, hosts.haplotypes, w.list)
+  
+  # add in gentoyping error
+  # Note, genotyping error is fixed
+  host.wsaf.genotypeerror <- host.wsaf * (1-epsilon) + (1-host.wsaf)*epsilon
+  
 
   # draw read counts, taking into account overdispersion
   get_read_counts <- function(L, coverage, p_error, overdispersion){
     if (overdispersion == 0) {
       counts <- rbinom(L, size = coverage, prob = p_error)
     } else {
-      counts <- rbetabinom(L, k = coverage, alpha = p_error/overdispersion, beta = (1-p_error)/overdispersion)
+      counts <- rbetabinom(L, k = coverage, alpha = p_error/overdispersion, 
+                           beta = (1-p_error)/overdispersion)
     }
     return(counts)
-
   }
 
   # get counts
-  counts <- mapply(p_error = p_error.list, L = L, coverage = coverage, overdispersion = overdispersion,
-                   get_read_counts)
+  counts <- apply(host.wsaf.genotypeerror, 2, get_read_counts, 
+                  L = L, 
+                  coverage = coverage, 
+                  overdispersion = overdispersion)
 
   # split into samples
   smpls.list <- lapply(COIsplitter, function(x){
@@ -146,18 +149,8 @@ sim_biallelic <- function(COIs = c(1,1),
 
 
   # convert counts and coverage to NRWSAF
-  NRWSAF <- matrix(NA, nrow = L, ncol = length(COIs))
-  # anon functions to summarize counts and divide by coverage to get NSWRAF
-  NRWSAF <- sapply(smpls.list,
-                   function(x, coverage){
-                     if (is.null(dim(x))) {
-                       ret <- x/coverage
-                     } else {
-                       ret <- rowSums(x)/(coverage*ncol(x))
-                     }
-                     return(as.matrix(ret))
-                   },
-                   coverage = coverage)
+  coverage <- matrix( rep(coverage, times = length(COIs)), ncol = length(COIs) )
+  NRWSAF <- counts/coverage
 
   # save out positions
   NRWSAFdf <- cbind.data.frame(POS = pos, NRWSAF)
@@ -165,8 +158,8 @@ sim_biallelic <- function(COIs = c(1,1),
 
 
   # return list
-  ret <- list(strain_proportions = w,
-              haplotypematrix.biall = m,
+  ret <- list(strain_proportions = w.list,
+              hosts.haplotypes = hosts.haplotypes,
               NRWSAcounts = counts,
               WS.coverage = coverage,
               NRWSAFdf = NRWSAFdf)
