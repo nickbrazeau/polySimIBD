@@ -21,7 +21,7 @@ void Host::init(double mean_coi, int L) {
 }
 
 //------------------------------------------------
-// draws parents of every hapotype from within deme k
+// draws parents of every hapotype 
 void Host::draw(int i, int N, double m, const vector<Host> &prev_pop,
                 const vector<double> &odd_prob, int L) {
   

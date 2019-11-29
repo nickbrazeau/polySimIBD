@@ -50,11 +50,21 @@ Rcpp::List sim_swf_cpp(Rcpp::List args) {
   }
   
   // store ancestry array
-  vector<vector<vector<int>>> anc(tlim);
+  vector<vector<vector<int>>> recomb(tlim);
+  vector<vector<int>> parent_host1(tlim);
+  vector<vector<int>> parent_host2(tlim);
+  vector<vector<int>> parent_haplo1(tlim);
+  vector<vector<int>> parent_haplo2(tlim);
+  
   for (int t = 0; t < tlim; ++t) {
     for (int i = 0; i < N; ++i) {
       for (int j = 0; j < pop[t][i].coi; ++j) {
-        anc[t].push_back(pop[t][i].haplo_vec[j].parent_vec);
+        recomb[t].push_back(pop[t][i].haplo_vec[j].parent_vec);
+        parent_host1[t].push_back(pop[t][i].haplo_vec[j].pat_ind);
+        parent_host2[t].push_back(pop[t][i].haplo_vec[j].mat_ind);
+        parent_haplo1[t].push_back(pop[t][i].haplo_vec[j].pat_hap);
+        parent_haplo2[t].push_back(pop[t][i].haplo_vec[j].mat_hap);
+        
       }
     }
   }
@@ -63,6 +73,10 @@ Rcpp::List sim_swf_cpp(Rcpp::List args) {
   chrono_timer(t1);
   
   return Rcpp::List::create(Rcpp::Named("coi") = coi,
-                            Rcpp::Named("anc") = anc);
+                            Rcpp::Named("recomb") = recomb,
+                            Rcpp::Named("parent_host1") = parent_host1,
+                            Rcpp::Named("parent_host2") = parent_host2,
+                            Rcpp::Named("parent_haplo1") = parent_haplo1,
+                            Rcpp::Named("parent_haplo2") = parent_haplo2);
 }
 

@@ -12,12 +12,10 @@ public:
   // PUBLIC OBJECTS
   
   // 'maternal' properties
-  int mat_deme;
   int mat_ind;
   int mat_hap;
   
   // 'paternal' properties
-  int pat_deme;
   int pat_ind;
   int pat_hap;
   

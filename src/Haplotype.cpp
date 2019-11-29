@@ -46,6 +46,7 @@ void Haplotype::populate(int parent1, int haplo1,
     parent_vec[i] = switcher;
   }
   
+  print_haplo();
 }
 
 //------------------------------------------------
@@ -53,8 +54,8 @@ void Haplotype::populate(int parent1, int haplo1,
 void Haplotype::print_haplo() {
   
   print_stars();
-  print("maternal:", mat_deme, mat_ind, mat_hap);
-  print("paternal:", pat_deme, pat_ind, pat_hap);
+  print("maternal:", mat_ind, mat_hap);
+  print("paternal:", pat_ind, pat_hap);
   print_vector(parent_vec);
   
 }
