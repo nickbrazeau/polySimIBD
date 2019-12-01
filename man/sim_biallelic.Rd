@@ -7,6 +7,8 @@
 sim_biallelic(
   COIs = c(1, 1),
   haplotypematrix = matrix(1, 2, 2),
+  shape1 = 1,
+  shape2 = 1,
   coverage = 100,
   alpha = 1,
   overdispersion = 0,
@@ -17,6 +19,12 @@ sim_biallelic(
 \item{COIs}{integer vector of the number of haplotypes within each sample.}
 
 \item{haplotypematrix}{matrix of haplotypes that correspond to within individual COI.}
+
+\item{shape1}{the alpha value for the beta binomial distribution, which the population-allele frequency
+for each allele is drawn from.}
+
+\item{shape2}{the beta value for the beta binomial distribution, which the population-allele frequency
+for each allele is drawn from.}
 
 \item{coverage}{coverage at each locus. If a single value then the same
 coverage is applied over all loci.}
