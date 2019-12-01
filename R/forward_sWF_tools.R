@@ -1,9 +1,10 @@
+#------------------------------------------------
 #' internal class
 #' @noRd
 setClass("bvtree",
          slots=list(c="numeric", t="numeric", z="numeric"))
 
-
+#------------------------------------------------
 #' Find Coalescence
 #' @param swf S4 object; A discrete-loci, discrete-time structured Wright Fisher Simulation
 #'            called from `sim_structured_WF`.

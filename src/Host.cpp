@@ -26,7 +26,7 @@ void Host::draw(int i, int N, double m, const vector<Host> &prev_pop,
                 const vector<double> &odd_prob, int L) {
   
   // loop through every haplotype
-  for (int i = 0; i < coi; ++i) {
+  for (int j = 0; j < coi; ++j) {
     
     // draw parental hosts
     int parent_host1 = rbernoulli1(m) ? sample2(0, N-1) : i;
@@ -36,7 +36,7 @@ void Host::draw(int i, int N, double m, const vector<Host> &prev_pop,
     int parent_haplo2 = sample2(0, prev_pop[parent_host2].coi-1);
     
     // fill in haplotype details
-    haplo_vec[i].populate(parent_host1, parent_haplo1,
+    haplo_vec[j].populate(parent_host1, parent_haplo1,
                           parent_host2, parent_haplo2,
                           odd_prob, L);
     

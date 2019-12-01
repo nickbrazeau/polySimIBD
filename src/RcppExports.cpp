@@ -16,9 +16,35 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// get_arg_cpp
+Rcpp::List get_arg_cpp(Rcpp::List args);
+RcppExport SEXP _polySimIBD_get_arg_cpp(SEXP argsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type args(argsSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_arg_cpp(args));
+    return rcpp_result_gen;
+END_RCPP
+}
+// subset_bvtree_cpp
+Rcpp::List subset_bvtree_cpp(std::vector<int> c, std::vector<int> t, std::vector<int> m);
+RcppExport SEXP _polySimIBD_subset_bvtree_cpp(SEXP cSEXP, SEXP tSEXP, SEXP mSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::vector<int> >::type c(cSEXP);
+    Rcpp::traits::input_parameter< std::vector<int> >::type t(tSEXP);
+    Rcpp::traits::input_parameter< std::vector<int> >::type m(mSEXP);
+    rcpp_result_gen = Rcpp::wrap(subset_bvtree_cpp(c, t, m));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_polySimIBD_sim_swf_cpp", (DL_FUNC) &_polySimIBD_sim_swf_cpp, 1},
+    {"_polySimIBD_get_arg_cpp", (DL_FUNC) &_polySimIBD_get_arg_cpp, 1},
+    {"_polySimIBD_subset_bvtree_cpp", (DL_FUNC) &_polySimIBD_subset_bvtree_cpp, 3},
     {NULL, NULL, 0}
 };
 
