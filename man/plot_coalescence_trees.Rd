@@ -8,7 +8,7 @@ plot_coalescence_trees(ARGsim, loci)
 }
 \arguments{
 \item{ARGsim}{S4 object; The ARGsim object that was created from a structured Wright
-Fisher Simulation via \code{sim_structured_WF`` and then processed with }get_ARG`.}
+Fisher Simulation via \code{sim_structured_WF} and then processed with \code{get_ARG}.}
 
 \item{loci}{numeric vector; Loci to plot}
 }

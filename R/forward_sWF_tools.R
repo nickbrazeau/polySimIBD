@@ -143,7 +143,7 @@ get_ARG <- function(swf, parasites = NULL){
 
 #' plot the bvtrees
 #' @param ARGsim S4 object; The ARGsim object that was created from a structured Wright
-#'        Fisher Simulation via `sim_structured_WF`` and then processed with `get_ARG`.
+#'        Fisher Simulation via `sim_structured_WF` and then processed with `get_ARG`.
 #' @param loci numeric vector; Loci to plot
 #' @import ggplot2
 #' @return ggplot object of geom_segments

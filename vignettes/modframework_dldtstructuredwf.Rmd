@@ -70,14 +70,17 @@ pos <- seq(1,1e3,1e2)
 N <- 10
 m <- 0.5
 rho <- 1e-3
-mean_coi <- 3
+mean_coi <- 1
+tlim <- 1e2
 
 swfsim <- sim_structured_WF(pos = pos,
                             N = N, 
                             m = m,
                             rho = rho, 
                             mean_coi = mean_coi,
-                            tlim = Inf)
+                            tlim = tlim)
+
+
 ```
   
 The discrete-loci, discrete-time structured Wright Fisher simulation outputs three objets: 

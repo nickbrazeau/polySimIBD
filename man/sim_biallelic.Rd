@@ -4,8 +4,14 @@
 \alias{sim_biallelic}
 \title{Simulate biallelic data}
 \usage{
-sim_biallelic(COIs = c(1, 1), haplotypematrix = matrix(1, 2, 2),
-  coverage = 100, alpha = 1, overdispersion = 0, epsilon = 0)
+sim_biallelic(
+  COIs = c(1, 1),
+  haplotypematrix = matrix(1, 2, 2),
+  coverage = 100,
+  alpha = 1,
+  overdispersion = 0,
+  epsilon = 0
+)
 }
 \arguments{
 \item{COIs}{integer vector of the number of haplotypes within each sample.}
