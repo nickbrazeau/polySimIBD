@@ -2,13 +2,27 @@
 % Please edit documentation in R/forward_sWF.R
 \name{sim_swf}
 \alias{sim_swf}
-\title{TODO}
+\title{Run forwards simulation from structured Wright-Fisher model}
 \usage{
 sim_swf(pos, N, m, rho, mean_coi, tlim)
 }
 \arguments{
-\item{x}{TODO}
+\item{pos}{genomic positions of loci to track}
+
+\item{N}{number of hosts}
+
+\item{m}{migration parameter, dictating the balance between co-transmission
+(small m) and super-infection (large m)}
+
+\item{rho}{rate of recombination, in bp per generation}
+
+\item{mean_coi}{the COI of every host is drawn from a zero-truncated Poisson
+distribution with mean \code{mean_coi/(1 -exp(-mean_coi))}}
+
+\item{tlim}{run for this many generations}
 }
 \description{
-TODO.
+Run forwards simulation from structured Wright-Fisher model, in
+which "demes" correspond to human hosts, and fluctuating population sizes
+over generations correspond to changing COIs of individuals.
 }

@@ -5,3 +5,11 @@ sim_swf_cpp <- function(args) {
     .Call(`_polySimIBD_sim_swf_cpp`, args)
 }
 
+get_arg_cpp <- function(args) {
+    .Call(`_polySimIBD_get_arg_cpp`, args)
+}
+
+subset_bvtree_cpp <- function(c, t, m) {
+    .Call(`_polySimIBD_subset_bvtree_cpp`, c, t, m)
+}
+

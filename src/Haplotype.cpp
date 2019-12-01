@@ -16,6 +16,13 @@ Haplotype::Haplotype(int L) {
 // initialise haplotype
 void Haplotype::init(int L) {
   
+  // populate parental fields
+  mat_ind = -1;
+  mat_hap = -1;
+  
+  pat_ind = -1;
+  pat_hap = -1;
+  
   // initialse parental vector
   parent_vec = vector<int>(L);
   
@@ -46,7 +53,6 @@ void Haplotype::populate(int parent1, int haplo1,
     parent_vec[i] = switcher;
   }
   
-  print_haplo();
 }
 
 //------------------------------------------------
