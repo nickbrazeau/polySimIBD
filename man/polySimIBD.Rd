@@ -3,6 +3,7 @@
 \docType{package}
 \name{polySimIBD}
 \alias{polySimIBD}
+\alias{polySimIBD-package}
 \title{Structured Wright Fisher Simulator for Malarai Genetics}
 \description{
 Unique features of the malaria life-cycle and transmission
