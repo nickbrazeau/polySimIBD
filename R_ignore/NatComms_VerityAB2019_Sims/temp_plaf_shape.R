@@ -22,7 +22,6 @@ pos <- seq(0,1e6,1e4) # assuming 1 million base-pairs and a SNP every 10,000 bp
 N <- 10 # small Effective Pop size
 m <- 0.5 # intermediate co-transmission, superinfxn
 rho <- 1e-3
-mean_coi <- 2
 tlim <- 10
 genome_length <- 23e6
 mut_rate <- 0 #2.45e-10 * 23e6/length(pos) 

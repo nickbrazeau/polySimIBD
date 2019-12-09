@@ -13,14 +13,14 @@ source("R_ignore/NatComms_VerityAB2019_Sims/utils.R")
 # Aimee gets this number by taking the inverse of Mile's estiamte of the CO recombination rate of 13.5 kb/cM
 #
 
-pos <- seq(0,1e6,5e5) # assuming 1 million base-pairs and a SNP every 10,000 bp
+pos <- seq(0,1e6,1e4) # assuming 1 million base-pairs and a SNP every 10,000 bp
 N <- 100 # small Effective Pop size
 m <- 0.1 # intermediate co-transmission, superinfxn
 rho <- 1e-3
-mean_coi <- 2
+mean_coi <- 0.1
 tlim <- 10
 genome_length <- 23e6
-mut_rate <- 2.45e-10 * 23e6/length(pos) * tlim # treating loci as blocks
+mut_rate <- 0 #2.45e-10 * 23e6/length(pos) * tlim # treating loci as blocks
 hosts <- 1:2
 
 
@@ -65,7 +65,7 @@ trueIBD <- trueIBD %>%
   dplyr::select(c("smpl1", "smpl2", "IBDprop"))
 
 # note trueIBD has both relationships
-# ignores transitivity
+# ignores transitivity which is ok bc of left join later
 
 #plot_coalescence_trees(ARG)
 
@@ -86,7 +86,6 @@ WSAF.list <- polySimIBD::sim_biallelic(COIs = this_coi,
                                        overdispersion = 0.1,
                                        epsilon = 0.05)
 
-
 # run Bob's MLE 
 ret <- wrap_MIPanalyzer_inbreeding_mle_cpp(
   WSAF.list = WSAF.list,
@@ -102,4 +101,6 @@ colnames(ret$mle) <- rownames(ret$mle) <- 1:length(this_coi)
 ret.long <- broom::tidy(as.dist(ret$mle)) %>%  
   magrittr::set_colnames(c("smpl1", "smpl2", "malecotf")) %>% 
   dplyr::left_join(., y = trueIBD, by = c("smpl1", "smpl2"))
+
+
 

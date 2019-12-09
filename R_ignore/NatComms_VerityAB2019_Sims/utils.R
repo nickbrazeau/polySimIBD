@@ -19,10 +19,10 @@ wrap_MIPanalyzer_inbreeding_mle_cpp <- function(WSAF.list,
   wsaf <- as.matrix(wsaf)
   
   # get population allele frequencies based on haplotype biallelic matrix
- # p <- rowMeans(wsaf, na.rm = TRUE)
+ p <- rowMeans(wsaf, na.rm = TRUE)
   
   # get population allele frequencies based on our simulate beta dist
-  p <- WSAF.list$rbetaPLAF
+  #p <- WSAF.list$rbetaPLAF
   
   
   #------------------------------------
