@@ -73,21 +73,20 @@ sim_biallelic <- function(COIs = c(1,1),
             message = "The COIsum must be equal to the number of columns in your haplotype matrix")
 
 
-
+  # store hapmat
+  m <- haplotypematrix
+  
   # generate biallelic table from PLAF of haplotype
   PLAF <- rbeta(n = nrow(m), shape1 = shape1, shape2 = shape2)
   
-  m <- haplotypematrix
   for(i in 1:nrow(m)){
     uniqueAllele <- unique( m[i, ] )
-
-    if (!all(uniqueAllele %in% c(0,1))) {
-      liftoverAlleles <- sample(x = c(0,1), 
-                                size = length(uniqueAllele[! uniqueAllele %in% c(0,1)]),
-                                prob = c(PLAF[i], (1-PLAF[i])), 
-                                replace = T)
-      names(liftoverAlleles) <- uniqueAllele[! uniqueAllele %in% c(0,1)]
-    }
+    liftoverAlleles <- sample(x = c(0,1), 
+                              size = length(uniqueAllele),
+                              prob = c(PLAF[i], (1-PLAF[i])), 
+                              replace = T)
+    names(liftoverAlleles) <- uniqueAllele
+    
     for (j in 1:length(liftoverAlleles)) {
       # now convert multiallelic to biallelic
       m[i,][ m[i,] == names(liftoverAlleles[j]) ] <- liftoverAlleles[j]
@@ -98,7 +97,7 @@ sim_biallelic <- function(COIs = c(1,1),
   splitter <- rep(1:length(COIs), times = COIs)
   hosts.haplotypes <- NULL
   for (i in 1:length(unique(splitter))) {
-    hosthap <- m[, c( splitter == i )]
+    hosthap <- m[, c( splitter == i ), drop = F]
     hosts.haplotypes <- c(hosts.haplotypes, list(hosthap))
   }
   
@@ -143,7 +142,7 @@ sim_biallelic <- function(COIs = c(1,1),
                   overdispersion = overdispersion)
 
   # split into samples
-  smpls.list <- lapply(COIsplitter, function(x){
+  smpls.list <- lapply(splitter, function(x){
     return(counts[,x])
   })
 
@@ -158,7 +157,8 @@ sim_biallelic <- function(COIs = c(1,1),
 
 
   # return list
-  ret <- list(strain_proportions = w.list,
+  ret <- list(rbetaPLAF = PLAF,
+              strain_proportions = w.list,
               hosts.haplotypes = hosts.haplotypes,
               NRWSAcounts = counts,
               WS.coverage = coverage,

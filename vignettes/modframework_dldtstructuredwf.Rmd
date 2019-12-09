@@ -67,11 +67,11 @@ Users are able to specify loci positions, `pos`, the number of Hosts in the popu
 set.seed(1)
 # define parameters
 pos <- seq(1,1e3,1e2)
-N <- 10
+N <- 2
 m <- 0.5
 rho <- 1e-3
-mean_coi <- 1
-tlim <- 1e2
+mean_coi <- 2
+tlim <- 10
 
 swfsim <- sim_swf(pos = pos,
                   N = N, 
@@ -83,18 +83,30 @@ swfsim <- sim_swf(pos = pos,
 
 ```
   
-The discrete-loci, discrete-time structured Wright Fisher simulation outputs three objets: 
-1. A vector of COIs, where each item in the vector is the number of parasites within that host 
-2. A list that contains two matrices that correspond to the Ancestries for each parasite
-3. A vector of loci positions
+The discrete-loci, discrete-time structured Wright Fisher simulation outputs six objets: 
+1. A vector of COIs, where each item in the vector is the number of parasites within a given host 
+2. A list of recombination blocks for each generation for each haplotype 
+3. The host and parental assignments for the "maternal" and "paternal" haplotype, respectively. 
+  
+The output of this function is largely for internal use and is intended to be parsed with the `get_arg` function (next section).
 
 
 # Getting the ARG 
-Using the ancestry matrices, we can derive the most recent common ancestor (MRCA) and the time of MRCA coalescent event for each parasite ("terminal node") at each discrete loci. By deriving the MRCA and the timing of each coalescent event at each discrete loci, we are able to recreate the marginal tree for each loci and store the entire ancestral recombination graph. 
+Using the ancestry matrices produced above, we can derive the most recent common ancestor (MRCA) and the time of MRCA coalescent event for each parasite (i.e. haplotype) at each discrete loci. As such, we are recreating a marginal tree for each loci and then collectively storing the entire set of marginal trees, termed the ancestral recombination graph. 
 
 ```{r}
 ARG <- get_arg(swfsim)
 ```
+
+The `get_arg` function takes the output from the discrete-loci, discrete-time structured Wright Fisher simulation above and produces `bv_trees`, an S4 class, for each loci.
+
+### `bv_tree` Class
+ The `bv_tree` class is a lightweight representation of a marginal tree. The `bv_tree` class contains three slots: 
+ 
+1. `c`: The node connection for each haplotype (each haplotype is an element in a vector)
+2. `t`: The timing of the node connection (time to MRCA)
+3. `z`: The order of coalescence for each set of haplotypes
+
 
 # Visualizing the Simulation
 Here, we will visualize the maringal tree for each loci. Users are able to specify which loci to visualize. Of note, you will only be able to visualize the marginal trees for the parasites that you created the ARG for in the previous section.

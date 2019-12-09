@@ -1,91 +1,123 @@
 #' Layer Mutations onto the ARG for Each Loci
-#' @param ARGsim S4 object;
+#' @param ARG set of bvtree; a set of bvtrees 
 #' @param mutationrate numeric; the genome-wide per-generation mutation rate
+#' 
+#' @details The mutation model approximates an infinite allele model in time which is then collapsed into a single loci. 
+#' Mutations are drawn with respect to the mutation rate and overall tree length from a poisson model. Mutations are
+#' then "droppped" onto the tree following a uniform distribution. Mutations that happen upstream (i.e. are ancestral)
+#' are carried along the tree branch to produce the final haplotypes for each parasite node.
 #'
 #'
-#' @return GTmatrix numeric matrix;
+#' @return hapmat numeric matrix; a matrix of mutliallelic haplotypes for each parasite considered. Loci are in
+#' rows and parasites (haplotypes) are in columns. 
 #' @export
 
 
-layer_mutations_on_ARG <- function(mutationrate, ARGsim){
-  # assetions
-  assert_custom_class(x = ARGsim, c = "ARGsim")
+layer_mutations_on_ARG <- function(mutationrate, ARG, t_lim){
+  
+  # assertions
   assert_numeric(mutationrate)
-
+  assert_numeric(t_lim)
+  assert_custom_class(ARG[[1]], "bvtree", message  =  "Elements within the %s must inherit from class '%s'")
+  
   # init
-  hapmat <- matrix(NA, nrow = length(ARGsim$ARG), ncol = length(ARGsim$ARG[[1]]@c)) # loci by samples
-
-  # find breakpoints
-  # going to assume that mutational rate among recombination blocks is constant
-  brkpts <- c()
-  for (l in 2:length(ARGsim$ARG)) {
-    if (! isTRUE(all.equal(ARGsim$ARG[[l-1]], ARGsim$ARG[[l]]))) { # if breakpoint between loci
-      brkpts <- c(brkpts, l)
+  # convert trees into matrix of haplotypes with alleles corresponding to genealogical history
+  hapmat <- t(mapply(function(x, tlim) {
+    ret <- rep(NA, length(x@c))
+    root <- which(x@c == -1 | x@t >  tlim) # non-coal 
+    allele <- 1:length(root)
+    
+    # start at the root and work way down the tree
+    for (r in 1:length(root)) {
+      root_c <- root[r] - 1 # r to cpp
+      # first find connections that belong to root
+      conn_c <- which(x@c == root_c) - 1 # r to cpp
+      # now loop through potential subtrees (i.e. coal to branch that coals to root)
+      subtrees <- NA
+      while (any( x@c %in% conn_c[!conn_c %in% subtrees])) {
+        subtrees <- conn_c # level we are considering now
+        newconn_c <- which(x@c %in% conn_c) - 1 # r to c
+        conn_c <- c(conn_c, newconn_c)
+      }
+      # now that we have all connections, overwite with that allele
+      conn <- conn_c + 1 # c to r 
+      ret[ c(root[r], conn) ] <- allele[r]
+      
     }
-  }
-
-  # mutate trees for given breakpoint
-  for (t in c(1, brkpts)) {
+    return(ret)
+  }, ARG, t_lim))
+  
+  
+  # NB, to keep alleles unique, we will start counting after the point of the genealogy alleles
+  mut_allelestart <- max(hapmat)
+  
+  # mutate trees for each loci
+  for (t in 1:length(ARG)) { 
     # extract objs
-    coalbvtree <- ARGsim$ARG[[t]]
-    pairw <- ARGsim$coal_times[[t]] %>%
-      broom::tidy(.)
-
-    # init gt vector for loci
-    gt_l <- rep(0, length(coalbvtree@t))
-
+    coalbvtree <- ARG[[t]]
+    
+    # init hapmat and gt vector for loci
+    gt_l <- rep(NA, length(coalbvtree@t))
+    
     # branch lengths, make root equal to max
     brnchlngth <- coalbvtree@t
-
+    
     # catch if no coalescence (all roots)
     if (max(brnchlngth) == -1 ) {
-      alltreesbrnchlngth <- unlist( purrr::map(ARGsim$ARG, "t") )
+      alltreesbrnchlngth <- unlist( purrr::map(ARG, "t") )
       brnchlngth[brnchlngth == -1] <- max(alltreesbrnchlngth) # just set to max time in simulation
-
     } else {
-      brnchlngth[brnchlngth == -1] <- max(brnchlngth)
+      brnchlngth[brnchlngth == -1] <- max(brnchlngth) + 1e-5 # plus small bit 
     }
-
+    
     Tbrnchlngth <- sum(brnchlngth) # total branch length
     mutn <- rpois(n = 1, lambda = mutationrate*Tbrnchlngth) # number of mutations
-
-    if (mutn > 0){
-
-      mutg <-  sort( runif(n=mutn, min = 0, max = Tbrnchlngth ) )  # need runif for infinite allele model
+    
+    if (mutn > 0) {
+      
+      mutg <-  sort( runif(n=mutn, min = 0, max = Tbrnchlngth ), decreasing = T )  # need runif for infinite allele model
       # run back in time to present to allow for the overwriting of branches with multiple mutations
-
+      
+      # keep track of orig position in vec but sort for easier looping through mutations
+      names(brnchlngth) <- 1:length(brnchlngth)
+      sorted.coaltimes <- sort(brnchlngth)
+      
       for (i in 1:length(mutg)) {
         # what lineage does this occur on
-        mutlin <- min( which(  mutg[i] < cumsum(brnchlngth) ))
-        # are any other lineages affected
-        for (j in 1:nrow(pairw)) {
-          # find nodes that are descendants of the branch that is currently being mutated
-          # Note, item2 due to the fact that the swf object has cols 1:(n-1) and rows, 2:n
-          mutlindesc <- pairw$item1[ (pairw$distance < mutg[i] & pairw$item2 == mutlin) ]
-        }
-        mutlin <- c(mutlin, mutlindesc)
+        mutlin.sorted <-   sort( which( cumsum(sorted.coaltimes) > mutg[i] ) ) # get min, but use sort to keep names 
+        mutlin <- which(names(brnchlngth) == names(mutlin.sorted)[1])
+        
+        # does this affect any other lineages
+        if(any(coalbvtree@t[mutlin] > coalbvtree@t[coalbvtree@t != -1])){ # does this coalesce later than other samples
+          if(any(coalbvtree@c == mutlin - 1)){ # does this sample have connections; -1 for cpp to R 
+            mut_brnchlngth <- coalbvtree@t
+            mut_brnchlngth[mut_brnchlngth == -1] <- .Machine$double.xmax
+            extmutlin <- which(coalbvtree@t[mutlin] > mut_brnchlngth &
+                                 coalbvtree@c == mutlin - 1)
+            mutlin <- c(mutlin, extmutlin)
+          }
+        } 
+        
         gt_l[ mutlin ] <- i
-      } # end if for mutations
-    } # end for loop for mutations
-
-    # fill in hap matrix
-    if (is.null(brkpts)) { # same tree throughout
-      hapmat[1:nrow(hapmat), ] <- gt_l
-    } else if (max(brkpts) == t) {
-      hapmat[t:nrow(hapmat), ] <- gt_l
-    } else {
-      hapmat[t: brkpts[ which(t == c(1, brkpts)) ], ] <- gt_l # note, we temporarily include beginning of next block, is immediately overwritten in next gen
-    }
-  }
-
-  # liftover haplotype matrix so that we only carry unique ints that start at 0, 1, 2 ...
-  hapmat <- t( apply(hapmat, 1, function(x){
-    unq <- unique(x)
-    for(i in 1:length(unq)){
-      x[x == unq[i]] <- i - 1 # zero-based
-    }
-    return(x)
-  }) )
+      } # end for loop for mutations
+      
+   
+      # fill in hap matrix
+      hapmat[t, !is.na(gt_l)] <- gt_l[!is.na(gt_l)] + mut_allelestart
+     
+      
+      # liftover haplotype matrix so that we only carry unique ints and always start at 0 (and then count up 1, 2 ...)
+      hapmat <- t( apply(hapmat, 1, function(x){
+        unq <- unique(x)
+        for(i in 1:length(unq)){
+          x[x == unq[i]] <- i - 1 # zero-based
+        }
+        return(x)
+      }) )
+      
+    } 
+    
+  } # end for loop for trees (i.e. a tree per loci)
 
   # return
   return(hapmat)
