@@ -21,17 +21,17 @@ source("R_ignore/NatComms_VerityAB2019_Sims/utils.R")
 pos <- seq(0,1e6,1e4) # assuming 1 million base-pairs and a SNP every 10,000 bp
 N <- 10 # small Effective Pop size
 m <- 0.5 # intermediate co-transmission, superinfxn
-rho <- 1e-3
+rho <- 1e-6
 mean_coi <- 2
 tlim <- 10
-genome_length <- 23e6
+# genome_length <- 23e6
 mut_rate <- 0 #2.45e-10 * 23e6/length(pos) 
 hosts <- 1:10 
 
 paramsdf <- tibble::tibble(
   N = c(10, 50, 100, 500, 1000),
   m = c(0, 0.25, 0.5, 0.75, 1),
-  mean_coi = c(1, 2, 3, 4, 5),
+  mean_coi = c(1, 2, 3, 4, 5)
 )
 
 paramsdf <- tibble::as_tibble(expand.grid(paramsdf))
@@ -76,24 +76,16 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, mutationrate, 
   ARG <- mapply(function(x) polySimIBD::subset_bvtree(x, w), ARG)
   
   
-  # get true IBD
-  trueIBD <- get_truth_from_arg(swfsim = swfsim,
-                                arg = ARG,
-                                t_lim = tlim,
-                                hosts = hosts)
-  # extract relevant elements
-  trueIBD <- trueIBD %>% 
-    dplyr::mutate(IBDprop = purrr::map(IBD, "IBDprop")) %>% 
-    tidyr::unnest(cols = IBDprop) %>% 
-    dplyr::select(c("smpl1", "smpl2", "IBDprop"))
-  
   #..............................................................
   # Add noise
   #..............................................................
   # layer on mutations
   hapmat <- polySimIBD::layer_mutations_on_ARG(ARG, mutationrate = mut_rate, t_lim = tlim)
   
-  # simulate biallelic reads
+  
+  #..............................................................
+  # Simulate Reads
+  #..............................................................
   WSAF.list <- polySimIBD::sim_biallelic(COIs = this_coi,
                                          haplotypematrix = hapmat,
                                          shape1 = 0.1,
@@ -101,10 +93,35 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, mutationrate, 
                                          coverage = 100,
                                          alpha = 1,
                                          overdispersion = 0.1,
-                                         epsilon = 0.05)
+                                         epsilon = 0.05)  
+  #..............................................................
+  # Get True IBD 
+  #..............................................................
+  trueIBD <- get_truth_from_arg(swfsim = swfsim,
+                                arg = ARG,
+                                WSAFlist = WSAF.list,
+                                t_lim = 10,
+                                hosts = hosts)
+
+
+  trueIBD.btwn <- trueIBD$btwn_host_comparisons %>% 
+    dplyr::mutate(btwnIBDprop = purrr::map(btwnIBD, "btwn_IBDprop"),
+                  btwnmajIBDprop = purrr::map(majStrainIBD, "majstrain_IBDprop")
+    ) %>% 
+    tidyr::unnest(cols = c("btwnIBDprop", "btwnmajIBDprop")) %>% 
+    dplyr::select(c("smpl1", "smpl2", "btwnIBDprop", "btwnmajIBDprop"))
+  # note trueIBD has both relationships
+  # ignores transitivity which is ok bc of left join later
+ 
+  trueIBD.wthn <- trueIBD$wthn_host_comparisons %>% 
+    dplyr::mutate(
+      wthnIBD = purrr::map(wthnIBD, "within_IBDprop") ) %>% 
+  tidyr::unnest(cols = wthnIBD) %>% 
+  dplyr::select(c("hosts", "wthnIBD"))
   
-  
-  # run Bob's MLE 
+  #..............................................................
+  # Run Bob's MLE
+  #..............................................................
   ret <- wrap_MIPanalyzer_inbreeding_mle_cpp(
     WSAF.list = WSAF.list,
     f = seq(0, 1, l = 100),
@@ -112,13 +129,27 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, mutationrate, 
     report_progress = F)
   
   
+  
   #..............................................................
   # DATA WRANGLE truth and MLE
   #..............................................................
-  colnames(ret$mle) <- rownames(ret$mle) <- 1:length(this_coi)
-  ret.long <- broom::tidy(as.dist(ret$mle)) %>%  
+  ret.long <- broom::tidy(ret$mle) %>%  
     magrittr::set_colnames(c("smpl1", "smpl2", "malecotf")) %>% 
-    dplyr::left_join(., y = trueIBD, by = c("smpl1", "smpl2"))
+    dplyr::left_join(., y = trueIBD.btwn, by = c("smpl1", "smpl2"))
+  
+  # add in within for sample 1
+  trueIBD.wthn <- trueIBD.wthn %>% 
+    dplyr::rename(smpl1 = hosts, 
+                  wthnIBD.host1 = wthnIBD)
+  
+  ret.long <- dplyr::left_join(ret.long, trueIBD.wthn, by = "smpl1")
+  
+  # add in within for sample 2
+  trueIBD.wthn <- trueIBD.wthn %>% 
+    dplyr::rename(smpl2 = smpl1, 
+                  wthnIBD.host2 = wthnIBD.host1)
+  
+  ret.long <- dplyr::left_join(ret.long, trueIBD.wthn, by = "smpl2")
   
   #..............................................................
   # RETURN
@@ -165,22 +196,21 @@ plotObj <- plotdf %>%
   dplyr::group_by(mean_coi, m, N, IBD) %>% 
   dplyr::summarise(
     n = n(),
-    meanIBD = mean(IBDest),
-    seIBD = sd(IBDest)/sqrt(n),
-    IBDLL = meanIBD - 1.96*seIBD,
-    IBDUL = meanIBD + 1.96*seIBD
+    meanIBD = mean(IBDest > 0.9)
   ) %>% 
   dplyr::mutate(logN = log10(N)) %>% 
   ggplot() + 
-  geom_pointrange(aes(x = logN, y = meanIBD, ymin = IBDLL, ymax = IBDUL, 
-                      group = factor(IBD), color = factor(IBD)), alpha = 0.5) +
+  # geom_pointrange(aes(x = logN, y = meanIBD, ymin = IBDLL, ymax = IBDUL, 
+  #                     group = factor(IBD), color = factor(IBD)), alpha = 0.5) +
+  geom_point(aes(x = logN, y = meanIBD,
+                 group = factor(IBD), color = factor(IBD)), alpha = 0.5) +                     
   scale_color_manual("IBD Measure", values = c("#542788", "#e08214")) +
   facet_grid(mean_coi ~ m) + 
-  ylab("Between-Sample IBD") + xlab("Effective Population (log10-transformed)") +
+  ylab("Between-Sample IBD > 90") + xlab("Effective Population (log10-transformed)") +
   plot_theme +
   ggtitle("Using Not Mut, WSAF as PLAF")
 
-jpeg("~/Desktop/temp_polysimibd_nomut.jpg", width = 11, height = 8, units = "in", res = 300)
+jpeg("~/Desktop/temp_polysimibd_meanIBD_nomut_rho.jpg", width = 11, height = 8, units = "in", res = 300)
 plot(plotObj)
 graphics.off()
 

@@ -14,14 +14,14 @@ source("R_ignore/NatComms_VerityAB2019_Sims/utils.R")
 #
 
 pos <- seq(0,1e6,1e4) # assuming 1 million base-pairs and a SNP every 10,000 bp
-N <- 100 # small Effective Pop size
-m <- 0.1 # intermediate co-transmission, superinfxn
-rho <- 1e-3
-mean_coi <- 0.1
+N <- 50 # small Effective Pop size
+m <- 0.5 # intermediate co-transmission, superinfxn
+rho <- 1e-6
+mean_coi <- 2
 tlim <- 10
 genome_length <- 23e6
 mut_rate <- 0 #2.45e-10 * 23e6/length(pos) * tlim # treating loci as blocks
-hosts <- 1:2
+hosts <- 1:5
 
 
 #..............................................................
@@ -50,24 +50,6 @@ w <- which(rep(1:length(swfsim$coi), times = swfsim$coi) %in% hosts)
 ARG <- mapply(function(x) polySimIBD::subset_bvtree(x, w), ARG)
 
 
-# get true IBD
-trueIBD <- get_truth_from_arg(swfsim = swfsim,
-                              arg = ARG,
-                              t_lim = 10,
-                              hosts = hosts)
-
-
-
-# extract relevant elements
-trueIBD <- trueIBD %>% 
-  dplyr::mutate(IBDprop = purrr::map(IBD, "IBDprop")) %>% 
-  tidyr::unnest(cols = IBDprop) %>% 
-  dplyr::select(c("smpl1", "smpl2", "IBDprop"))
-
-# note trueIBD has both relationships
-# ignores transitivity which is ok bc of left join later
-
-#plot_coalescence_trees(ARG)
 
 #..............................................................
 # Add noise
@@ -76,7 +58,10 @@ trueIBD <- trueIBD %>%
 hapmat <- polySimIBD::layer_mutations_on_ARG(ARG, 
                                              mutationrate = mut_rate, t_lim = 10)
 
-# simulate biallelic reads
+
+#..............................................................
+# Simulate Reads
+#..............................................................
 WSAF.list <- polySimIBD::sim_biallelic(COIs = this_coi,
                                        haplotypematrix = hapmat,
                                        shape1 = 0.1,
@@ -86,7 +71,35 @@ WSAF.list <- polySimIBD::sim_biallelic(COIs = this_coi,
                                        overdispersion = 0.1,
                                        epsilon = 0.05)
 
-# run Bob's MLE 
+#..............................................................
+# Get True IBD 
+#..............................................................
+trueIBD <- get_truth_from_arg(swfsim = swfsim,
+                              arg = ARG,
+                              WSAFlist = WSAF.list,
+                              t_lim = 10,
+                              hosts = hosts)
+
+
+trueIBD <- trueIBD %>% 
+  dplyr::mutate(btwnIBD = purrr::map(btwn_host_comparisons, "btwnIBD"),
+                trueIBDprop = purrr::map(btwnIBD, "true_IBDprop"),
+                majStrainIBD = purrr:map(btwn_host_comparisons, "majStrainIBD"),
+                majIBDprop = purrr::map(majStrainIBD, "majstrain_IBDprop"),
+                wthnIBD = purrr::map(wthn_host_comparisons, "wthnIBD"),
+                wthnIBDprop = purrr::map(wthn_host_comparisons, "within_IBDprop"),
+                ) %>% 
+  tidyr::unnest(cols = c("trueIBDprop", "majIBDprop", "within_IBDprop")) %>% 
+  dplyr::select(c("smpl1", "smpl2", "trueIBDprop", "majIBDprop", "within_IBDprop"))
+
+# note trueIBD has both relationships
+# ignores transitivity which is ok bc of left join later
+
+#plot_coalescence_trees(ARG)
+
+#..............................................................
+# Run Bob's MLE
+#..............................................................
 ret <- wrap_MIPanalyzer_inbreeding_mle_cpp(
   WSAF.list = WSAF.list,
   f = seq(0, 1, l = 100),
@@ -97,8 +110,7 @@ ret <- wrap_MIPanalyzer_inbreeding_mle_cpp(
 #..............................................................
 # DATA WRANGLE truth and MLE
 #..............................................................
-colnames(ret$mle) <- rownames(ret$mle) <- 1:length(this_coi)
-ret.long <- broom::tidy(as.dist(ret$mle)) %>%  
+ret.long <- broom::tidy(ret$mle) %>%  
   magrittr::set_colnames(c("smpl1", "smpl2", "malecotf")) %>% 
   dplyr::left_join(., y = trueIBD, by = c("smpl1", "smpl2"))
 

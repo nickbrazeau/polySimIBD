@@ -28,7 +28,6 @@ wrap_MIPanalyzer_inbreeding_mle_cpp <- function(WSAF.list,
   #------------------------------------
   # liftovers needed for mipanalyzer
   #------------------------------------
-  
   # progress bar
   pb <- txtProgressBar(min = 0, max = nrow(wsaf) - 1, initial = NA,
                        style = 3)
@@ -51,11 +50,7 @@ wrap_MIPanalyzer_inbreeding_mle_cpp <- function(WSAF.list,
   ret <- list(mle = ret_ml, loglike = ret_all)
   
   # note Bob stores upper tri not lower,
-  # lower is easier for parsing with broom
-  
-  ret$mle[lower.tri(ret$mle, diag = F)] <- ret$mle[ upper.tri(ret$mle, diag = F) ] # fill in lower tri
-  diag(ret$mle) <- 0
-  
+  ret$mle <- as.dist(t(ret$mle))
   return(ret)
 }
 
@@ -64,21 +59,17 @@ wrap_MIPanalyzer_inbreeding_mle_cpp <- function(WSAF.list,
 #------------------------
 # pull out overlap
 #------------------------
-get_truth_from_arg <- function(swfsim, arg, t_lim, hosts = NULL){
+get_truth_from_arg <- function(swfsim, arg, WSAFlist, t_lim, hosts = NULL){
   
+  # need these details in order to know
+  # which hosts you subsetted to to prune the
+  # swfsim since the ARG doesn't store this information
   # choose hosts to subset to
   if(is.null(hosts)){
     hosts <- 1:length(swfsim$coi)
   }
-  
   # find which elements in sim2 bvtrees correspond to haplotypes from these hosts
   this_coi <- swfsim$coi[hosts]
-  
-  # find haplotype index within the host
-  w <- which(rep(1:length(swfsim$coi), times = swfsim$coi) %in% hosts)
-  
-  # subset bvtrees
-  sub_tree <- mapply(function(x) polySimIBD::subset_bvtree(x, w), arg)
   
   
   # convert trees into matrix of alleles
@@ -105,7 +96,7 @@ get_truth_from_arg <- function(swfsim, arg, t_lim, hosts = NULL){
       
     }
     return(ret)
-  }, sub_tree, t_lim))
+  }, arg, t_lim))
   
   # split the haplotype matrix into individual (host) matrices 
   hosts.haplotypes <- NULL
@@ -115,13 +106,17 @@ get_truth_from_arg <- function(swfsim, arg, t_lim, hosts = NULL){
     hosts.haplotypes <- c(hosts.haplotypes, list(hosthap))
   }
   
+  #..............................................................
+  # Find true IBD between samples
+  #..............................................................
   # expand grid for combinations
   paircompar.long <- expand.grid(list( 1:length(hosts), 1:length(hosts) ) ) %>% 
     magrittr::set_colnames(c("smpl1", "smpl2")) %>% 
     dplyr::filter(smpl1 != smpl2) %>% 
     tibble::as_tibble()
   
-  paircompar.long$IBD <- purrr::pmap(paircompar.long, function(smpl1, smpl2){
+  paircompar.long$btwnIBD <- purrr::pmap(paircompar.long[,c("smpl1", "smpl2")], 
+                                     function(smpl1, smpl2){
     # get mat for pairwise
     allele_mat_i <- hosts.haplotypes[[smpl1]]
     allele_mat_j <- hosts.haplotypes[[smpl2]]
@@ -133,16 +128,74 @@ get_truth_from_arg <- function(swfsim, arg, t_lim, hosts = NULL){
     
     # just want if any overlap
     overlap[overlap >= 1] <- 1
+    
     # return
     ret <- list(
       locioverlap = overlap,
-      IBDprop = sum(overlap)/length(overlap)
+      btwn_IBDprop = sum(overlap)/length(overlap)
     )
     return(ret)
     
   })
   
-  return(paircompar.long)
+  #..............................................................
+  # Get Major Strain IBD
+  #..............................................................
+  paircompar.long$majStrainIBD <-  purrr::pmap(paircompar.long[,c("smpl1", "smpl2")], 
+                                               function(smpl1, smpl2){
+    # get mat for pairwise
+    allele_mat_i <- hosts.haplotypes[[smpl1]]
+    allele_mat_j <- hosts.haplotypes[[smpl2]]
+    
+    # get major strain
+    majstrain.smpl1 <- which(WSAF.list$strain_proportions[[smpl1]] == max(WSAF.list$strain_proportions[[smpl1]]) )
+    majstrain.smpl2 <- which(WSAF.list$strain_proportions[[smpl2]] == max(WSAF.list$strain_proportions[[smpl2]]) )
+    
+    if (ncol(allele_mat_i) > 1) {
+      allele_mat_i <- allele_mat_i[,majstrain.smpl1]
+    }
+    if (ncol(allele_mat_j) > 1) {
+      allele_mat_j <- allele_mat_j[,majstrain.smpl2]
+    }
+    
+    # proportion overlap
+    overlap <- as.numeric(allele_mat_i == allele_mat_j)
+    
+    # return
+    ret <- list(
+      locioverlap = overlap,
+      majstrain_IBDprop = sum(overlap)/length(overlap)
+    )
+    return(ret)
+  })
+  
+  #..............................................................
+  # Find true IBD within samples
+  #..............................................................
+  wthnhost <- tibble(hosts = hosts)
+  
+  wthnhost$wthnIBD <- purrr::map(wthnhost$hosts, 
+                                        function(host){
+    # get mat 
+    allele_mat <- hosts.haplotypes[[host]]
+    # effective number of strains within sample
+    Keff <- apply(allele_mat, 1, function(x){ return(length(unique(x))) })
+    # return
+    ret <- list(
+      Keff = Keff,
+      within_IBDprop = sum(Keff < ncol(allele_mat))/nrow(allele_mat) 
+    )
+    return(ret)
+  })
+  
+  #..............................................................
+  # Out
+  #..............................................................
+  ret <- list(
+    wthn_host_comparisons = wthnhost,
+    btwn_host_comparisons = paircompar.long
+  )
+  return(ret)
   
 }
 

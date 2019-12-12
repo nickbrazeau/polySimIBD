@@ -55,9 +55,6 @@ sim_biallelic <- function(COIs = c(1,1),
                           overdispersion = 0,
                           epsilon = 0) {
 
-  # get loci
-  L <- nrow(haplotypematrix)
-
   # check inputs
   if (length(coverage) == 1) {
     coverage <- rep(coverage, L)
@@ -73,14 +70,12 @@ sim_biallelic <- function(COIs = c(1,1),
             message = "The COIsum must be equal to the number of columns in your haplotype matrix")
 
 
-  # store hapmat
-  m <- haplotypematrix
   
   # generate biallelic table from PLAF of haplotype
-  PLAF <- rbeta(n = nrow(m), shape1 = shape1, shape2 = shape2)
+  PLAF <- rbeta(n = nrow(haplotypematrix), shape1 = shape1, shape2 = shape2)
   
-  for(i in 1:nrow(m)){
-    uniqueAllele <- unique( m[i, ] )
+  for(i in 1:nrow(haplotypematrix)){
+    uniqueAllele <- unique( haplotypematrix[i, ] )
     liftoverAlleles <- sample(x = c(0,1), 
                               size = length(uniqueAllele),
                               prob = c(PLAF[i], (1-PLAF[i])), 
@@ -97,7 +92,7 @@ sim_biallelic <- function(COIs = c(1,1),
   splitter <- rep(1:length(COIs), times = COIs)
   hosts.haplotypes <- NULL
   for (i in 1:length(unique(splitter))) {
-    hosthap <- m[, c( splitter == i ), drop = F]
+    hosthap <- haplotypematrix[, c( splitter == i ), drop = F]
     hosts.haplotypes <- c(hosts.haplotypes, list(hosthap))
   }
   
@@ -125,19 +120,19 @@ sim_biallelic <- function(COIs = c(1,1),
   
 
   # draw read counts, taking into account overdispersion
-  get_read_counts <- function(L, coverage, p_error, overdispersion){
+  get_read_counts <- function(L, coverage, p, overdispersion){
     if (overdispersion == 0) {
-      counts <- rbinom(L, size = coverage, prob = p_error)
+      counts <- rbinom(L, size = coverage, prob = p)
     } else {
-      counts <- rbetabinom(L, k = coverage, alpha = p_error/overdispersion, 
-                           beta = (1-p_error)/overdispersion)
+      counts <- rbetabinom(L, k = coverage, alpha = p/overdispersion, 
+                           beta = (1-p)/overdispersion)
     }
     return(counts)
   }
 
   # get counts
   counts <- apply(host.wsaf.genotypeerror, 2, get_read_counts, 
-                  L = L, 
+                  L = nrow(haplotypematrix), 
                   coverage = coverage, 
                   overdispersion = overdispersion)
 

@@ -21,7 +21,7 @@ source("R_ignore/NatComms_VerityAB2019_Sims/utils.R")
 pos <- seq(0,1e6,1e4) # assuming 1 million base-pairs and a SNP every 10,000 bp
 N <- 10 # small Effective Pop size
 m <- 0.5 # intermediate co-transmission, superinfxn
-rho <- 1e-3
+rho <- 1e-6
 tlim <- 10
 genome_length <- 23e6
 mut_rate <- 0 #2.45e-10 * 23e6/length(pos) 
@@ -31,15 +31,24 @@ paramsdf <- tibble::tibble(
   N = c(10, 50, 100, 500, 1000),
   m = c(0, 0.25, 0.5, 0.75, 1),
   mean_coi = c(1, 2, 3, 4, 5),
+  rbeta = c("rb: 0.1-0.1", "rb: 0.25-0.25", "rb: 0.5-0.5", "rb: 1-1", "rb: 5-5")
 )
 
 paramsdf <- tibble::as_tibble(expand.grid(paramsdf))
+paramsdf <- dplyr::left_join(paramsdf, tibble::tibble(
+  rbeta = c("rb: 0.1-0.1", "rb: 0.25-0.25", "rb: 0.5-0.5", "rb: 1-1", "rb: 5-5"),
+  shp1 = c(0.1, 0.25, 0.5, 1, 5),
+  shp2 = c(0.1, 0.25, 0.5, 1, 5)
+))
+
 paramsdf <- paramsdf %>% 
   dplyr::mutate(pos = list(pos), 
                 rho = rho, 
                 tlim = tlim, 
                 mutationrate = mut_rate,
-                hosts = list(hosts))
+                hosts = list(hosts)) %>% 
+  dplyr::select(-c("rbeta"))
+               
 
 # replicates of this framework
 #reps <- 25
@@ -52,7 +61,7 @@ paramsdf <- paramsdf %>%
 # Wrapper Function
 #..............................................................
 
-nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, mutationrate, hosts){
+nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, mutationrate, hosts, shp1, shp2){
   # run forward
   swfsim <- polySimIBD::sim_swf(pos = pos,
                                 N = N,
@@ -95,8 +104,8 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, mutationrate, 
   # simulate biallelic reads
   WSAF.list <- polySimIBD::sim_biallelic(COIs = this_coi,
                                          haplotypematrix = hapmat,
-                                         shape1 = 0.1,
-                                         shape2 = 0.1,
+                                         shape1 = shp1,
+                                         shape2 = shp2,
                                          coverage = 100,
                                          alpha = 1,
                                          overdispersion = 0.1,
@@ -156,11 +165,16 @@ plot_theme <- theme(plot.title = element_text(family = "Helvetica", face = "bold
                     axis.line = element_line(color = "#000000", size = 1))
 
 plotdf <- paramsdf %>% 
-  dplyr::mutate(simout = purrr::map(paramsdf$nat_com_sims, "sim_out")) %>% 
-  tidyr::unnest(cols = simout)
+  dplyr::mutate(simout = purrr::map(paramsdf$nat_com_sims, "sim_out"),
+                rbeta = paste0("Rbeta: ", shp1, "-", shp2)) %>% 
+  tidyr::unnest(cols = simout) 
 
-plotObj <- plotdf %>% 
-  tidyr::gather(., key = "IBD", value = "IBDest", 12:13) %>% 
+plotdf.list <- split(plotdf, factor(plotdf$rbeta))
+
+ploterObj <- function(plotdf){
+  plotdf %>% 
+  dplyr::select(rbeta, dplyr::everything()) %>% 
+  tidyr::gather(., key = "IBD", value = "IBDest", 15:16) %>% 
   dplyr::group_by(mean_coi, m, N, IBD) %>% 
   dplyr::summarise(
     n = n(),
@@ -177,10 +191,17 @@ plotObj <- plotdf %>%
   facet_grid(mean_coi ~ m) + 
   ylab("Between-Sample IBD") + xlab("Effective Population (log10-transformed)") +
   plot_theme +
-  ggtitle("Using Not Mut, WSAF as PLAF")
+  ggtitle(paste(unique(plotdf$rbeta)))
+}
 
-jpeg("~/Desktop/temp_polysimibd_nomut.jpg", width = 11, height = 8, units = "in", res = 300)
-plot(plotObj)
+plotObj.list <- lapply(plotdf.list, ploterObj)
+
+
+
+jpeg("~/Desktop/temp_plaf_shape_fct.jpg", width = 39, height = 28, units = "in", res = 500)
+cowplot::plot_grid(plotObj.list[[1]], plotObj.list[[2]], plotObj.list[[3]],
+                   plotObj.list[[4]], plotObj.list[[5]],
+                   ncol = 3, align = "v")
 graphics.off()
 
 
