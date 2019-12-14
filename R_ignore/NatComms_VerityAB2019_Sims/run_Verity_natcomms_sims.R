@@ -5,6 +5,7 @@
 # using a discrete loci, discrete time structured wright fisher model
 #--------------------------------------------------------------------
 library(tidyverse)
+remotes::install_github("nickbrazeau/polySimIBD")
 library(polySimIBD)
 library(rslurm)
 set.seed(1)
