@@ -13,39 +13,14 @@
 #' @export
 
 
-layer_mutations_on_ARG <- function(mutationrate, ARG, t_lim){
+layer_mutations_on_ARG <- function(mutationrate, ARG){
   
   # assertions
   assert_numeric(mutationrate)
-  assert_numeric(t_lim)
   assert_custom_class(ARG[[1]], "bvtree", message  =  "Elements within the %s must inherit from class '%s'")
   
-  # init
-  # convert trees into matrix of haplotypes with alleles corresponding to genealogical history
-  hapmat <- t(mapply(function(x, tlim) {
-    ret <- rep(NA, length(x@c))
-    root <- which(x@c == -1 | x@t >  tlim) # non-coal 
-    allele <- 1:length(root)
-    
-    # start at the root and work way down the tree
-    for (r in 1:length(root)) {
-      root_c <- root[r] - 1 # r to cpp
-      # first find connections that belong to root
-      conn_c <- which(x@c == root_c) - 1 # r to cpp
-      # now loop through potential subtrees (i.e. coal to branch that coals to root)
-      subtrees <- NA
-      while (any( x@c %in% conn_c[!conn_c %in% subtrees])) {
-        subtrees <- conn_c # level we are considering now
-        newconn_c <- which(x@c %in% conn_c) - 1 # r to c
-        conn_c <- c(conn_c, newconn_c)
-      }
-      # now that we have all connections, overwite with that allele
-      conn <- conn_c + 1 # c to r 
-      ret[ c(root[r], conn) ] <- allele[r]
-      
-    }
-    return(ret)
-  }, ARG, t_lim))
+  # get haplotype matrix
+  hapmat <- polySimIBD::get_haplotype_matrix(ARG = ARG)
   
   
   # NB, to keep alleles unique, we will start counting after the point of the genealogy alleles

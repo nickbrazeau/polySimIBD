@@ -57,7 +57,7 @@ sim_biallelic <- function(COIs = c(1,1),
 
   # check inputs
   if (length(coverage) == 1) {
-    coverage <- rep(coverage, L)
+    coverage <- rep(coverage, nrow(haplotypematrix))
   }
   assert_matrix(haplotypematrix)
   assert_vector(coverage)
@@ -71,11 +71,15 @@ sim_biallelic <- function(COIs = c(1,1),
 
 
   
-  # generate biallelic table from PLAF of haplotype
-  PLAF <- rbeta(n = nrow(haplotypematrix), shape1 = shape1, shape2 = shape2)
+  # make copy of hapmat because we are going to
+  # overwrite it with the alleles that we draw to be biallelic
+  m <- haplotypematrix
   
-  for(i in 1:nrow(haplotypematrix)){
-    uniqueAllele <- unique( haplotypematrix[i, ] )
+  # generate biallelic table from PLAF of haplotype
+  PLAF <- rbeta(n = nrow(m), shape1 = shape1, shape2 = shape2)
+  
+  for(i in 1:nrow(m)){
+    uniqueAllele <- unique( m[i, ] )
     liftoverAlleles <- sample(x = c(0,1), 
                               size = length(uniqueAllele),
                               prob = c(PLAF[i], (1-PLAF[i])), 
@@ -87,16 +91,15 @@ sim_biallelic <- function(COIs = c(1,1),
       m[i,][ m[i,] == names(liftoverAlleles[j]) ] <- liftoverAlleles[j]
     }
   }
-
+  
   # split the haplotype matrix into individual (host) matrices 
   splitter <- rep(1:length(COIs), times = COIs)
   hosts.haplotypes <- NULL
   for (i in 1:length(unique(splitter))) {
-    hosthap <- haplotypematrix[, c( splitter == i ), drop = F]
+    hosthap <- m[, c( splitter == i ), drop = F]
     hosts.haplotypes <- c(hosts.haplotypes, list(hosthap))
   }
   
-
   # generate strain proportions by drawing from dirichlet
   w <- polySimIBD::rdirichlet(rep(alpha, sum(COIs)))
   # make this a list that corresponds to within host COIs from above
@@ -146,18 +149,13 @@ sim_biallelic <- function(COIs = c(1,1),
   coverage <- matrix( rep(coverage, times = length(COIs)), ncol = length(COIs) )
   NRWSAF <- counts/coverage
 
-  # save out positions
-  NRWSAFdf <- cbind.data.frame(POS = pos, NRWSAF)
-  colnames(NRWSAFdf)[2:ncol(NRWSAFdf)] <- paste0("smpl", 1:(ncol(NRWSAFdf)-1))
-
-
   # return list
   ret <- list(rbetaPLAF = PLAF,
               strain_proportions = w.list,
               hosts.haplotypes = hosts.haplotypes,
               NRWSAcounts = counts,
               WS.coverage = coverage,
-              NRWSAFdf = NRWSAFdf)
+              NRWSAF = NRWSAF)
 
   return(ret)
 }

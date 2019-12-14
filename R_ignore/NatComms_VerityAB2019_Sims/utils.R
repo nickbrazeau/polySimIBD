@@ -15,14 +15,13 @@ wrap_MIPanalyzer_inbreeding_mle_cpp <- function(WSAF.list,
   
 
   # extract WSAF
-  wsaf <- WSAF.list$NRWSAFdf[,2:ncol(WSAF.list$NRWSAFdf)]
-  wsaf <- as.matrix(wsaf)
+  wsaf <- WSAF.list$NRWSAF
   
   # get population allele frequencies based on haplotype biallelic matrix
- p <- rowMeans(wsaf, na.rm = TRUE)
+  # p <- rowMeans(wsaf, na.rm = TRUE)
   
   # get population allele frequencies based on our simulate beta dist
-  #p <- WSAF.list$rbetaPLAF
+  p <- WSAF.list$rbetaPLAF
   
   
   #------------------------------------
@@ -59,7 +58,7 @@ wrap_MIPanalyzer_inbreeding_mle_cpp <- function(WSAF.list,
 #------------------------
 # pull out overlap
 #------------------------
-get_truth_from_arg <- function(swfsim, arg, WSAFlist, t_lim, hosts = NULL){
+get_truth_from_arg <- function(swfsim, arg, hosts = NULL){
   
   # need these details in order to know
   # which hosts you subsetted to to prune the
@@ -73,30 +72,8 @@ get_truth_from_arg <- function(swfsim, arg, WSAFlist, t_lim, hosts = NULL){
   
   
   # convert trees into matrix of alleles
-  allele_mat <- t(mapply(function(x, tlim) {
-    ret <- rep(NA, length(x@c))
-    root <- which(x@c == -1 | x@t >  tlim) # non-coal 
-    allele <- 1:length(root)
-    
-    # start at the root and work way down the tree
-    for (r in 1:length(root)) {
-      root_c <- root[r] - 1 # r to cpp
-      # first find connections that belong to root
-      conn_c <- which(x@c == root_c) - 1 # r to cpp
-      # now loop through potential subtrees (i.e. coal to branch that coals to root)
-      subtrees <- NA
-      while (any( x@c %in% conn_c[!conn_c %in% subtrees])) {
-        subtrees <- conn_c # level we are considering now
-        newconn_c <- which(x@c %in% conn_c) - 1 # r to c
-        conn_c <- c(conn_c, newconn_c)
-      }
-      # now that we have all connections, overwite with that allele
-      conn <- conn_c + 1 # c to r 
-      ret[ c(root[r], conn) ] <- allele[r]
-      
-    }
-    return(ret)
-  }, arg, t_lim))
+  allele_mat <- polySimIBD::get_haplotype_matrix(arg)
+  
   
   # split the haplotype matrix into individual (host) matrices 
   hosts.haplotypes <- NULL
@@ -138,66 +115,5 @@ get_truth_from_arg <- function(swfsim, arg, WSAFlist, t_lim, hosts = NULL){
     
   })
   
-  #..............................................................
-  # Get Major Strain IBD
-  #..............................................................
-  paircompar.long$majStrainIBD <-  purrr::pmap(paircompar.long[,c("smpl1", "smpl2")], 
-                                               function(smpl1, smpl2){
-    # get mat for pairwise
-    allele_mat_i <- hosts.haplotypes[[smpl1]]
-    allele_mat_j <- hosts.haplotypes[[smpl2]]
-    
-    # get major strain
-    majstrain.smpl1 <- which(WSAF.list$strain_proportions[[smpl1]] == max(WSAF.list$strain_proportions[[smpl1]]) )
-    majstrain.smpl2 <- which(WSAF.list$strain_proportions[[smpl2]] == max(WSAF.list$strain_proportions[[smpl2]]) )
-    
-    if (ncol(allele_mat_i) > 1) {
-      allele_mat_i <- allele_mat_i[,majstrain.smpl1]
-    }
-    if (ncol(allele_mat_j) > 1) {
-      allele_mat_j <- allele_mat_j[,majstrain.smpl2]
-    }
-    
-    # proportion overlap
-    overlap <- as.numeric(allele_mat_i == allele_mat_j)
-    
-    # return
-    ret <- list(
-      locioverlap = overlap,
-      majstrain_IBDprop = sum(overlap)/length(overlap)
-    )
-    return(ret)
-  })
-  
-  #..............................................................
-  # Find true IBD within samples
-  #..............................................................
-  wthnhost <- tibble(hosts = hosts)
-  
-  wthnhost$wthnIBD <- purrr::map(wthnhost$hosts, 
-                                        function(host){
-    # get mat 
-    allele_mat <- hosts.haplotypes[[host]]
-    # effective number of strains within sample
-    Keff <- apply(allele_mat, 1, function(x){ return(length(unique(x))) })
-    # return
-    ret <- list(
-      Keff = Keff,
-      within_IBDprop = sum(Keff < ncol(allele_mat))/nrow(allele_mat) 
-    )
-    return(ret)
-  })
-  
-  #..............................................................
-  # Out
-  #..............................................................
-  ret <- list(
-    wthn_host_comparisons = wthnhost,
-    btwn_host_comparisons = paircompar.long
-  )
-  return(ret)
-  
+  return(paircompar.long)
 }
-
-
-
