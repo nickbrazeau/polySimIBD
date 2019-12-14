@@ -152,8 +152,6 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, hosts){
 #..............................................................
 # Run Sims
 #..............................................................
-paramsdf$nat_com_sims <- purrr::pmap(paramsdf, nat_comm_sims_wrapper)
-
 # for slurm on LL
 dir.create("R_ignore/NatComms_VerityAB2019_Sims/results/", recursive = T)
 setwd("R_ignore/NatComms_VerityAB2019_Sims/results/")
