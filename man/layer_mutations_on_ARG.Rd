@@ -4,16 +4,23 @@
 \alias{layer_mutations_on_ARG}
 \title{Layer Mutations onto the ARG for Each Loci}
 \usage{
-layer_mutations_on_ARG(mutationrate, ARGsim)
+layer_mutations_on_ARG(mutationrate, ARG)
 }
 \arguments{
 \item{mutationrate}{numeric; the genome-wide per-generation mutation rate}
 
-\item{ARGsim}{S4 object;}
+\item{ARG}{set of bvtree; a set of bvtrees}
 }
 \value{
-GTmatrix numeric matrix;
+hapmat numeric matrix; a matrix of mutliallelic haplotypes for each parasite considered. Loci are in
+rows and parasites (haplotypes) are in columns.
 }
 \description{
 Layer Mutations onto the ARG for Each Loci
+}
+\details{
+The mutation model approximates an infinite allele model in time which is then collapsed into a single loci.
+Mutations are drawn with respect to the mutation rate and overall tree length from a poisson model. Mutations are
+then "droppped" onto the tree following a uniform distribution. Mutations that happen upstream (i.e. are ancestral)
+are carried along the tree branch to produce the final haplotypes for each parasite node.
 }

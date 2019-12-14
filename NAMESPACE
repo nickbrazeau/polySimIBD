@@ -2,6 +2,7 @@
 
 export("%>%")
 export(get_arg)
+export(get_haplotype_matrix)
 export(layer_mutations_on_ARG)
 export(plot_coalescence_trees)
 export(rbetabinom)

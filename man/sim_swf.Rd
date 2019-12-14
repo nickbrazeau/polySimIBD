@@ -7,25 +7,29 @@
 sim_swf(pos, N, m, rho, mean_coi, tlim)
 }
 \arguments{
-\item{pos}{dataframe <factor><numeric>; the genomic coordinates for chromosome and position of the sites}
+\item{pos}{vector; the genomic coordinates for chromosome and position of the sites}
 
 \item{N}{numeric; The number of individuals to consider}
 
-\item{m}{numeric; Probability of migration where m represents the probability of moving from \eqn{host_{origin}} to \eqn{host_{new}} by \eqn{m*(1-1/N)}}
+\item{m}{numeric; Probability of migration where m represents the probability of moving from \italic{host_{origin}} to \italic{host_{new}} by \italic{m*(1-1/N)}}
 
 \item{rho}{numeric; expected recombination rate}
 
-\item{mean_coi}{numeric; The lambda of a right-shifted Poisson process, \eqn{1 + Pos(lambda)} representing the average COI of an individual deme}
+\item{mean_coi}{numeric; The lambda of a right-shifted Poisson process, \italic{1 + Pos(lambda)} representing the average COI of an individual deme}
 
 \item{tlim}{numeric; the maximum number of generations to consider before exitting gracefully if all samples have not coalesced}
 }
 \value{
-Returns a list of length G (the number of generations it took for all lineages to coalesce). Each
-list item is a matrix with n x L dimensions where n is the number of parasites considered and L is loci.
-Parasites are then indexed into demes (individuals) based on the COI distribution.
+Returns a list of length six that contains the COI of each individual. A recombination list of length of tlim
+where each element contains the recombination block -- as a boolean -- of the two parental haplotypes.
+(the number of generations it took for all lineages to coalesce). Finally, there are lists for the parental host
+and parental haplotype assignments for the "paternal" and "maternal" haplotypes (1 and 2), respectively.
 }
 \description{
 Simulate a population forwards with recombination that approximates the Structured Wright Fisher Process
 and tracks haplotype identity by descent where individuals represent demes, such that within
 a deme individual-level COI is considered.
+}
+\details{
+This function is intended to fed directly into the \code{get_arg} function for interpretability.
 }

@@ -4,13 +4,13 @@
 \alias{plot_coalescence_trees}
 \title{plot the bvtrees}
 \usage{
-plot_coalescence_trees(ARGsim, loci)
+plot_coalescence_trees(ARG, loci = NULL)
 }
 \arguments{
+\item{loci}{numeric vector; Loci to plot}
+
 \item{ARGsim}{S4 object; The ARGsim object that was created from a structured Wright
 Fisher Simulation via \code{sim_structured_WF} and then processed with \code{get_ARG}.}
-
-\item{loci}{numeric vector; Loci to plot}
 }
 \value{
 ggplot object of geom_segments
