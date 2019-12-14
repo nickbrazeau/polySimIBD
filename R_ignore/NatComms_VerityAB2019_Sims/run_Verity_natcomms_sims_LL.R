@@ -257,16 +257,18 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, hosts){
   #..............................................................
   # RETURN
   #..............................................................
-  ret <- list(sim_out = ret.long,
-              ibdmle = ret, 
-              WSAF.list = WSAF.list,
-              hapmuts = hapmat,
-              trueIBD = trueIBD,
-              ARG = ARG,
-              swfsim = swfsim
-  )
+  # ret <- list(sim_out = ret.long,
+  #             ibdmle = ret, 
+  #             WSAF.list = WSAF.list,
+  #             hapmuts = hapmat,
+  #             trueIBD = trueIBD,
+  #             ARG = ARG,
+  #             swfsim = swfsim
+  # )
+  # 
+  # return(ret)
   
-  return(ret)
+  return(ret.long)
   
 }
 
