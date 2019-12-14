@@ -7,8 +7,8 @@
 #'
 #' @param pos vector; the genomic coordinates for chromosome and position of the sites
 #' @param N numeric; The number of individuals to consider
-#' @param m numeric; Probability of migration where m represents the probability of moving from \italic{host_{origin}} to \italic{host_{new}} by \italic{m*(1-1/N)}
-#' @param mean_coi numeric; The lambda of a right-shifted Poisson process, \italic{1 + Pos(lambda)} representing the average COI of an individual deme
+#' @param m numeric; Probability of migration where m represents the probability of moving from host_{origin} to host_{new} by m*(1-1/N)
+#' @param mean_coi numeric; The lambda of a right-shifted Poisson process, 1 + Pos(lambda) representing the average COI of an individual deme
 #' @param rho numeric; expected recombination rate
 #' @param tlim numeric; the maximum number of generations to consider before exitting gracefully if all samples have not coalesced
 #' 
