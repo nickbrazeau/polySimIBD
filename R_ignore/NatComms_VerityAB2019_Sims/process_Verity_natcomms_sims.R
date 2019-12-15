@@ -32,11 +32,12 @@ simfiles.df <- tibble::tibble(
   path = simfiles ) %>% 
   dplyr::mutate(
   iter = stringr::str_split_fixed(simfiles, "/", 3)[,3],
-  iter = stringr::str_extract(iter, "[0-9]+")
+  iter = stringr::str_extract(iter, "[0-9]+"),
+  iter = as.numeric(iter)
   )  %>% 
   dplyr::arrange(iter)
 
-paramsdf$results <- unlist( purrr::map(simfiles.df$path, readRDS(x)), 
+paramsdf$results <- unlist( purrr::map(simfiles.df$path, function(x) readRDS(x)), 
                             recursive = F) # extract results -- use unlist without recursion to match
 
 

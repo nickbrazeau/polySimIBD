@@ -6,4 +6,4 @@
 #SBATCH --mail-type=all
 #SBATCH --mail-user=nbrazeau@med.unc.edu
 
-~/.linuxbrew/bin/R -e 'setwd("/proj/ideel/meshnick/users/NickB/Projects/polySimIBD"); source("R_ignore/NatComms_VerityAB2019_Sims/run_Verity_natcomms_sims_LL.R")'
+~/.linuxbrew/bin/R -e 'setwd("/proj/ideel/meshnick/users/NickB/Projects/polySimIBD"); source("R_ignore/NatComms_VerityAB2019_Sims/run_Verity_natcomms_sims.R")'

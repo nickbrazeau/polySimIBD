@@ -1,5 +1,5 @@
 #..............................................................
-# Utilities 
+# Utilities for Nat Comm Simulations
 #..............................................................
 
 
@@ -73,7 +73,6 @@ get_truth_from_arg <- function(swfsim, arg, hosts = NULL){
   
   # convert trees into matrix of alleles
   allele_mat <- polySimIBD::get_haplotype_matrix(arg)
-  
   
   # split the haplotype matrix into individual (host) matrices 
   hosts.haplotypes <- NULL

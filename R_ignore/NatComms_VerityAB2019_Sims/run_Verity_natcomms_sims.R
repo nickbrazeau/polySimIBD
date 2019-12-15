@@ -9,7 +9,6 @@ remotes::install_github("nickbrazeau/polySimIBD")
 library(polySimIBD)
 library(rslurm)
 set.seed(1)
-source("R_ignore/NatComms_VerityAB2019_Sims/utils.R")
 
 #---------------------------------
 # Magic Numbers for Consideration
@@ -19,15 +18,12 @@ source("R_ignore/NatComms_VerityAB2019_Sims/utils.R")
 #
 # Miles et al. 2016 (PMC5052046) & Taylor et al. 2019 (PMC6707449) gives us a recombination rate by 7.4e-7 M/bp
 # Aimee gets this number by taking the inverse of Mile's estiamte of the CO recombination rate of 13.5 kb/cM
-
-
 pos <- readRDS("R_ignore/NatComms_VerityAB2019_Sims/simparams/sim_POS.rds")
 rho <- 7.4e-7
 tlim <- 10
-
+#source("R_ignore/NatComms_VerityAB2019_Sims/natcomm_utils.R")
 # NB, we will consider hosts (N) on a logarithmic-base 10 scale 
 N <- round(10^seq(1, 3, l = 11))
-
 # Mean COIs for lambda
 coilamdas <- readRDS("R_ignore/NatComms_VerityAB2019_Sims/simparams/optim_lambda.RDS") 
 
@@ -42,17 +38,15 @@ paramsdf <- expand.grid(N, coilamdas, M) %>%
 paramsdf <- paramsdf %>% 
   dplyr::mutate(pos = list(pos), 
                 rho = rho, 
-                tlim = tlim, 
-                # take 25% of hosts
-                hosts = round(N * 0.25),
-                hosts = purrr::map(hosts, function(x){return(1:x)})
+                tlim = tlim,
+                hosts = list(5:6)
   )
 
 
 # replicates of this framework
-#reps <- 25
-#paramsdf <- lapply(1:reps, function(x) return(paramsdf)) %>%
-#  dplyr::bind_rows()
+reps <- 1e3
+paramsdf <- lapply(1:reps, function(x) return(paramsdf)) %>%
+  dplyr::bind_rows()
 
 
 
@@ -60,16 +54,11 @@ paramsdf <- paramsdf %>%
 # Wrapper Function
 #..............................................................
 
-nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, hosts){
+nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, hosts, LL = FALSE){
   
-  #..............................................................
-  # Internal Function Start
-  #..............................................................
-  
-  
-  #..............................................................
-  # Internal Function End
-  #..............................................................
+  if(LL){
+    source("/proj/ideel/meshnick/users/NickB/Projects/polySimIBD/R_ignore/NatComms_VerityAB2019_Sims/natcomm_utils.R")
+  }
   
   # run forward
   swfsim <- polySimIBD::sim_swf(pos = pos,
@@ -119,9 +108,8 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, hosts){
                                 hosts = hosts)
   
   trueIBD.btwn <- trueIBD %>% 
-    dplyr::mutate(btwnIBDprop = purrr::map(btwnIBD, "btwn_IBDprop")) %>% 
-    dplyr::select(-c("btwnIBD")) %>% 
-    tidyr::unnest(cols = btwnIBDprop)
+    dplyr::mutate(btwnIBD = purrr::map(btwnIBD, "btwn_IBDprop")) %>% 
+    tidyr::unnest(cols = btwnIBD)
   
   #..............................................................
   # Run Bob's MLE
@@ -145,19 +133,19 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, hosts){
   #..............................................................
   # RETURN
   #..............................................................
-  ret <- list(sim_out = ret.long,
-              ibdmle = ret, 
-              WSAF.list = WSAF.list,
-              hapmuts = hapmat,
-              trueIBD = trueIBD,
-              ARG = ARG,
-              swfsim = swfsim
-  )
+  # ret <- list(sim_out = ret.long,
+  #             ibdmle = ret, 
+  #             WSAF.list = WSAF.list,
+  #             hapmuts = hapmat,
+  #             trueIBD = trueIBD,
+  #             ARG = ARG,
+  #             swfsim = swfsim
+  # )
   
-  return(ret)
+  
+  return(ret.long)
   
 }
-
 
 #..............................................................
 # Run Sims
@@ -165,6 +153,8 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, hosts){
 # for slurm on LL
 dir.create("R_ignore/NatComms_VerityAB2019_Sims/results/", recursive = T)
 setwd("R_ignore/NatComms_VerityAB2019_Sims/results/")
+
+paramsdf$LL <- TRUE
 ntry <- 1028 # max number of nodes
 sjob <- rslurm::slurm_apply(f = nat_comm_sims_wrapper,
                             params = paramsdf,
