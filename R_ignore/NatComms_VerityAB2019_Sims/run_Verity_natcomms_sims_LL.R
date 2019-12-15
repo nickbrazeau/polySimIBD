@@ -42,7 +42,7 @@ paramsdf <- paramsdf %>%
   dplyr::mutate(pos = list(pos), 
                 rho = rho, 
                 tlim = tlim, 
-                hosts = 1:2)
+                hosts = list(1:2))
 
 
 # replicates of this framework
