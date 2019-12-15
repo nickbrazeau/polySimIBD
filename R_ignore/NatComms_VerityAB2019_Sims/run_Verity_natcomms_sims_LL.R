@@ -31,10 +31,10 @@ N <- round(10^seq(1, 3, l = 11))
 coilamdas <- readRDS("R_ignore/NatComms_VerityAB2019_Sims/simparams/optim_lambda.RDS") 
 
 # various levels of M
-M <- c(0, 0.25, 0.5, 1)
+m <- c(0, 0.25, 0.5, 1)
 
 # expand out combinations
-paramsdf <- expand.grid(N, coilamdas, M) %>% 
+paramsdf <- expand.grid(N, coilamdas, m) %>% 
   tibble::as_tibble() %>% 
   magrittr::set_colnames(c("N", "mean_coi", "m"))
 
@@ -42,16 +42,13 @@ paramsdf <- paramsdf %>%
   dplyr::mutate(pos = list(pos), 
                 rho = rho, 
                 tlim = tlim, 
-                # take 25% of hosts
-                hosts = round(N * 0.25),
-                hosts = purrr::map(hosts, function(x){return(1:x)})
-  )
+                hosts = 1:2)
 
 
 # replicates of this framework
-#reps <- 25
-#paramsdf <- lapply(1:reps, function(x) return(paramsdf)) %>%
-#  dplyr::bind_rows()
+reps <- 100
+paramsdf <- lapply(1:reps, function(x) return(paramsdf)) %>%
+  dplyr::bind_rows()
 
 
 
@@ -134,7 +131,6 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, hosts){
     
     # convert trees into matrix of alleles
     allele_mat <- polySimIBD::get_haplotype_matrix(arg)
-    
     
     # split the haplotype matrix into individual (host) matrices 
     hosts.haplotypes <- NULL
@@ -272,6 +268,7 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, hosts){
   
 }
 
+paramsdf$simout <- purrr::pmap(paramsdf, nat_comm_sims_wrapper)
 
 #..............................................................
 # Run Sims
@@ -279,8 +276,8 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, hosts){
 # for slurm on LL
 dir.create("R_ignore/NatComms_VerityAB2019_Sims/results/", recursive = T)
 setwd("R_ignore/NatComms_VerityAB2019_Sims/results/")
-# ntry <- 1028 # max number of nodes
-ntry <- nrow(paramsdf)
+ntry <- 1028 # max number of nodes
+#ntry <- nrow(paramsdf)
 sjob <- rslurm::slurm_apply(f = nat_comm_sims_wrapper,
                             params = paramsdf,
                             jobname = 'verity_nat_comm_sims',

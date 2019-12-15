@@ -7,10 +7,8 @@
 library(tidyverse)
 library(polySimIBD)
 
+# rsync -av nfb@longleaf.unc.edu:/proj/ideel/meshnick/users/NickB/Projects/polySimIBD/R_ignore/NatComms_VerityAB2019_Sims/results/_rslurm_verity_nat_comm_sims/ /Users/nickbrazeau/Documents/GitHub/polySimIBD/R_ignore/NatComms_VerityAB2019_Sims/results/ 
 
-#..............................................................
-# Plot Results
-#..............................................................
 plot_theme <- theme(plot.title = element_text(family = "Helvetica", face = "bold", hjust = 0.5, size = 14),
                     axis.title = element_text(family = "Helvetica", face = "bold", hjust = 0.5, size = 12),
                     axis.text.y = element_text(family = "Helvetica", hjust = 0.5, size = 11),
@@ -20,13 +18,37 @@ plot_theme <- theme(plot.title = element_text(family = "Helvetica", face = "bold
                     legend.text = element_text(family = "Helvetica", hjust = 0.5, vjust = 0.5, size = 10),
                     axis.line = element_line(color = "#000000", size = 1))
 
+
+#..............................................................
+# read in sims
+#..............................................................
+paramsdf <- readRDS("R_ignore/NatComms_VerityAB2019_Sims/results/params.RDS")
+
+simfiles <- list.files("R_ignore/NatComms_VerityAB2019_Sims/results/",
+                       pattern = ".RDS", full.names = T)
+simfiles <- simfiles[!grepl("f.RDS|params.RDS", simfiles)]
+
+simfiles.df <- tibble::tibble(
+  path = simfiles ) %>% 
+  dplyr::mutate(
+  iter = stringr::str_split_fixed(simfiles, "/", 3)[,3],
+  iter = stringr::str_extract(iter, "[0-9]+")
+  )  %>% 
+  dplyr::arrange(iter)
+
+paramsdf$results <- purrr::map(simfiles.df$path, function(x){
+  return(readRDS(x)[[1]])
+})
+
+
+#..............................................................
+# plot results
+#..............................................................
 plotdf <- paramsdf %>% 
-  dplyr::mutate(simout = purrr::map(paramsdf$nat_com_sims, "sim_out")) %>% 
-  tidyr::unnest(cols = simout)
+  tidyr::unnest(cols = "results")
 
 plotObj <- plotdf %>% 
-  tidyr::gather(., key = "IBD", value = "IBDest", 12:16) %>% 
-  dplyr::filter(IBD %in% c("btwnIBDprop", "malecotf")) %>% 
+  tidyr::gather(., key = "IBD", value = "IBDest", 10:11) %>% 
   dplyr::group_by(mean_coi, m, N, IBD) %>% 
   dplyr::summarise(
     n = n(),
@@ -34,18 +56,19 @@ plotObj <- plotdf %>%
     seIBD = sd(IBDest)/sqrt(n),
     IBDLL = meanIBD - 1.96*seIBD,
     IBDUL = meanIBD + 1.96*seIBD
-    #meanIBD = mean(IBDest > 0.9)
-    
   ) %>% 
-  dplyr::mutate(logN = log10(N)) %>% 
+  dplyr::ungroup(.) %>% 
+  dplyr::mutate(mean_coi = factor(mean_coi, 
+                                  levels = c("0.000000167", "1.59362417276452", "2.82143932879378"),
+                                  labels = c("Mean COI: 1", "Mean COI: 2", "Mean COI: 3")),
+                m = factor(m, 
+                           levels = c("0", "0.25", "0.5", "1"),
+                           labels = c("Migr: 0", "Migr: 0.25", "Migr: 0.5", "Migr: 1")),
+                logN = log10(N)) %>% 
   ggplot() + 
   geom_pointrange(aes(x = logN, y = meanIBD, ymin = IBDLL, ymax = IBDUL, 
                       group = factor(IBD), color = factor(IBD)), alpha = 0.5) +
-  #geom_point(aes(x = logN, y = meanIBD,
-  #               group = factor(IBD), color = factor(IBD)), alpha = 0.5) +                     
-  #scale_color_manual("IBD Measure", values = c("#542788", "#f768a1", "#e08214", "#2171b5", "#08519c")) +
-  scale_color_manual("IBD Measure", values = c("#006d2c", "#542788", "#e08214")) +
-  #scale_color_manual("IBD Measure", values = c("#006d2c", "#e08214", "#ef6548")) +
+  scale_color_manual("IBD Measure", values = c("#54278f", "#e08214")) +
   facet_grid(mean_coi ~ m) + 
   ylab("IBD") + xlab("Effective Population (log10-transformed)") +
   plot_theme 
