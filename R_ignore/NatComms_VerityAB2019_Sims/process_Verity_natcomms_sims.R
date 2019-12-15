@@ -51,7 +51,7 @@ plotdf <- paramsdf %>%
 coilvls <- levels(factor(plotdf$mean_coi))
 
 plotObj <- plotdf %>% 
-  tidyr::gather(., key = "IBD", value = "IBDest", 10:11) %>% 
+  tidyr::gather(., key = "IBD", value = "IBDest", 11:12) %>% 
   dplyr::group_by(mean_coi, m, N, IBD) %>% 
   dplyr::summarise(
     n = n(),
@@ -67,6 +67,9 @@ plotObj <- plotdf %>%
                 m = factor(m, 
                            levels = c("0", "0.25", "0.5", "1"),
                            labels = c("Migr: 0", "Migr: 0.25", "Migr: 0.5", "Migr: 1")),
+                IBD = factor(IBD, 
+                             levels = c("btwnIBD", "malecotf"),
+                             labels = c("Truth", "MLE")),
                 logN = log10(N)) %>% 
   ggplot() + 
   geom_pointrange(aes(x = logN, y = meanIBD, ymin = IBDLL, ymax = IBDUL, 
@@ -76,7 +79,8 @@ plotObj <- plotdf %>%
   ylab("IBD") + xlab("Effective Population (log10-transformed)") +
   plot_theme 
 
-jpeg("~/Desktop/newtemp_polysimibd_btwnIBD_nomut_rho.jpg", width = 11, height = 8, units = "in", res = 300)
+jpeg("R_ignore/NatComms_VerityAB2019_Sims/MLE_vs_DLWTsWFmod.jpg", 
+     width = 11, height = 8, units = "in", res = 300)
 plot(plotObj)
 graphics.off()
 
