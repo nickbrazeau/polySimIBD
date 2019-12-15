@@ -21,7 +21,7 @@ wrap_MIPanalyzer_inbreeding_mle_cpp <- function(WSAF.list,
   # p <- rowMeans(wsaf, na.rm = TRUE)
   
   # get population allele frequencies based on our simulate beta dist
-  p <- 1 - WSAF.list$rbetaPLAF
+  p <- WSAF.list$rbetaPLAF
   
   
   #------------------------------------

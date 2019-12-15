@@ -80,7 +80,7 @@ sim_biallelic <- function(COIs = c(1,1),
   
   for(i in 1:nrow(m)){
     uniqueAllele <- unique( m[i, ] )
-    liftoverAlleles <- sample(x = c(0,1), 
+    liftoverAlleles <- sample(x = c(1,0), 
                               size = length(uniqueAllele),
                               prob = c(PLAF[i], (1-PLAF[i])), 
                               replace = T)

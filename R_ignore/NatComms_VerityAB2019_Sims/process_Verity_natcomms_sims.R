@@ -76,7 +76,7 @@ plotObj <- plotdf %>%
   ylab("IBD") + xlab("Effective Population (log10-transformed)") +
   plot_theme 
 
-jpeg("~/Desktop/temp_polysimibd_btwnIBD_nomut_rho.jpg", width = 11, height = 8, units = "in", res = 300)
+jpeg("~/Desktop/newtemp_polysimibd_btwnIBD_nomut_rho.jpg", width = 11, height = 8, units = "in", res = 300)
 plot(plotObj)
 graphics.off()
 
