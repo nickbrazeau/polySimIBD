@@ -36,9 +36,8 @@ simfiles.df <- tibble::tibble(
   )  %>% 
   dplyr::arrange(iter)
 
-paramsdf$results <- purrr::map(simfiles.df$path, function(x){
-  return(readRDS(x)[[1]])
-})
+paramsdf$results <- unlist( purrr::map(simfiles.df$path, readRDS(x)), 
+                            recursive = F) # extract results -- use unlist without recursion to match
 
 
 #..............................................................
@@ -46,6 +45,9 @@ paramsdf$results <- purrr::map(simfiles.df$path, function(x){
 #..............................................................
 plotdf <- paramsdf %>% 
   tidyr::unnest(cols = "results")
+
+# housekeeping
+coilvls <- levels(factor(plotdf$mean_coi))
 
 plotObj <- plotdf %>% 
   tidyr::gather(., key = "IBD", value = "IBDest", 10:11) %>% 
@@ -59,7 +61,7 @@ plotObj <- plotdf %>%
   ) %>% 
   dplyr::ungroup(.) %>% 
   dplyr::mutate(mean_coi = factor(mean_coi, 
-                                  levels = c("0.000000167", "1.59362417276452", "2.82143932879378"),
+                                  levels = coilvls,
                                   labels = c("Mean COI: 1", "Mean COI: 2", "Mean COI: 3")),
                 m = factor(m, 
                            levels = c("0", "0.25", "0.5", "1"),

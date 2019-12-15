@@ -20,7 +20,8 @@ set.seed(1)
 # Aimee gets this number by taking the inverse of Mile's estiamte of the CO recombination rate of 13.5 kb/cM
 
 
-pos <- readRDS("R_ignore/NatComms_VerityAB2019_Sims/simparams/sim_POS.rds")
+#pos <- readRDS("R_ignore/NatComms_VerityAB2019_Sims/simparams/sim_POS.rds")
+pos <- seq(1, 1e6, 1e3)
 rho <- 7.4e-7
 tlim <- 10
 
