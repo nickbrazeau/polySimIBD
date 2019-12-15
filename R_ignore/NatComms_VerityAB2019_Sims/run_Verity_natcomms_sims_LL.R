@@ -268,8 +268,6 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, hosts){
   
 }
 
-paramsdf$simout <- purrr::pmap(paramsdf, nat_comm_sims_wrapper)
-
 #..............................................................
 # Run Sims
 #..............................................................
