@@ -39,12 +39,12 @@ paramsdf <- paramsdf %>%
   dplyr::mutate(pos = list(pos), 
                 rho = rho, 
                 tlim = tlim,
-                hosts = list(5:6)
+                hosts = list(1:10)
   )
 
 
 # replicates of this framework
-reps <- 1e3
+reps <- 1e2
 paramsdf <- lapply(1:reps, function(x) return(paramsdf)) %>%
   dplyr::bind_rows()
 
@@ -147,6 +147,9 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, hosts, LL = FA
   
 }
 
+paramsdf$LL <- F
+paramsdf$results <- purrr::pmap(paramsdf, nat_comm_sims_wrapper)
+
 #..............................................................
 # Run Sims
 #..............................................................
@@ -158,7 +161,7 @@ paramsdf$LL <- TRUE
 ntry <- 1028 # max number of nodes
 sjob <- rslurm::slurm_apply(f = nat_comm_sims_wrapper,
                             params = paramsdf,
-                            jobname = 'verity_nat_comm_sims',
+                            jobname = 'verity_nat_comm_sims_tenhost',
                             nodes = ntry,
                             cpus_per_node = 1,
                             submit = T,
