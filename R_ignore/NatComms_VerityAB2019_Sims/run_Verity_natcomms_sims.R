@@ -39,15 +39,14 @@ paramsdf <- paramsdf %>%
   dplyr::mutate(pos = list(pos), 
                 rho = rho, 
                 tlim = tlim,
-                hosts = list(1:10)
+                hosts = list(1:2)
   )
 
 
 # replicates of this framework
-reps <- 1e2
+reps <- 1e3
 paramsdf <- lapply(1:reps, function(x) return(paramsdf)) %>%
   dplyr::bind_rows()
-
 
 
 #..............................................................
@@ -68,19 +67,8 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, hosts, LL = FA
                                 mean_coi = mean_coi,
                                 tlim = tlim)
   
-  # extract ARG
-  ARG <- polySimIBD::get_arg(swfsim)
-  
-  
-  #..............................................................
-  # Downsample ARG
-  #..............................................................
-  
-  this_coi <- swfsim$coi[hosts]
-  # find haplotype index within the host
-  w <- which(rep(1:length(swfsim$coi), times = swfsim$coi) %in% hosts)
-  ARG <- mapply(function(x) polySimIBD::subset_bvtree(x, w), ARG)
-  
+  # extract ARG and down sample arg
+  ARG <- polySimIBD::get_arg(swfsim, host_index = hosts)
   
   #..............................................................
   # Extract Haplotype Matrix
@@ -91,10 +79,11 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, hosts, LL = FA
   #..............................................................
   # Simulate Reads
   #..............................................................
+  this_coi <- swfsim$coi[hosts]
   WSAF.list <- polySimIBD::sim_biallelic(COIs = this_coi,
                                          haplotypematrix = hapmat,
-                                         shape1 = 5.1,
-                                         shape2 = 5.1,
+                                         shape1 = 1.544,
+                                         shape2 = 0.620,
                                          coverage = 100,
                                          alpha = 1,
                                          overdispersion = 0.1,
@@ -119,8 +108,6 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, hosts, LL = FA
     f = seq(0, 1, l = 100),
     ignore_het = F,
     report_progress = F)
-  
-  
   
   #..............................................................
   # DATA WRANGLE truth and MLE
@@ -147,9 +134,6 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, hosts, LL = FA
   
 }
 
-paramsdf$LL <- F
-paramsdf$results <- purrr::pmap(paramsdf, nat_comm_sims_wrapper)
-
 #..............................................................
 # Run Sims
 #..............................................................
@@ -161,7 +145,7 @@ paramsdf$LL <- TRUE
 ntry <- 1028 # max number of nodes
 sjob <- rslurm::slurm_apply(f = nat_comm_sims_wrapper,
                             params = paramsdf,
-                            jobname = 'verity_nat_comm_sims_tenhost',
+                            jobname = 'verity_nat_comm_sims',
                             nodes = ntry,
                             cpus_per_node = 1,
                             submit = T,
