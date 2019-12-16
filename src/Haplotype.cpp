@@ -47,7 +47,7 @@ void Haplotype::populate(int parent1, int haplo1,
   
   // draw total number of recombination breakpoints
   for (int i = 1; i < L; ++i) {
-    if (rbernoulli1(odd_prob[i])) {
+    if (rbernoulli1(odd_prob[i-1])) {
       switcher = 1 - switcher;
     }
     parent_vec[i] = switcher;
