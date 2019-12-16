@@ -44,7 +44,7 @@ paramsdf <- paramsdf %>%
 
 
 # replicates of this framework
-reps <- 1e3
+reps <- 1e2
 paramsdf <- lapply(1:reps, function(x) return(paramsdf)) %>%
   dplyr::bind_rows()
 
@@ -146,6 +146,9 @@ nat_comm_sims_wrapper <- function(pos, N, m, mean_coi, rho, tlim, hosts, LL = FA
   return(ret.long)
   
 }
+
+paramsdf$LL <- F
+paramsdf$results <- purrr::pmap(paramsdf, nat_comm_sims_wrapper)
 
 #..............................................................
 # Run Sims
