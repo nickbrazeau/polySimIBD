@@ -37,13 +37,12 @@ Rcpp::List sim_swf_cpp(Rcpp::List args) {
   chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
   
   // extract arguments
-  vector<int> pos = rcpp_to_vector_int(args["pos"]);
   int N = rcpp_to_int(args["N"]);
   double m = rcpp_to_double(args["m"]);
   double mean_coi = rcpp_to_double(args["mean_coi"]);
   int tlim = rcpp_to_int(args["tlim"]);
   vector<double> odd_prob = rcpp_to_vector_double(args["odd_prob"]);
-  int L = int(pos.size());
+  int L = int(odd_prob.size()) + 1;
   
   // nested vectors, first over time, then individuals
   vector<vector<Host>> pop(tlim, vector<Host>(N));
