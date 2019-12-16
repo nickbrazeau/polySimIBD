@@ -40,7 +40,7 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim){
   # precalculate probability of an odd number of recombination events between
   # any interval
   odd_prob <- exp(-rho*diff(pos))*sinh(rho*diff(pos))
-  if (any(is.nan(odd_prob))) {  # catch underflow issue
+  if (any(!is.finite(odd_prob))) {  # catch underflow issue
     odd_prob[is.nan(odd_prob)] <- 0.5
   }
   
