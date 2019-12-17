@@ -7,7 +7,7 @@
 library(tidyverse)
 library(polySimIBD)
 
-# rsync -av nfb@longleaf.unc.edu:/proj/ideel/meshnick/users/NickB/Projects/polySimIBD/R_ignore/NatComms_VerityAB2019_Sims/results/_rslurm_verity_nat_comm_sims/ /Users/nickbrazeau/Documents/GitHub/polySimIBD/R_ignore/NatComms_VerityAB2019_Sims/results/ 
+# rsync -av nfb@longleaf.unc.edu:/proj/ideel/meshnick/users/NickB/Projects/polySimIBD/R_ignore/NatComms_VerityAB2019_Sims/results/_rslurm_verity_nat_comm_sims/ /Users/nickbrazeau/Documents/GitHub/polySimIBD/R_ignore/NatComms_VerityAB2019_Sims/LL_sim_results/ 
 
 plot_theme <- theme(plot.title = element_text(family = "Helvetica", face = "bold", hjust = 0.5, size = 14),
                     axis.title = element_text(family = "Helvetica", face = "bold", hjust = 0.5, size = 12),
@@ -22,9 +22,9 @@ plot_theme <- theme(plot.title = element_text(family = "Helvetica", face = "bold
 #..............................................................
 # read in sims
 #..............................................................
-paramsdf <- readRDS("R_ignore/NatComms_VerityAB2019_Sims/results/params.RDS")
+paramsdf <- readRDS("R_ignore/NatComms_VerityAB2019_Sims/LL_sim_results/params.RDS")
 
-simfiles <- list.files("R_ignore/NatComms_VerityAB2019_Sims/results/",
+simfiles <- list.files("R_ignore/NatComms_VerityAB2019_Sims/LL_sim_results/",
                        pattern = ".RDS", full.names = T)
 simfiles <- simfiles[!grepl("f.RDS|params.RDS", simfiles)]
 
@@ -80,7 +80,7 @@ plotObj <- plotdf %>%
   plot_theme 
 
 jpeg("R_ignore/NatComms_VerityAB2019_Sims/MLE_vs_DLWTsWFmod.jpg", 
-     width = 11, height = 8, units = "in", res = 300)
+     width = 11, height = 8, units = "in", res = 500)
 plot(plotObj)
 graphics.off()
 

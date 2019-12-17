@@ -9,6 +9,8 @@ simdata/
 *.jpg
 *.svg
 simulations/*.html
+LL_sim_results/
+
 # mac files
 .DS_Store
 R_ignore/NatComms_VerityAB2019_Sims/results/
