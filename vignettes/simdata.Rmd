@@ -68,7 +68,7 @@ WSAF.list <- polySimIBD::sim_biallelic(COIs = swfsim$coi[1:2], # how many haplot
 
 ```
 
-The return form the `sim_billalelic` function is a list of phased and unphased items. Phased items include the strain proportions, the biallelic haplotype matrix, the non-referent within sample allele counts, and the per-haplotype coverage. We then collapse all of this information to form convoluted, or unphased, non-referent within sample allele frequencies for each of the hosts that were specified above. These non-referent within sample allele frequencies can no be used for downstream analyses or converted to a variant call file (see the `vcf` package).
+The return form the `sim_billalelic` function is a list of phased and unphased items. Phased items include the strain proportions, the biallelic haplotype matrix, the non-referent within sample allele counts, and the per-haplotype coverage. We then collapse all of this information to form convoluted, or unphased, non-referent within sample allele frequencies for each of the hosts that were specified above. These non-referent within sample allele frequencies can now be used for downstream analyses or converted to a variant call file (see the `vcfR` package).
 
 
   
