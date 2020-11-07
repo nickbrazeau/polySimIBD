@@ -54,7 +54,10 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim){
   
   # run efficient C++ function
   ret <- sim_swf_cpp(args)
-  
+
+  # keep pos around for ease
+  pos <- list(pos = pos)
+  ret <- append(pos, ret)  
   # return as custom class
   class(ret) <-"swfsim"
   return(ret)
