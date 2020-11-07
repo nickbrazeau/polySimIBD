@@ -2,10 +2,10 @@
 title: "Simulating Data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Simulating Data}
+%\VignetteIndexEntry{Simulating Data}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
-editor_options: 
+  editor_options: 
   chunk_output_type: console
 ---
 
@@ -22,7 +22,7 @@ library(polySimIBD)
 
 # Overview
 After having reviewed the [Structured DTWF Malaria Model Overview Vignette](https://nickbrazeau.github.io/polySimIBD/articles/modframework_dldtstructuredwf.html) , you are ready to simulate some malaria genetic data! In the previous tutorial, we did not track within-host COI as we were working with at the "parasite-level". Unfortunately, malaria genetic data is usually complicated by polyclonality resulting in convoluted sequencing results. For example, in a polyclonal infection with a COI of 3, some reads will belong to parasite A, some to B, and finally, some to C. Deconvoluting these reads is challenging because MOI is a random variable for each host and there is stochastiticity in NGS platform read depth, read errors, etc. (although recent methodological advances have been made for phasing (see [Zhu et al. 2019](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6684230/) and inferences with unphased data are forthcoming).    
-  
+
 Here, we will use the Structured Discrete-Loci, Discrete Time Wright Fisher model to simulate relatedness among parasites. We will then collapse parasites into a single sample with respect to host. Finally, we will simulate "reads" from our sample and extract our the allele depths for our variants (for those of you familiar with VCF terminology, the AD and DP fields). In this tutorial, we will force all sites to be biallelic.  
 
 
@@ -33,7 +33,7 @@ As Uncle Ben once said, "With great flexibility, comes great responsibility". We
 ```{r}
 set.seed(1)
 # define some parameters parameters
-pos <- seq(1,1e3,1e2)
+pos <- seq(1, 1e3, 1e2)
 N <- 10
 m <- 0.5
 rho <- 1e-3
@@ -45,7 +45,7 @@ swfsim <- polySimIBD::sim_swf(pos = pos,
                               m = m,
                               rho = rho, 
                               mean_coi = mean_coi,
-                              tlim = Inf)
+                              tlim = 10)
 
 
 # get ARG
@@ -60,7 +60,7 @@ We now have created a matrix of haplotypes that has dimensions Loci x Parasites.
 ```{r}
 
 WSAF.list <- polySimIBD::sim_biallelic(COIs = swfsim$coi[1:2], # how many haplotypes in each sample
-                                       haplotypematrix = parasite.hapmat, 
+                                       haplotypematrix = parasite.hapmat[, 1:2], 
                                        coverage = 100, 
                                        alpha = 1, 
                                        overdispersion = 0.1, 
@@ -68,10 +68,54 @@ WSAF.list <- polySimIBD::sim_biallelic(COIs = swfsim$coi[1:2], # how many haplot
 
 ```
 
-The return form the `sim_billalelic` function is a list of phased and unphased items. Phased items include the strain proportions, the biallelic haplotype matrix, the non-referent within sample allele counts, and the per-haplotype coverage. We then collapse all of this information to form convoluted, or unphased, non-referent within sample allele frequencies for each of the hosts that were specified above. These non-referent within sample allele frequencies can now be used for downstream analyses or converted to a variant call file (see the `vcfR` package).
+The return form the `sim_billalelic` function is a list of phased and unphased items. Phased items include the strain proportions, the biallelic haplotype matrix, the non-referent within sample allele counts, and the per-haplotype coverage. We then collapse all of this information to form convoluted, or unphased, non-referent within sample allele frequencies for each of the hosts that were specified above. These non-referent within sample allele frequencies can now be used for downstream analyses or converted to a more standard file format.    
+   
+Below, we show how this data could be used to create a variant call file (VCF; for more details, see [VCF specifciations](https://samtools.github.io/hts-specs/VCFv4.3.pdf)) with the `vcfR` package. It is important to note, that we continue in a biallelic SNP framework after using the `polySimIBD::sim_biallelic` function. 
+
+```{r, eval = F}
+
+# VCF files (and vcfR Objects) contain three pieces: 
+#    1. Meta (Header information)
+#    2. Fixed (Loci and Filtering Information)
+#    3. Genotype Matrix 
+
+# Here we will assume that we are using the VCFv4.3 specifications 
+# Also assuming user called the VCF with a ploidy of 2 specification (allowed for homozyg-ref, heterozyg, homozyg-alt calls)
+# get meta
+meta <- paste("##fileformat=VCFv4.3", "##Simulated with polySimIBD", "##ploidy=2", collapse = "\n")
+
+# get Fix:  must be in this order and only these
+fix <- data.frame(CHROM = "CHROM1",
+                  POS = swfsim$pos,
+                  ID = NA,
+                  REF = "A", # arbitrary choice 
+                  ALT = "T", # arbitrary choice 
+                  QUAL = NA,
+                  FILTER = "PASS",
+                  INFO = NA) 
+# get GT
+# here we will need to make a choice on the "threshold" for "calling" a homozyg-ref, heterozyg, or homozyg-alt allele
+# selecting 10% as 2x the simulated error rate
+gtmatsim <- matrix("0/1", nrow = nrow(WSAF.list$NRWSAcounts), ncol = ncol(WSAF.list$NRWSAcounts))
+gtmatsim[WSAF.list$NRWSAF > 0.9] <- "1/1"
+gtmatsim[WSAF.list$NRWSAF < 0.1] <- "0/0"
+# now that we have genotype calls, we can combine these into depths
+gt <- matrix(NA, nrow = nrow(gtmatsim), ncol = ncol(gtmatsim))
+# quick for loop to protect against vector setting
+for (i in 1:nrow(gtmatsim)) {
+  for (j in 1:ncol(gtmatsim)) {
+    AD <- paste(WSAF.list$WS.coverage[i,j] - WSAF.list$NRWSAcounts[i,j], WSAF.list$NRWSAcounts[i,j], sep = ",")
+    gt[i, j] <- paste(gtmatsim[i,j], AD, WSAF.list$WS.coverage[i,j], sep = ":")
+  }
+}
+gt <- cbind(FORMAT = "GT:AD:DP", gtmatsim)
+
+# write out new vcfRobj
+require(vcfR) # need this for class
+newvcfR <- new("vcfR", meta = meta, fix = as.matrix(fix), gt = gt)
 
 
-  
 
+```
 
-
+**Reminder** that as Uncle Ben once said, "With great flexibility, comes great responsibility". We leave it to the user to decide how to wrangle and combine this data per their project specifications! 

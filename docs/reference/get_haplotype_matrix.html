@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get ancestral recombination graph from forward simulations — get_arg • polySimIBD</title>
+<title>Extract haplotypes from ARG — get_haplotype_matrix • polySimIBD</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,8 @@
 
 
 
-<meta property="og:title" content="Get ancestral recombination graph from forward simulations — get_arg" />
-<meta property="og:description" content="Given an object swf, which is the result of forward
-simulation using the function sim_swf(), walks backwards through the
-ancestry and calculates the coalescent tree at every locus for the
-specified haplotypes." />
+<meta property="og:title" content="Extract haplotypes from ARG — get_haplotype_matrix" />
+<meta property="og:description" content="Extract haplotypes from ARG" />
 
 
 
@@ -120,38 +117,30 @@ specified haplotypes." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get ancestral recombination graph from forward simulations</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nickbrazeau/polySimIBD/blob/master/R/forward_sWF.R'><code>R/forward_sWF.R</code></a></small>
-    <div class="hidden name"><code>get_arg.Rd</code></div>
+    <h1>Extract haplotypes from ARG</h1>
+    <small class="dont-index">Source: <a href='https://github.com/nickbrazeau/polySimIBD/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
+    <div class="hidden name"><code>get_haplotype_matrix.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Given an object <code>swf</code>, which is the result of forward
-simulation using the function <code><a href='sim_swf.html'>sim_swf()</a></code>, walks backwards through the
-ancestry and calculates the coalescent tree at every locus for the
-specified haplotypes.</p>
+    <p>Extract haplotypes from ARG</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_arg</span><span class='op'>(</span><span class='va'>swf</span>, host_index <span class='op'>=</span> <span class='cn'>NULL</span>, haplo_index <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_haplotype_matrix</span><span class='op'>(</span><span class='va'>ARG</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>swf</th>
-      <td><p>result of forwards simulation using the function <code><a href='sim_swf.html'>sim_swf()</a></code></p></td>
-    </tr>
-    <tr>
-      <th>host_index</th>
-      <td><p>a vector of target hosts. Defaults to all hosts</p></td>
-    </tr>
-    <tr>
-      <th>haplo_index</th>
-      <td><p>a list of target haplotypes within the hosts specified by
-<code>host_index</code>. Defaults to all haplotypes within the specified hosts</p></td>
+      <th>ARG</th>
+      <td><p>set of bvtree; a set of bvtrees</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>hapmat numeric matrix; a matrix of mutliallelic haplotypes for each parasite considered. Loci are in
+rows and parasites (haplotypes) are in columns.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

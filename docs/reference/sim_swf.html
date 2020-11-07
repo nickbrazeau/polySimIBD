@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get ancestral recombination graph from forward simulations — get_arg • polySimIBD</title>
+<title>The Structured Wright Fisher Model for IBD — sim_swf • polySimIBD</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,10 @@
 
 
 
-<meta property="og:title" content="Get ancestral recombination graph from forward simulations — get_arg" />
-<meta property="og:description" content="Given an object swf, which is the result of forward
-simulation using the function sim_swf(), walks backwards through the
-ancestry and calculates the coalescent tree at every locus for the
-specified haplotypes." />
+<meta property="og:title" content="The Structured Wright Fisher Model for IBD — sim_swf" />
+<meta property="og:description" content="Simulate a population forwards with recombination that approximates the Structured Wright Fisher Process
+and tracks haplotype identity by descent where individuals represent demes, such that within
+a deme individual-level COI is considered." />
 
 
 
@@ -120,38 +119,57 @@ specified haplotypes." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get ancestral recombination graph from forward simulations</h1>
+    <h1>The Structured Wright Fisher Model for IBD</h1>
     <small class="dont-index">Source: <a href='https://github.com/nickbrazeau/polySimIBD/blob/master/R/forward_sWF.R'><code>R/forward_sWF.R</code></a></small>
-    <div class="hidden name"><code>get_arg.Rd</code></div>
+    <div class="hidden name"><code>sim_swf.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Given an object <code>swf</code>, which is the result of forward
-simulation using the function <code><a href='sim_swf.html'>sim_swf()</a></code>, walks backwards through the
-ancestry and calculates the coalescent tree at every locus for the
-specified haplotypes.</p>
+    <p>Simulate a population forwards with recombination that approximates the Structured Wright Fisher Process
+and tracks haplotype identity by descent where individuals represent demes, such that within
+a deme individual-level COI is considered.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_arg</span><span class='op'>(</span><span class='va'>swf</span>, host_index <span class='op'>=</span> <span class='cn'>NULL</span>, haplo_index <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>sim_swf</span><span class='op'>(</span><span class='va'>pos</span>, <span class='va'>N</span>, <span class='va'>m</span>, <span class='va'>rho</span>, <span class='va'>mean_coi</span>, <span class='va'>tlim</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>swf</th>
-      <td><p>result of forwards simulation using the function <code><a href='sim_swf.html'>sim_swf()</a></code></p></td>
+      <th>pos</th>
+      <td><p>vector; the genomic coordinates for chromosome and position of the sites</p></td>
     </tr>
     <tr>
-      <th>host_index</th>
-      <td><p>a vector of target hosts. Defaults to all hosts</p></td>
+      <th>N</th>
+      <td><p>numeric; The number of individuals to consider</p></td>
     </tr>
     <tr>
-      <th>haplo_index</th>
-      <td><p>a list of target haplotypes within the hosts specified by
-<code>host_index</code>. Defaults to all haplotypes within the specified hosts</p></td>
+      <th>m</th>
+      <td><p>numeric; Probability of migration where m represents the probability of moving from host_origin to host_new by m*(1-1/N)</p></td>
+    </tr>
+    <tr>
+      <th>rho</th>
+      <td><p>numeric; expected recombination rate</p></td>
+    </tr>
+    <tr>
+      <th>mean_coi</th>
+      <td><p>numeric; The lambda of a right-shifted Poisson process, 1 + Pos(lambda) representing the average COI of an individual deme</p></td>
+    </tr>
+    <tr>
+      <th>tlim</th>
+      <td><p>numeric; the maximum number of generations to consider before exitting gracefully if all samples have not coalesced</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Returns a list of length six that contains the COI of each individual. A recombination list of length of tlim
+where each element contains the recombination block -- as a boolean -- of the two parental haplotypes.
+(the number of generations it took for all lineages to coalesce). Finally, there are lists for the parental host
+and parental haplotype assignments for the "paternal" and "maternal" haplotypes (1 and 2), respectively.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>This function is intended to fed directly into the <code>get_arg</code> function for interpretability.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
