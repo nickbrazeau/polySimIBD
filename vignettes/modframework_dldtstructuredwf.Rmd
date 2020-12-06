@@ -120,12 +120,21 @@ Finally, we can layer mutations on to each marginal tree (and the overall ARG) b
 ```{r}
 hapmat <- polySimIBD::layer_mutations_on_ARG(ARG, mutationrate = 0.1)
 hapmat <- cbind(POS = swfsim$pos, hapmat)
-colnames(hapmat) <- c("POS", paste0("parasite", 1:ncol(hapmat)-1))
+colnames(hapmat) <- c("POS", paste0("parasite", 1:(ncol(hapmat)-1)))
 knitr::kable(hapmat)
 ```
 
 
 # Conclusion
-Up until this point, we have ignored within host COI and have only analyzed parasites as independent infections. In the next vignette [Simulating Data])(https://nickbrazeau.github.io/polySimIBD/articles/simdata.html), we will explore how to convert our marginal tree and forward model into genomic data.   
+Up until this point, we have ignored within host COI and have only analyzed parasites as independent infections. In the next vignette [Simulating Data](https://nickbrazeau.github.io/polySimIBD/articles/simdata.html), we will explore how to convert our marginal tree and forward model into genomic data.   
   
 You may have noticed that our coalescent trees (`bvtree` class) always coalesce "right". This is intentional and an approach to optimize looping through ancestries to get the ARG. As a result, remember that not every intersection is a true node (e.g. lines can "jump" over other lines).
+
+
+
+
+
+
+
+
+

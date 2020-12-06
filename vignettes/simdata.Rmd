@@ -2,7 +2,7 @@
 title: "Simulating Data"
 output: rmarkdown::html_vignette
 vignette: >
-%\VignetteIndexEntry{Simulating Data}
+  %\VignetteIndexEntry{Simulating Data}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
   editor_options: 
@@ -60,7 +60,7 @@ We now have created a matrix of haplotypes that has dimensions Loci x Parasites.
 ```{r}
 
 WSAF.list <- polySimIBD::sim_biallelic(COIs = swfsim$coi[1:2], # how many haplotypes in each sample
-                                       haplotypematrix = parasite.hapmat[, 1:2], 
+                                       haplotypematrix = parasite.hapmat[, 1:sum(swfsim$coi[1:2])], 
                                        coverage = 100, 
                                        alpha = 1, 
                                        overdispersion = 0.1, 

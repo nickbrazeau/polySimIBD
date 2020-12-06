@@ -139,7 +139,7 @@ subset_bvtree <- function(bvtree, s) {
   
   # create mask vector
   m <- rep(0, length(bvtree@c))
-  m[s] <- TRUE
+  m[s] <- 1
   
   # run efficient C++ function
   output_raw <- subset_bvtree_cpp(bvtree@c, bvtree@t, m)
