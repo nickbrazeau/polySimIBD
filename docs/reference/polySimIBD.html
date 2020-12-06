@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get ancestral recombination graph from forward simulations — get_arg • polySimIBD</title>
+<title>Structured Wright Fisher Simulator for Malarai Genetics — polySimIBD • polySimIBD</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,12 @@
 
 
 
-<meta property="og:title" content="Get ancestral recombination graph from forward simulations — get_arg" />
-<meta property="og:description" content="Given an object swf, which is the result of forward
-simulation using the function sim_swf(), walks backwards through the
-ancestry and calculates the coalescent tree at every locus for the
-specified haplotypes." />
+<meta property="og:title" content="Structured Wright Fisher Simulator for Malarai Genetics — polySimIBD" />
+<meta property="og:description" content="Unique features of the malaria life-cycle and transmission
+dynamics requires extensions of typical population genetic simulators.
+Using a discrete-loci, discrete-time structured Wright Fisher framework, we
+simulate malaria population genetics forwards in time. Users are then able
+to capture the full Ancestral Recombination Graph." />
 
 
 
@@ -120,37 +121,20 @@ specified haplotypes." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get ancestral recombination graph from forward simulations</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nickbrazeau/polySimIBD/blob/master/R/forward_sWF.R'><code>R/forward_sWF.R</code></a></small>
-    <div class="hidden name"><code>get_arg.Rd</code></div>
+    <h1>Structured Wright Fisher Simulator for Malarai Genetics</h1>
+    <small class="dont-index">Source: <a href='https://github.com/nickbrazeau/polySimIBD/blob/master/R/polySimIBD.R'><code>R/polySimIBD.R</code></a></small>
+    <div class="hidden name"><code>polySimIBD.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Given an object <code>swf</code>, which is the result of forward
-simulation using the function <code><a href='sim_swf.html'>sim_swf()</a></code>, walks backwards through the
-ancestry and calculates the coalescent tree at every locus for the
-specified haplotypes.</p>
+    <p>Unique features of the malaria life-cycle and transmission
+dynamics requires extensions of typical population genetic simulators.
+Using a discrete-loci, discrete-time structured Wright Fisher framework, we
+simulate malaria population genetics forwards in time. Users are then able
+to capture the full Ancestral Recombination Graph.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_arg</span><span class='op'>(</span><span class='va'>swf</span>, host_index <span class='op'>=</span> <span class='cn'>NULL</span>, haplo_index <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>swf</th>
-      <td><p>result of forwards simulation using the function <code><a href='sim_swf.html'>sim_swf()</a></code></p></td>
-    </tr>
-    <tr>
-      <th>host_index</th>
-      <td><p>a vector of target hosts. Defaults to all hosts</p></td>
-    </tr>
-    <tr>
-      <th>haplo_index</th>
-      <td><p>a list of target haplotypes within the hosts specified by
-<code>host_index</code>. Defaults to all haplotypes within the specified hosts</p></td>
-    </tr>
-    </table>
 
 
   </div>

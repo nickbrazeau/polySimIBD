@@ -6,27 +6,31 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>The Structured Wright Fisher Model for IBD — sim_structured_WF • polySimIBD</title>
+<title>The Structured Wright Fisher Model for IBD — sim_swf • polySimIBD</title>
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -35,12 +39,10 @@
 
 
 
-<meta property="og:title" content="The Structured Wright Fisher Model for IBD — sim_structured_WF" />
+<meta property="og:title" content="The Structured Wright Fisher Model for IBD — sim_swf" />
 <meta property="og:description" content="Simulate a population forwards with recombination that approximates the Structured Wright Fisher Process
 and tracks haplotype identity by descent where individuals represent demes, such that within
-a deme individual-level COI is considered
-if mean_coi &amp;gt; 10, then we say the zero-trunc approximates the pois" />
-<meta name="twitter:card" content="summary" />
+a deme individual-level COI is considered." />
 
 
 
@@ -58,7 +60,7 @@ if mean_coi &amp;gt; 10, then we say the zero-trunc approximates the pois" />
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -79,12 +81,6 @@ if mean_coi &amp;gt; 10, then we say the zero-trunc approximates the pois" />
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
@@ -105,7 +101,7 @@ if mean_coi &amp;gt; 10, then we say the zero-trunc approximates the pois" />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/nickbrazeau/polySimIBD">
+  <a href="https://github.com/nickbrazeau/polySimIBD/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -125,24 +121,23 @@ if mean_coi &amp;gt; 10, then we say the zero-trunc approximates the pois" />
     <div class="page-header">
     <h1>The Structured Wright Fisher Model for IBD</h1>
     <small class="dont-index">Source: <a href='https://github.com/nickbrazeau/polySimIBD/blob/master/R/forward_sWF.R'><code>R/forward_sWF.R</code></a></small>
-    <div class="hidden name"><code>sim_structured_WF.Rd</code></div>
+    <div class="hidden name"><code>sim_swf.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>Simulate a population forwards with recombination that approximates the Structured Wright Fisher Process
 and tracks haplotype identity by descent where individuals represent demes, such that within
-a deme individual-level COI is considered</p>
-<p>if mean_coi &gt; 10, then we say the zero-trunc approximates the pois</p>
+a deme individual-level COI is considered.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sim_structured_WF</span>(<span class='no'>pos</span>, <span class='no'>N</span>, <span class='no'>m</span>, <span class='no'>rho</span>, <span class='no'>mean_coi</span>, <span class='no'>tlim</span>)</pre>
+    <pre class="usage"><span class='fu'>sim_swf</span><span class='op'>(</span><span class='va'>pos</span>, <span class='va'>N</span>, <span class='va'>m</span>, <span class='va'>rho</span>, <span class='va'>mean_coi</span>, <span class='va'>tlim</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>pos</th>
-      <td><p>dataframe &lt;factor&gt;&lt;numeric&gt;; the genomic coordinates for chromosome and position of the sites</p></td>
+      <td><p>vector; the genomic coordinates for chromosome and position of the sites</p></td>
     </tr>
     <tr>
       <th>N</th>
@@ -150,7 +145,7 @@ a deme individual-level COI is considered</p>
     </tr>
     <tr>
       <th>m</th>
-      <td><p>numeric; Probability of migration where m represents the probability of moving from \(host_{origin}\) to \(host_{new}\) by \(m*(1-1/N)\)</p></td>
+      <td><p>numeric; Probability of migration where m represents the probability of moving from host_origin to host_new by m*(1-1/N)</p></td>
     </tr>
     <tr>
       <th>rho</th>
@@ -158,7 +153,7 @@ a deme individual-level COI is considered</p>
     </tr>
     <tr>
       <th>mean_coi</th>
-      <td><p>numeric; The lambda of a right-shifted Poisson process, \(1 + Pos(lambda)\) representing the average COI of an individual deme</p></td>
+      <td><p>numeric; The lambda of a right-shifted Poisson process, 1 + Pos(lambda) representing the average COI of an individual deme</p></td>
     </tr>
     <tr>
       <th>tlim</th>
@@ -168,30 +163,19 @@ a deme individual-level COI is considered</p>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Returns a list of length G (the number of generations it took for all lineages to coalesce). Each
-list item is a matrix with n x L dimensions where n is the number of parasites considered and L is loci.
-Parasites are then indexed into demes (individuals) based on the COI distribution.</p>
+    <p>Returns a list of length six that contains the COI of each individual. A recombination list of length of tlim
+where each element contains the recombination block -- as a boolean -- of the two parental haplotypes.
+(the number of generations it took for all lineages to coalesce). Finally, there are lists for the parental host
+and parental haplotype assignments for the "paternal" and "maternal" haplotypes (1 and 2), respectively.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Data is simulated under the following framework:</p><ol>
-<li><p>... TODO&gt;..</p></li>
-</ol>
+    <p>This function is intended to fed directly into the <code>get_arg</code> function for interpretability.</p>
 
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-
-}</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -202,7 +186,7 @@ Parasites are then indexed into demes (individuals) based on the COI distributio
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
