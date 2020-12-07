@@ -7,7 +7,7 @@
 get_haplotype_matrix(ARG)
 }
 \arguments{
-\item{ARG}{set of bvtree; a set of bvtrees}
+\item{ARG}{set of bvtrees}
 }
 \value{
 hapmat numeric matrix; a matrix of mutliallelic haplotypes for each parasite considered. Loci are in

@@ -1,6 +1,7 @@
 
 #' quiet from hadley
 #' https://stackoverflow.com/questions/34208564/how-to-hide-or-disable-in-function-printed-message/34208658#34208658
+#' @noRd
 quiet <- function(x) { 
   sink(tempfile()) 
   on.exit(sink()) 
@@ -54,7 +55,7 @@ get_realized_coi <- function(swf, host_index = NULL) {
 #' @details Only accepts a single host 
 #' @return double of within-host IBD
 #' @export
-get_realized_coi <- function(swf, host_index = NULL) {
+get_within_host_IBD <- function(swf, host_index = NULL) {
   
   # checks
   assert_custom_class(swf, "swfsim")
