@@ -19,6 +19,11 @@ public:
   // vector of haplotypes
   std::vector<Haplotype> haplo_vec;
   
+  // deme migration features
+  int home; // home deme
+  int visit; // visiting deme
+  int taway; // time away
+  
   
   // PUBLIC FUNCTIONS
   

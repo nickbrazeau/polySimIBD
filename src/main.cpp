@@ -36,63 +36,131 @@ Rcpp::List sim_swf_cpp(Rcpp::List args) {
   // start timer
   chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
   
+  // extract quick dims for ease
+  int maxN = rcpp_to_int(args["maxN"]);
+  int demecnt = rcpp_to_int(args["demecnt"]);
+  
+  // migration arguments
+  vector<vector<double>> mig_mat_prob = rcpp_to_matrix_double(args["mig_mat_prob"]);
   // extract arguments
-  int N = rcpp_to_int(args["N"]);
-  double m = rcpp_to_double(args["m"]);
-  double mean_coi = rcpp_to_double(args["mean_coi"]);
+  vector<int> N = rcpp_to_vector_int(args["N"]);
+  vector<double> m = rcpp_to_vector_double(args["m"]);
+  vector<double> mean_coi = rcpp_to_vector_double(args["mean_coi"]);
   int tlim = rcpp_to_int(args["tlim"]);
   vector<double> odd_prob = rcpp_to_vector_double(args["odd_prob"]);
   int L = int(odd_prob.size()) + 1;
   
-  // nested vectors, first over time, then individuals
-  vector<vector<Host>> pop(tlim, vector<Host>(N));
-  
-  // draw COI for every individual in every time step
-  for (int t = 0; t < tlim; ++t) {
-    for (int i = 0; i < N; ++i) {
-      pop[t][i].init(mean_coi, L);
+  // nested vector of hosts, first wrt to demes, then over time, then individuals
+  vector<vector<vector<Host>>> pop(demecnt, vector<vector<Host>>(tlim, vector<Host>(maxN)));
+  // draw COI for every individual in every time step wrt to the COI in their home deme
+  for (int d = 0; d < demecnt; ++d) {
+    for (int t = 0; t < tlim; ++t) {
+      for (int i = 0; i < N[d]; ++i) {
+        pop[d][t][i].init(mean_coi[d], L);
+        pop[d][t][i].home = d; // write home deme int
+        pop[d][t][i].visit = d; // initialize that everyone is visiting home
+        pop[d][t][i].taway = -1; // initialize 
+      }
     }
   }
-  
   // step through time in discrete generations, starting at the second timestep
+  // first determine migration
+  // then determine relatednes
+  
   for (int t = 1; t < tlim; ++t) {
-    for (int i = 0; i < N; ++i) {
-      pop[t][i].draw(i, N, m, pop[t-1], odd_prob, L);
+    // for each individual w/in each deme, find out if they need to move
+    for (int d = 0; d < demecnt; ++d) {
+      for (int i = 0; i < N[d]; ++i) {
+        // if individuals are at home , they can travel
+        if (pop[d][t][i].home == pop[d][t][i].visit) {
+          int whereto = sample1(mig_mat_prob[d], 1);
+          if (pop[d][t][i].home != whereto) {
+            pop[d][t][i].visit = whereto;
+            pop[d][t][i].taway = rgeom1(mig_mat_prob[d][whereto]);
+          }
+        } else if (pop[d][t][i].taway <= 0) { // <= is catch for fact geom has support in {0,1,2...}
+          // send host home if there time away has expired
+          pop[d][t][i].visit = pop[d][t][i].home;
+        }
+      }
+    }
+    // we now need to update deme memberships
+    vector<int> Nupd(demecnt); // vector of updated number of hosts w/in demes sizes
+    fill(Nupd.begin(), Nupd.end(), 0);
+    vector<vector<Host>> popupd(demecnt, vector<Host>(maxN)); // vector of deme of hosts at given time
+    
+    for (int d = 0; d < demecnt; ++d) {
+      for (int i = 0; i < N[d]; ++i) {
+        int this_deme = pop[d][t][i].visit;
+        popupd[this_deme][Nupd[this_deme]] = pop[d][t][i];
+        // increase counter
+        Nupd[this_deme] += 1;
+      }
+    }
+    
+    // now step through demes and individuals and draw W-F for each generation
+    // NB need the -1 in the (Nupd[d]-1) to acount for "last step" of for loop, since we are purposefully pointing to the "next" item that we expect
+    for (int d = 0; d < demecnt; ++d) {
+      for (int i = 0; i < (Nupd[d]-1); ++i) {
+        pop[d][t][i].draw(i, (Nupd[d]-1), m[d], popupd[d], odd_prob, L);
+      }
+    }
+    
+    // finally account for time away
+    for (int d = 0; d < demecnt; ++d) {
+      for (int i = 0; i < N[d]; ++i) {
+        // if individuals are at home , they can travel
+        if (pop[d][t][i].home != pop[d][t][i].visit) {
+          pop[d][t][i].taway -= 1;
+        }
+      }
     }
   }
   
   // create objects for storing results
-  vector<int> coi(N);
-  vector<vector<vector<vector<int>>>> recomb(tlim, vector<vector<vector<int>>>(N));
-  vector<vector<vector<int>>> parent_host1(tlim, vector<vector<int>>(N));
-  vector<vector<vector<int>>> parent_host2(tlim, vector<vector<int>>(N));
-  vector<vector<vector<int>>> parent_haplo1(tlim, vector<vector<int>>(N));
-  vector<vector<vector<int>>> parent_haplo2(tlim, vector<vector<int>>(N));
+  // NB going to be using iters because we want to return the vectors of interest
+  int Nsum = 0;
+  for (int n = 0; n < N.size(); ++n) {
+    Nsum += N[n];
+  }
+  vector<int> coi(Nsum);
+  vector<vector<vector<vector<int>>>> recomb(tlim, vector<vector<vector<int>>>(Nsum));
+  vector<vector<vector<int>>> parent_host1(tlim, vector<vector<int>>(Nsum));
+  vector<vector<vector<int>>> parent_host2(tlim, vector<vector<int>>(Nsum));
+  vector<vector<vector<int>>> parent_haplo1(tlim, vector<vector<int>>(Nsum));
+  vector<vector<vector<int>>> parent_haplo2(tlim, vector<vector<int>>(Nsum));
   
   // store COI distribution at final time point only
-  for (int i = 0; i < N; ++i) {
-    coi[i] = pop[tlim-1][i].coi;
+  int citer = 0;
+  for (int d = 0; d < demecnt; ++d) {
+    for (int i = 0; i < N[d]; ++i) {
+      coi[citer] = pop[d][tlim-1][i].coi;
+      citer++;
+    }
   }
   
-  // loop through time and individuals
+  // loop through time and individuals wrt to demes
   for (int t = 0; t < tlim; ++t) {
-    for (int i = 0; i < N; ++i) {
-      
-      // preallocate for this coi
-      int this_coi = pop[t][i].coi;
-      recomb[t][i] = vector<vector<int>>(this_coi);
-      parent_host1[t][i] = vector<int>(this_coi);
-      parent_host2[t][i] = vector<int>(this_coi);
-      parent_haplo1[t][i] = vector<int>(this_coi);
-      parent_haplo2[t][i] = vector<int>(this_coi);
-      
-      // loop through all haplotypes in this individual
-      for (int j = 0; j < this_coi; ++j) {
-        recomb[t][i][j] = pop[t][i].haplo_vec[j].parent_vec;
-        parent_host1[t][i][j] = pop[t][i].haplo_vec[j].pat_ind;
-        parent_host2[t][i][j] = pop[t][i].haplo_vec[j].mat_ind;
-        parent_haplo1[t][i][j] = pop[t][i].haplo_vec[j].pat_hap;
-        parent_haplo2[t][i][j] = pop[t][i].haplo_vec[j].mat_hap;
+    int iter = 0;
+    for (int d = 0; d < demecnt; ++d) {
+      for (int i = 0; i < N[d]; ++i) {
+        // preallocate for this coi
+        int this_coi = pop[d][t][i].coi;
+        recomb[t][iter] = vector<vector<int>>(this_coi);
+        parent_host1[t][iter] = vector<int>(this_coi);
+        parent_host2[t][iter] = vector<int>(this_coi);
+        parent_haplo1[t][iter] = vector<int>(this_coi);
+        parent_haplo2[t][iter] = vector<int>(this_coi);
+        
+        // loop through all haplotypes in this individual
+        for (int j = 0; j < this_coi; ++j) {
+          recomb[t][iter][j] = pop[d][t][i].haplo_vec[j].parent_vec;
+          parent_host1[t][iter][j] = pop[d][t][i].haplo_vec[j].pat_ind;
+          parent_host2[t][iter][j] = pop[d][t][i].haplo_vec[j].mat_ind;
+          parent_haplo1[t][iter][j] = pop[d][t][i].haplo_vec[j].pat_hap;
+          parent_haplo2[t][iter][j] = pop[d][t][i].haplo_vec[j].mat_hap;
+        }
+        iter++;
       }
     }
   }
@@ -108,6 +176,8 @@ Rcpp::List sim_swf_cpp(Rcpp::List args) {
                             Rcpp::Named("parent_haplo1") = parent_haplo1,
                             Rcpp::Named("parent_haplo2") = parent_haplo2);
 }
+
+
 
 //------------------------------------------------
 // walk back through ancestry, find coalescent events
@@ -238,3 +308,4 @@ Rcpp::List subset_bvtree_cpp(vector<int> c,
   return Rcpp::List::create(Rcpp::Named("c") = c,
                             Rcpp::Named("t") = t);
 }
+
