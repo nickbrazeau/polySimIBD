@@ -54,7 +54,7 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim,
   assert_pos_int(N, zero_allowed = FALSE)
   assert_bounded(m, left = 0, right = 1)
   assert_bounded(rho, left = 0, right = 1, inclusive_left = FALSE, inclusive_right = FALSE)
-  assert_pos_int(mean_coi, zero_allowed = FALSE)
+  assert_pos(mean_coi, zero_allowed = FALSE)
   assert_single_pos_int(tlim, zero_allowed = FALSE)
   
   
