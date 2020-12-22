@@ -4,20 +4,24 @@
 \alias{sim_swf}
 \title{The Structured Wright Fisher Model for IBD}
 \usage{
-sim_swf(pos, N, m, rho, mean_coi, tlim)
+sim_swf(pos, N, m, rho, mean_coi, tlim, migr_dist_mat = NULL, verbose = FALSE)
 }
 \arguments{
 \item{pos}{vector; the genomic coordinates for chromosome and position of the sites}
 
-\item{N}{numeric; The number of individuals to consider}
+\item{N}{numeric numeric; The number of individuals to consider in each deme}
 
-\item{m}{numeric; Probability of migration where m represents the probability of moving from host_{origin} to host_{new} by m*(1-1/N)}
+\item{m}{numeric numeric; Probability of internal migration where m represents the probability of moving from host_{origin} to host_{new} by m*(1-1/N) of each deme}
 
 \item{rho}{numeric; expected recombination rate}
 
-\item{mean_coi}{numeric; The lambda of a right-shifted Poisson process, 1 + Pos(lambda) representing the average COI of an individual deme}
+\item{mean_coi}{numeric vector; The lambda of a right-shifted Poisson process, 1 + Pos(lambda) representing the average COI of each deme}
 
-\item{tlim}{numeric; the maximum number of generations to consider before exitting gracefully if all samples have not coalesced}
+\item{tlim}{numeric; the maximum number of generations to consider before exiting gracefully if all samples have not coalesced}
+
+\item{migr_dist_mat}{numeric matrix; Migrations rates with origin specified as rows and destination in columns.}
+
+\item{verbose}{boolean}
 }
 \value{
 Returns a list of length six that contains the COI of each individual. A recombination list of length of tlim
@@ -31,5 +35,10 @@ and tracks haplotype identity by descent where individuals represent demes, such
 a deme individual-level COI is considered.
 }
 \details{
-This function is intended to fed directly into the \code{get_arg} function for interpretability.
+Demes are assumed to be ordered throughout (i.e. the order needs to be consistent between N, m, mean_coi, and the rows and columns of the migration matrix).
+
+Migration matrix is assumed to be a distance matrix, where the user can specify the scalar through the
+\emph{dist_scalar} parameter
+
+
 }

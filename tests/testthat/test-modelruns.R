@@ -1,4 +1,4 @@
-test_that("model runs", {
+testthat::test_that("model runs", {
   N <- c(3, 2, 7)
   m <- c(0.5, 0.5, 0.5)
   mean_coi <- c(1, 1, 1)
@@ -12,6 +12,5 @@ test_that("model runs", {
                              tlim = 2)
   
   ARG <- polySimIBD::get_arg(swf = swf, host_index = c(1,2))
-  
   testthat::expect_gt(length(ARG), 0)
 })
