@@ -10,7 +10,6 @@
 #' @param m numeric numeric; Probability of internal migration where m represents the probability of moving from host_{origin} to host_{new} by m*(1-1/N) of each deme
 #' @param mean_coi numeric vector; The lambda of a right-shifted Poisson process, 1 + Pos(lambda) representing the average COI of each deme
 #' @param migr_dist_mat numeric matrix; Migrations rates with origin specified as rows and destination in columns. 
-#' @param dist_scalar numeric; Migrations rates with origin specified as rows and destination in columns. 
 #' @param rho numeric; expected recombination rate
 #' @param tlim numeric; the maximum number of generations to consider before exiting gracefully if all samples have not coalesced
 #' @param verbose boolean
@@ -28,19 +27,30 @@
 #' @export
 
 sim_swf <- function(pos, N, m, rho, mean_coi, tlim,
-                    migr_dist_mat = NULL, dist_scalar = 1,
+                    migr_dist_mat = NULL, 
                     verbose = FALSE){
   
   # assertions
   assert_vector(pos)
   assert_numeric(pos)
-  assert_matrix(migr_dist_mat)
-  assert_eq(ncol(migr_dist_mat), length(N),
-            message = "Migration matrix and deme sizes must be of same relative dimensions. In other words, you need to specify a deme size for every deme")
-  assert_eq(ncol(migr_dist_mat), length(m),
-            message = "Migration matrix and internal migration rates must be of same relative dimensions. In other words, you need to specify a deme size for internal migration")
-  assert_eq(ncol(migr_dist_mat), length(mean_coi),
-            message = "Migration matrix and mean COI must be of same relative dimensions. In other words, you need to specify a mean COI for every deme")
+  if (length(migr_dist_mat) == 1) {
+    assert_eq(migr_dist_mat, 1, 
+              message = "Distance matrix can be set to 1 to indicate a non-spatial model. Otherwise, needs to be a matrix")
+    assert_length(N, 1,
+              message = "If non-spatial model considered, deme size is of length 1") 
+    assert_length(m, 1,
+              message = "If non-spatial model considered, internal migration rates is of length 1") 
+    assert_length(mean_coi, 1,
+              message = "If non-spatial model considered, mean coi is of length 1") 
+  } else {
+    assert_matrix(migr_dist_mat)
+    assert_eq(ncol(migr_dist_mat), length(N),
+              message = "Migration matrix and deme sizes must be of same relative dimensions. In other words, you need to specify a deme size for every deme")
+    assert_eq(ncol(migr_dist_mat), length(m),
+              message = "Migration matrix and internal migration rates must be of same relative dimensions. In other words, you need to specify a deme size for internal migration")
+    assert_eq(ncol(migr_dist_mat), length(mean_coi),
+              message = "Migration matrix and mean COI must be of same relative dimensions. In other words, you need to specify a mean COI for every deme")
+  }
   assert_pos_int(N, zero_allowed = FALSE)
   assert_bounded(m, left = 0, right = 1)
   assert_bounded(rho, left = 0, right = 1, inclusive_left = FALSE, inclusive_right = FALSE)
@@ -56,9 +66,14 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim,
   }
   
   # calculate migration rates and probability from distance matrix
-  mig_mat_prob <- migr_dist_mat/rowSums(migr_dist_mat)
-  mig_mat_prob <- split(mig_mat_prob, 1:nrow(mig_mat_prob))
-  mig_mat_prob <- unname(mig_mat_prob)
+  if (is.matrix(migr_dist_mat)) { # split out for cpp import
+    mig_mat_prob <- migr_dist_mat/rowSums(migr_dist_mat)
+    mig_mat_prob <- split(mig_mat_prob, 1:nrow(mig_mat_prob))
+    mig_mat_prob <- unname(mig_mat_prob)
+  } else {
+    mig_mat_prob <- 1
+  }
+
   # define argument list
   args <- list(pos = pos,
                maxN = max(N),
