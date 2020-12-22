@@ -1,0 +1,19 @@
+---
+title: "Extension of Model for Spatial Demes"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Extension of Model for Spatial Demes}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(polySimIBD)
+```
