@@ -32,16 +32,17 @@ void Host::draw(int i, int Ntot,
   for (int j = 0; j < coi; ++j) {
     
     // draw deme to sample parental host and haplotypes
-    int this_deme = sample1(mig_mat_prob, 1);
+    int this_deme = sample1(mig_mat_prob);
+    
     // index demes to properly account for which host in N we are considering
     int deme_start = 0;
-    if ((this_deme-1) > 0) {
-      for (int i = 0; i < (this_deme-1); ++i) {
+    if (this_deme != 0) {
+      for (int i = 0; i <= (this_deme-1); ++i) {
         deme_start += demesize[i];
       }
     }
     int deme_end = 0;
-    for (int i = 0; i < this_deme; ++i) {
+    for (int i = 0; i <= this_deme; ++i) {
       deme_end += demesize[i];
     }
     
