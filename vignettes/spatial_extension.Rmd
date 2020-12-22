@@ -14,8 +14,8 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-collapse = TRUE,
-comment = "#>"
+  collapse = TRUE,
+  comment = "#>"
 )
 ```
 
@@ -73,21 +73,30 @@ adj_graph <- t(combn(x = c(1:sum(demesizes)), m = 2)) %>%
 
 Let's visualize our simple scenarios
 ```{r}
-# for aesthetics
-pop_assignments <- tibble::tibble(name =  as.character(1:sum(demesizes)),
-                                  pop = rep(c("A", "B"), times = demesizes))
+adj_graph %>% 
+  ggplot() + 
+  geom_tile(aes(x = smpl1, y = smpl2, fill = pairwiseIBD)) + 
+  scale_fill_viridis_c("Pairwise IBD") + 
+  xlab("Sample 1") + ylab("Sample 2") + 
+  labs(caption = "Samples 1:10 are on island A; Samples 11:25 are on island B") + 
+  theme_minimal()
 
-# convert to network for easy plotting
-ibdnet <- tidygraph::as_tbl_graph(adj_graph, directed = FALSE)
-ibdnet %>% 
-  dplyr::mutate(community = as.factor(tidygraph::group_louvain())) %>% 
-  tidygraph::activate("nodes") %>% 
-  dplyr::left_join(., pop_assignments, by = "name")  %>% 
-    ggraph::ggraph(layout = 'kk') + 
-    ggraph::geom_node_point(aes(color = pop, shape = community), 
-                            size = 3) +
-    ggraph::geom_edge_link(aes(size = pairwiseIBD), 
-                           alpha = 0.25) + 
-    ggraph::theme_graph()
+
+# # for aesthetics
+# pop_assignments <- tibble::tibble(name =  as.character(1:sum(demesizes)),
+#                                   pop = rep(c("A", "B"), times = demesizes))
+# 
+# # convert to network for easy plotting
+# ibdnet <- tidygraph::as_tbl_graph(adj_graph, directed = FALSE)
+# ibdnet %>% 
+#   dplyr::mutate(community = as.factor(tidygraph::group_louvain())) %>% 
+#   tidygraph::activate("nodes") %>% 
+#   dplyr::left_join(., pop_assignments, by = "name")  %>% 
+#     ggraph::ggraph(layout = 'kk') + 
+#     ggraph::geom_node_point(aes(color = pop, shape = community), 
+#                             size = 3) +
+#     ggraph::geom_edge_link(aes(size = pairwiseIBD), 
+#                            alpha = 0.25) + 
+#     ggraph::theme_graph()
 
 ```
