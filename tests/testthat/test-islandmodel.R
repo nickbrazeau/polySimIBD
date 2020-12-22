@@ -23,13 +23,13 @@ test_that("island model returns two islands", {
       )
     }))
   
-  # convert to network and do community detection
-  nodesdf <- tidygraph::as_tbl_graph(adj_graph, directed = FALSE) %>% 
-    dplyr::mutate(community = as.factor(tidygraph::group_louvain())) %>% 
-    tidygraph::activate("nodes") %>% 
-    tibble::as_tibble()
+  # subset to island A for smpl1 and island B for smpl 2
+  ismod <- adj_graph %>% 
+    dplyr::filter(smpl1 %in% 1:10) %>% 
+    dplyr::filter(smpl2 %in% 11:25) 
   
-  # should be length two for two isolated populations
-  testthat::expect_length(unique(nodesdf$community), 2)
+  # no ibd between
+  testthat::expect_equal(unique(ismod$pairwiseIBD), 0)
+
   
 })
