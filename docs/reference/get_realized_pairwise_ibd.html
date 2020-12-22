@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Draw from Beta-binomial distribution — rbetabinom • polySimIBD</title>
+<title>Effective IBD by Loci from SWF Simulation for a Pair of Hosts — get_realized_pairwise_ibd • polySimIBD</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Draw from Beta-binomial distribution — rbetabinom" />
-<meta property="og:description" content="Draw from Beta-binomial distribution." />
+<meta property="og:title" content="Effective IBD by Loci from SWF Simulation for a Pair of Hosts — get_realized_pairwise_ibd" />
+<meta property="og:description" content="Assumes that the minimum realized COI between the pairs of host determines
+the denominator for the between realized IBD" />
 
 
 
@@ -123,38 +124,37 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Draw from Beta-binomial distribution</h1>
-    <small class="dont-index">Source: <a href='https://github.com/nickbrazeau/polySimIBD/blob/master/R/probability_v1.R'><code>R/probability_v1.R</code></a></small>
-    <div class="hidden name"><code>rbetabinom.Rd</code></div>
+    <h1>Effective IBD by Loci from SWF Simulation for a Pair of Hosts</h1>
+    <small class="dont-index">Source: <a href='https://github.com/nickbrazeau/polySimIBD/blob/master/R/get_results.R'><code>R/get_results.R</code></a></small>
+    <div class="hidden name"><code>get_realized_pairwise_ibd.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Draw from Beta-binomial distribution.</p>
+    <p>Assumes that the minimum realized COI between the pairs of host determines
+the denominator for the between realized IBD</p>
     </div>
 
-    <pre class="usage"><span class='fu'>rbetabinom</span><span class='op'>(</span>n <span class='op'>=</span> <span class='fl'>1</span>, k <span class='op'>=</span> <span class='fl'>10</span>, alpha <span class='op'>=</span> <span class='fl'>1</span>, beta <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_realized_pairwise_ibd</span><span class='op'>(</span><span class='va'>swf</span>, host_index <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>n</th>
-      <td><p>number of draws.</p></td>
+      <th>swf</th>
+      <td><p>result of forwards simulation using the function <code><a href='sim_swf.html'>sim_swf()</a></code></p></td>
     </tr>
     <tr>
-      <th>k</th>
-      <td><p>number of binomial trials.</p></td>
-    </tr>
-    <tr>
-      <th>alpha</th>
-      <td><p>first shape parameter of beta distribution.</p></td>
-    </tr>
-    <tr>
-      <th>beta</th>
-      <td><p>second shape parameter of beta distribution.</p></td>
+      <th>host_index</th>
+      <td><p>a vector of target hosts. Defaults to all hosts</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>double of pairwise IBD</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Only accepts a pair of hosts. Ignores mutations as interrupting IBD segments.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

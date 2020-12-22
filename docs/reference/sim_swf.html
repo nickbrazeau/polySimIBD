@@ -12,8 +12,8 @@
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -74,35 +74,41 @@ a deme individual-level COI is considered." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">polySimIBD</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-        <li>
-  <a href="../reference/index.html">Reference</a>
-</li>
-<li class="dropdown">
+        <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
+    Vignettes
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/modframework_dldtstructuredwf.html">Structured DTWF Malaria Model Overview</a>
+      <a href="../articles/installation.html">Installation</a>
+    </li>
+    <li>
+      <a href="../articles/orig_mod_framework.html">Original Model Framework</a>
     </li>
     <li>
       <a href="../articles/simdata.html">Simulating Data</a>
     </li>
+    <li>
+      <a href="../articles/spatial_extension.html">Spatial Extension</a>
+    </li>
   </ul>
+</li>
+<li>
+  <a href="../reference/index.html">Functions</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/nickbrazeau/polySimIBD/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/nickbrazeau/polySimIBD">
+    <span class="fa fa-github"></span>
      
   </a>
 </li>
@@ -130,7 +136,7 @@ and tracks haplotype identity by descent where individuals represent demes, such
 a deme individual-level COI is considered.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sim_swf</span><span class='op'>(</span><span class='va'>pos</span>, <span class='va'>N</span>, <span class='va'>m</span>, <span class='va'>rho</span>, <span class='va'>mean_coi</span>, <span class='va'>tlim</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>sim_swf</span><span class='op'>(</span><span class='va'>pos</span>, <span class='va'>N</span>, <span class='va'>m</span>, <span class='va'>rho</span>, <span class='va'>mean_coi</span>, <span class='va'>tlim</span>, migr_dist_mat <span class='op'>=</span> <span class='cn'>NULL</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -141,11 +147,11 @@ a deme individual-level COI is considered.</p>
     </tr>
     <tr>
       <th>N</th>
-      <td><p>numeric; The number of individuals to consider</p></td>
+      <td><p>numeric numeric; The number of individuals to consider in each deme</p></td>
     </tr>
     <tr>
       <th>m</th>
-      <td><p>numeric; Probability of migration where m represents the probability of moving from host_origin to host_new by m*(1-1/N)</p></td>
+      <td><p>numeric numeric; Probability of internal migration where m represents the probability of moving from host_origin to host_new by m*(1-1/N) of each deme</p></td>
     </tr>
     <tr>
       <th>rho</th>
@@ -153,11 +159,19 @@ a deme individual-level COI is considered.</p>
     </tr>
     <tr>
       <th>mean_coi</th>
-      <td><p>numeric; The lambda of a right-shifted Poisson process, 1 + Pos(lambda) representing the average COI of an individual deme</p></td>
+      <td><p>numeric vector; The lambda of a right-shifted Poisson process, 1 + Pos(lambda) representing the average COI of each deme</p></td>
     </tr>
     <tr>
       <th>tlim</th>
-      <td><p>numeric; the maximum number of generations to consider before exitting gracefully if all samples have not coalesced</p></td>
+      <td><p>numeric; the maximum number of generations to consider before exiting gracefully if all samples have not coalesced</p></td>
+    </tr>
+    <tr>
+      <th>migr_dist_mat</th>
+      <td><p>numeric matrix; Migrations rates with origin specified as rows and destination in columns.</p></td>
+    </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>boolean</p></td>
     </tr>
     </table>
 
@@ -169,7 +183,11 @@ where each element contains the recombination block -- as a boolean -- of the tw
 and parental haplotype assignments for the "paternal" and "maternal" haplotypes (1 and 2), respectively.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>This function is intended to fed directly into the <code>get_arg</code> function for interpretability.</p>
+    <p>Demes are assumed to be ordered throughout (i.e. the order needs to be consistent between N, m, mean_coi, and the rows and columns of the migration matrix).</p>
+<p>Migration matrix is assumed to be a distance matrix, where the user can specify the scalar through the
+<em>dist_scalar</em> parameter</p>
+
+
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
