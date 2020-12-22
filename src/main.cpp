@@ -73,7 +73,7 @@ Rcpp::List sim_swf_cpp(Rcpp::List args) {
     int diter = 0;
     for (int d = 0; d < demecnt; ++d) {
       for (int i = 0; i < demesize[d]; ++i) {
-        pop[t][diter].draw(i, N, m[d], pop[t-1], odd_prob,
+        pop[t][diter].draw(diter, N, m[d], pop[t-1], odd_prob,
                            L, demesize, mig_mat_prob[d]);
         diter++;
       }
