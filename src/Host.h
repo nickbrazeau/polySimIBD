@@ -27,8 +27,11 @@ public:
   
   // member functions
   void init(double mean_coi, int L);
-  void draw(int i, int N, double m, const std::vector<Host> &prev_pop,
-            const std::vector<double> &odd_prob, int L);
-  void print_host();
-  
+  void draw(int i, int Ntot,
+            double m, const std::vector<Host> &prev_pop,
+            const std::vector<double> &odd_prob, int L,
+            const std::vector<int> &demesize, 
+            const std::vector<double> &mig_mat_prob);
+            void print_host();
+            
 };
