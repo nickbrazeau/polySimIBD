@@ -37,27 +37,46 @@ Rcpp::List sim_swf_cpp(Rcpp::List args) {
   chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
   
   // extract arguments
-  int N = rcpp_to_int(args["N"]);
-  double m = rcpp_to_double(args["m"]);
-  double mean_coi = rcpp_to_double(args["mean_coi"]);
+  vector<double> m = rcpp_to_vector_double(args["m"]);
+  vector<double> mean_coi = rcpp_to_vector_double(args["mean_coi"]);
   int tlim = rcpp_to_int(args["tlim"]);
   vector<double> odd_prob = rcpp_to_vector_double(args["odd_prob"]);
   int L = int(odd_prob.size()) + 1;
+  // extract out demes arguements
+  vector<int> demesize = rcpp_to_vector_int(args["N"]);
+  int demecnt = demesize.size();
+  int N = 0;
+  for (int i = 0; i < demecnt; ++i) {
+    N += demesize[i]; 
+  }
+  
+  // migration arguments
+  vector<vector<double>> mig_mat_prob = rcpp_to_matrix_double(args["mig_mat_prob"]);
   
   // nested vectors, first over time, then individuals
   vector<vector<Host>> pop(tlim, vector<Host>(N));
   
   // draw COI for every individual in every time step
   for (int t = 0; t < tlim; ++t) {
-    for (int i = 0; i < N; ++i) {
-      pop[t][i].init(mean_coi, L);
+    // need to use iters to properly count through N
+    int citer = 0;
+    for (int d = 0; d < demecnt; ++d) {
+      for (int i = 0; i < demesize[d]; ++i) {
+        pop[t][citer].init(mean_coi[d], L);
+        citer++;
+      }
     }
   }
   
   // step through time in discrete generations, starting at the second timestep
   for (int t = 1; t < tlim; ++t) {
-    for (int i = 0; i < N; ++i) {
-      pop[t][i].draw(i, N, m, pop[t-1], odd_prob, L);
+    int diter = 0;
+    for (int d = 0; d < demecnt; ++d) {
+      for (int i = 0; i < demesize[d]; ++i) {
+        pop[t][diter].draw(i, N, m[d], pop[t-1], odd_prob,
+                           L, demesize, mig_mat_prob[d]);
+        diter++;
+      }
     }
   }
   
@@ -73,11 +92,11 @@ Rcpp::List sim_swf_cpp(Rcpp::List args) {
   for (int i = 0; i < N; ++i) {
     coi[i] = pop[tlim-1][i].coi;
   }
-  
+
   // loop through time and individuals
   for (int t = 0; t < tlim; ++t) {
     for (int i = 0; i < N; ++i) {
-      
+
       // preallocate for this coi
       int this_coi = pop[t][i].coi;
       recomb[t][i] = vector<vector<int>>(this_coi);
@@ -85,7 +104,7 @@ Rcpp::List sim_swf_cpp(Rcpp::List args) {
       parent_host2[t][i] = vector<int>(this_coi);
       parent_haplo1[t][i] = vector<int>(this_coi);
       parent_haplo2[t][i] = vector<int>(this_coi);
-      
+
       // loop through all haplotypes in this individual
       for (int j = 0; j < this_coi; ++j) {
         recomb[t][i][j] = pop[t][i].haplo_vec[j].parent_vec;
@@ -96,10 +115,10 @@ Rcpp::List sim_swf_cpp(Rcpp::List args) {
       }
     }
   }
-  
+
   // end timer
   chrono_timer(t1);
-  
+
   // return as list
   return Rcpp::List::create(Rcpp::Named("coi") = coi,
                             Rcpp::Named("recomb") = recomb,
