@@ -8,10 +8,8 @@ test_that("model runs", {
                              m = m, 
                              mean_coi = mean_coi, 
                              migr_dist_mat = migr_dist_mat, 
-                             dist_scalar = 1,
                              rho = 1e-2, 
-                             tlim = 2,
-                             verbose = FALSE)
+                             tlim = 2)
   
   ARG <- polySimIBD::get_arg(swf = swf, host_index = c(1,2))
   
