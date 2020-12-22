@@ -1,5 +1,5 @@
 ---
-title: "Simulating Data"
+title: "Simulating Genomic Data"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Simulating Data}
