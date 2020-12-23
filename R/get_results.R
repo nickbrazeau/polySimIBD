@@ -18,7 +18,7 @@ get_realized_coi <- function(swf, host_index = NULL) {
   assert_single_int(host_index)
   
   # get ARG from swf and host_index
-  arg <- polySimIBD::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
+  arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
   
   # get connections
   conn <- purrr::map(arg, "c")
@@ -40,7 +40,7 @@ get_within_host_IBD <- function(swf, host_index = NULL) {
   assert_single_int(host_index)
   
   # get ARG from swf and host_index
-  arg <- polySimIBD::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
+  arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
   
   # get connections
   conn <- purrr::map(arg, "c")

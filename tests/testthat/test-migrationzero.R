@@ -11,7 +11,7 @@ test_that("migration zero model with 1 deme", {
     tibble::as_tibble(., .name_repair = "minimal") %>% 
     magrittr::set_colnames(c("smpl1", "smpl2")) %>% 
     dplyr::mutate(pairwiseIBD = purrr::map2_dbl(.x = smpl1, .y = smpl2, .f = function(x,  y){
-      polySimIBD::quiet(
+      polySimIBD:::quiet(
         polySimIBD::get_realized_pairwise_ibd(swf = swf, host_index = c(x,y))
       )
     }))
@@ -35,7 +35,7 @@ test_that("migration zero model with multiple demes deme", {
     tibble::as_tibble(., .name_repair = "minimal") %>% 
     magrittr::set_colnames(c("smpl1", "smpl2")) %>% 
     dplyr::mutate(pairwiseIBD = purrr::map2_dbl(.x = smpl1, .y = smpl2, .f = function(x,  y){
-      polySimIBD::quiet(
+      polySimIBD:::quiet(
         polySimIBD::get_realized_pairwise_ibd(swf = swf, host_index = c(x,y))
       )
     }))
