@@ -26,15 +26,14 @@ library(tidygraph) # useful for manipulations & visaulizations
 ```
 
 # Extending the Model for Space
-We extend the discrete-loci, discrete-time structured Wright Fisher model for space by considering spatial _demes_ as a collection of hosts, where each host is a "micro-deme" in order to model complexity of infection. 
+We extend the discrete-loci, discrete-time structured Wright Fisher model for space by considering spatial _demes_ as a collection of hosts. Hosts move between demes based on a migration matrix *M*. In the spirit of the Wright-Fisher, the number of hosts within the deme (_i.e._ deme size) does not change over time. As before, , where each host is a "micro-deme" in order to model complexity of infection. 
 
-<p align="center">
-![Schematic of the Spatial DL-DT sWF Malaria Model](https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/spatial_sWFmodelframework.png){width=500px}
-</p>
+## Forwards-in-time Description 
+The full mathematical formulation of the nonspatial model can be found in the Supplementary Section of [Verity, Aydemic, Brazeau _et al._ Nat Comms 2020 (PMC7192906), Biorxiv](https://www.nature.com/articles/s41467-020-15779-8). The spatial extension to the model is described in [Brazeau _et al._ Biorxiv]().    
 
+As a brief lay summary, we assume that each deme (_hereafter_ macrodeme) is a subpopulation within a very large population ($\iota \in \nu$, where $\iota$ is an individual macrodeme and $\nu$ is the total number of macrodemes in the entire population) and that each macrodeme represents a collection of individual hosts. Then, as before, let each individual host be represented by a deme  (_hereafter_ macrodeme), or a subpopulation within this large macrodeme ($i \in N_{\iota}$, where $i$ is an individual host and $N_{\iota}$ is the total host population for that macrodeme).   
 
-
-As can be seen from the schematic, demes are a collection of hosts that can interact (i.e. hosts can move from deme to deme) based on the user-specified _Migration Matrix_, parameterized here as $M$. As before, within demes the complexity of infection is modeled as a probability of (internal) migration, $m$, which parameterized the spectrum of Cotranmission to Superinfection.
+We then allow the $J$ parasites (that reside within the host microdeme) to mate at random with the previous generation of parasites ($t_{1-}$) and produce a large number of parasite progeny. During mating, genetic recombination has the potential to occur based on the length of the genome and the recombination rate, $\rho$. Progeny are then allowed to move to a new macrodeme or stay in the current macrodeme based on the migration matrix, $\mathbf{M}$. Within the macrodemes, the progeny are then allowed migrate to a new or the same host microdeme with a probability of $\frac{m}{N_{\iota}}$. Progeny are then culled down to a smaller number of parasites per host by drawing from a Poisson distribution with a mean COI. In essence, the nonspatial and spatil simulator only differ by an additional hierarchical level of "demes" (macrodemes versus microdemes).
 
 
 # Island Case
@@ -82,22 +81,5 @@ adj_graph %>%
   labs(caption = "Samples 1:10 are on island A; Samples 11:25 are on island B") + 
   theme_minimal()
 
-
-# # for aesthetics
-# pop_assignments <- tibble::tibble(name =  as.character(1:sum(demesizes)),
-#                                   pop = rep(c("A", "B"), times = demesizes))
-# 
-# # convert to network for easy plotting
-# ibdnet <- tidygraph::as_tbl_graph(adj_graph, directed = FALSE)
-# ibdnet %>% 
-#   dplyr::mutate(community = as.factor(tidygraph::group_louvain())) %>% 
-#   tidygraph::activate("nodes") %>% 
-#   dplyr::left_join(., pop_assignments, by = "name")  %>% 
-#     ggraph::ggraph(layout = 'kk') + 
-#     ggraph::geom_node_point(aes(color = pop, shape = community), 
-#                             size = 3) +
-#     ggraph::geom_edge_link(aes(size = pairwiseIBD), 
-#                            alpha = 0.25) + 
-#     ggraph::theme_graph()
-
 ```
+As can be seen from the figure, samples 1-10, which reside on island A have no relatedness to samples 11-25 that reside on island by B as they have been completely isolated through our migration matrix. 

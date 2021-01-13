@@ -51,7 +51,7 @@
       <a href="../articles/orig_mod_framework.html">Original Model Framework</a>
     </li>
     <li>
-      <a href="../articles/simdata.html">Simulating Data</a>
+      <a href="../articles/simdata.html">Simulating Genomic Data</a>
     </li>
     <li>
       <a href="../articles/spatial_extension.html">Spatial Extension</a>
@@ -65,7 +65,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/nickbrazeau/polySimIBD">
-    <span class="fa fa-github"></span>
+    <span class="fas fa-github"></span>
      
   </a>
 </li>
@@ -121,7 +121,7 @@
 <div id="model-formulation" class="section level1">
 <h1 class="hasAnchor">
 <a href="#model-formulation" class="anchor"></a>Model Formulation</h1>
-<p>The full mathematical formulation of the model can be found in the Supplementary Section of <a href="https://www.nature.com/articles/s41467-020-15779-8">Verity, Aydemic, Brazeau <em>et al.</em> Nat Comms 2020 (PMC7192906), Biorxiv</a>. As a brief lay summary, we assume that each individual host can be represented by a deme, or a subpopulation within a large population (<span class="math inline">\(i \in N\)</span>, where <span class="math inline">\(i\)</span> is an individual host and <span class="math inline">\(N\)</span> is the total host population). We then allow the <span class="math inline">\(J\)</span> parasites (that reside within the host population) to mate at random with the previous generation of parasites (<span class="math inline">\(t_{1-}\)</span>) and produce a large number of parasite progeny. During mating, genetic recombination has the potential to occur based on the length of the genome and the recombination rate, <span class="math inline">\(\rho\)</span>. Progeny are then allowed to migrate to a new or the same host with a probability of <span class="math inline">\(\frac{m}{N}\)</span>. Progeny are then culled down to a smaller number of parasites per host by drawing from a Poisson distribution with a mean COI (schematic below).</p>
+<p>The full mathematical formulation of this (nonspatial) model can be found in the Supplementary Section of <a href="https://www.nature.com/articles/s41467-020-15779-8">Verity, Aydemic, Brazeau <em>et al.</em> Nat Comms 2020 (PMC7192906), Biorxiv</a>. As a brief lay summary, we assume that each individual host can be represented by a deme, or a subpopulation within a large population (<span class="math inline">\(i \in N\)</span>, where <span class="math inline">\(i\)</span> is an individual host and <span class="math inline">\(N\)</span> is the total host population). We then allow the <span class="math inline">\(J\)</span> parasites (that reside within the host population) to mate at random with the previous generation of parasites (<span class="math inline">\(t_{1-}\)</span>) and produce a large number of parasite progeny. During mating, genetic recombination has the potential to occur based on the length of the genome and the recombination rate, <span class="math inline">\(\rho\)</span>. Progeny are then allowed to migrate to a new or the same host with a probability of <span class="math inline">\(\frac{m}{N}\)</span>. Progeny are then culled down to a smaller number of parasites per host by drawing from a Poisson distribution with a mean COI (schematic below). Overall, the simulator is best described as a discrete-loci, discrete-time structured Wright Fisher model.</p>
 <p align="center">
 <img src="https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/sWFmodelframework.png" title="fig:" width="500" alt="Schematic of the DL-DT sWF Malaria Model"></p>
 <p>As can be seen from the schematic, the user-specified probability of migration, <span class="math inline">\(m\)</span>, has an effect on whether or not the transmission dynamic favors Superinfection (“panmictic”) or Contransmission (“independent”) setting.</p>
@@ -132,22 +132,14 @@
 <p>Users are able to specify loci positions, <code>pos</code>, the number of Hosts in the population, <code>N</code>, the probability of migration, <code>m</code>, the recombination rate, <code>rho</code>, and the Mean COI for host parasite burden (culling of the progeny), <code>mean_coi</code>. Finally, users have the option to let the model run forwards in time until all parasites have coalesced to a single common ancestor (<code>tlim = Inf</code>), or can set a limit on the number of generations that we simulate (<code>tlim = &lt;integer&gt;</code>).</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
-<span class="co"># define parameters</span>
-<span class="va">pos</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1e3</span>, <span class="fl">1e2</span><span class="op">)</span>
-<span class="va">N</span> <span class="op">&lt;-</span> <span class="fl">2</span>
-<span class="va">m</span> <span class="op">&lt;-</span> <span class="fl">0.5</span>
-<span class="va">rho</span> <span class="op">&lt;-</span> <span class="fl">1e-3</span>
-<span class="va">mean_coi</span> <span class="op">&lt;-</span> <span class="fl">2</span>
-<span class="va">tlim</span> <span class="op">&lt;-</span> <span class="fl">10</span>
-
-<span class="va">swfsim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_swf.html">sim_swf</a></span><span class="op">(</span>pos <span class="op">=</span> <span class="va">pos</span>,
-                  N <span class="op">=</span> <span class="va">N</span>, 
-                  m <span class="op">=</span> <span class="va">m</span>,
-                  rho <span class="op">=</span> <span class="va">rho</span>, 
-                  mean_coi <span class="op">=</span> <span class="va">mean_coi</span>,
+<span class="va">swfsim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_swf.html">sim_swf</a></span><span class="op">(</span>pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1e3</span>, <span class="fl">1e2</span><span class="op">)</span>,
+                  N <span class="op">=</span> <span class="fl">2</span>, 
+                  m <span class="op">=</span> <span class="fl">0.5</span>,
+                  rho <span class="op">=</span> <span class="fl">1e-3</span>, 
+                  mean_coi <span class="op">=</span> <span class="fl">2</span>,
                   migr_dist_mat <span class="op">=</span> <span class="fl">1</span>, <span class="co"># nonspatial</span>
-                  tlim <span class="op">=</span> <span class="va">tlim</span><span class="op">)</span>
-<span class="co">#&gt; completed in 0.000229 seconds</span></code></pre></div>
+                  tlim <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>
+<span class="co">#&gt; completed in 0.000144 seconds</span></code></pre></div>
 <p>The discrete-loci, discrete-time structured Wright Fisher simulation outputs six objets: 1. A vector of COIs, where each item in the vector is the number of parasites within a given host 2. A list of recombination blocks for each generation for each haplotype 3. The host and parental assignments for the “maternal” and “paternal” haplotype, respectively.</p>
 <p>The output of this function is largely for internal use and is intended to be parsed with the <code>get_arg</code> function (next section).</p>
 </div>
@@ -157,7 +149,7 @@
 <p>Using the ancestry matrices produced above, we can derive the most recent common ancestor (MRCA) and the time of MRCA coalescent event for each parasite (i.e. haplotype) at each discrete loci. As such, we are recreating a marginal tree for each loci and then collectively storing the entire set of marginal trees, termed the ancestral recombination graph.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ARG</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_arg.html">get_arg</a></span><span class="op">(</span><span class="va">swfsim</span><span class="op">)</span>
-<span class="co">#&gt; completed in 0.000080 seconds</span></code></pre></div>
+<span class="co">#&gt; completed in 0.000042 seconds</span></code></pre></div>
 <p>The <code>get_arg</code> function takes the output from the discrete-loci, discrete-time structured Wright Fisher simulation above and produces <code>bv_trees</code>, an S4 class, for each loci.</p>
 <div id="bv_tree-class" class="section level3">
 <h3 class="hasAnchor">
@@ -207,20 +199,20 @@
 <tr class="even">
 <td align="right">101</td>
 <td align="right">0</td>
-<td align="right">0</td>
+<td align="right">1</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="right">201</td>
 <td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="right">301</td>
 <td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="right">401</td>
@@ -237,14 +229,14 @@
 <tr class="odd">
 <td align="right">601</td>
 <td align="right">0</td>
-<td align="right">1</td>
+<td align="right">0</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="right">701</td>
 <td align="right">0</td>
 <td align="right">0</td>
-<td align="right">0</td>
+<td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="right">801</td>
