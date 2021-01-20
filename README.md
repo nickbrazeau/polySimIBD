@@ -17,4 +17,6 @@ The goal of `polySimIBD` is to perform forwards in-time simulation of malaria po
 Please see the [vignettes](https://nickbrazeau.github.io/polySimIBD/) for installation and use instructions. Thank you for your interest in our package! 
 
 
-
+<p align="center">
+<img src="https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/polysimibd_hex.png" width="200" height="200">
+</p>

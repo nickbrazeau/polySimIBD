@@ -51,7 +51,7 @@
       <a href="../articles/orig_mod_framework.html">Original Model Framework</a>
     </li>
     <li>
-      <a href="../articles/simdata.html">Simulating Genomic Data</a>
+      <a href="../articles/simdata.html">Simulating Data</a>
     </li>
     <li>
       <a href="../articles/spatial_extension.html">Spatial Extension</a>
@@ -121,12 +121,12 @@
                               mean_coi <span class="op">=</span> <span class="va">mean_coi</span>,
                               migr_dist_mat <span class="op">=</span> <span class="fl">1</span>, <span class="co"># nonspatial</span>
                               tlim <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>
-<span class="co">#&gt; completed in 0.000259 seconds</span>
+<span class="co">#&gt; completed in 0.000285 seconds</span>
 
 
 <span class="co"># get ARG</span>
 <span class="va">ARG</span> <span class="op">&lt;-</span> <span class="fu">polySimIBD</span><span class="fu">::</span><span class="fu"><a href="../reference/get_arg.html">get_arg</a></span><span class="op">(</span><span class="va">swfsim</span><span class="op">)</span>
-<span class="co">#&gt; completed in 0.000120 seconds</span>
+<span class="co">#&gt; completed in 0.000150 seconds</span>
 
 <span class="co"># layer on mutations</span>
 <span class="va">parasite.hapmat</span> <span class="op">&lt;-</span> <span class="fu">polySimIBD</span><span class="fu">::</span><span class="fu"><a href="../reference/layer_mutations_on_ARG.html">layer_mutations_on_ARG</a></span><span class="op">(</span><span class="va">ARG</span>, mutationrate <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></code></pre></div>

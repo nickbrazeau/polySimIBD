@@ -12,7 +12,7 @@ navbar:
           href: articles/installation.html
         - text: "Original Model Framework"
           href: articles/orig_mod_framework.html
-        - text: "Simulating Genomic Data"
+        - text: "Simulating Data"
           href: articles/simdata.html
         - text: "Spatial Extension"
           href: articles/spatial_extension.html
