@@ -9,7 +9,7 @@
 #' @param N numeric numeric; The number of individuals to consider in each deme
 #' @param m numeric numeric; Probability of internal migration where m represents the probability of moving from host_{origin} to host_{new} by m*(1-1/N) of each deme
 #' @param mean_coi numeric vector; The lambda of a right-shifted Poisson process, 1 + Pos(lambda) representing the average COI of each deme
-#' @param migr_dist_mat numeric matrix; Migrations rates with origin specified as rows and destination in columns. 
+#' @param migr_dist_mat numeric matrix; Migrations rates or probabilities between origin and destination with origin specified as rows and destination in columns. 
 #' @param rho numeric; expected recombination rate
 #' @param tlim numeric; the maximum number of generations to consider before exiting gracefully if all samples have not coalesced
 #' @param verbose boolean
@@ -20,8 +20,8 @@
 #'  and parental haplotype assignments for the "paternal" and "maternal" haplotypes (1 and 2), respectively. 
 #'  
 #' @details Demes are assumed to be ordered throughout (i.e. the order needs to be consistent between N, m, mean_coi, and the rows and columns of the migration matrix).
-#' @details Migration matrix is assumed to be a distance matrix, where the user can specify the scalar through the
-#'          \emph{dist_scalar} parameter
+#' @details Migration matrix is assumed to be a distance matrix that is either a rate or a probability. The program
+#'          will coerce the matrix into a probability distribution between origin and destination based on the row-sums. 
 #' @details This function is intended to be fed into the \code{\link(polysimIBD::get_arg}} function for interpretability. 
 #'
 #' @export

@@ -56,7 +56,7 @@ Rcpp::List sim_swf_cpp(Rcpp::List args) {
   // nested vectors, first over time, then individuals
   vector<vector<Host>> pop(tlim, vector<Host>(N));
   
-  // draw COI for every individual in every time step
+  // draw COI for every individual in every time step as part of init
   for (int t = 0; t < tlim; ++t) {
     // need to use iters to properly count through N
     int citer = 0;

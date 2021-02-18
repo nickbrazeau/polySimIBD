@@ -19,7 +19,7 @@ sim_swf(pos, N, m, rho, mean_coi, tlim, migr_dist_mat = NULL, verbose = FALSE)
 
 \item{tlim}{numeric; the maximum number of generations to consider before exiting gracefully if all samples have not coalesced}
 
-\item{migr_dist_mat}{numeric matrix; Migrations rates with origin specified as rows and destination in columns.}
+\item{migr_dist_mat}{numeric matrix; Migrations rates or probabilities between origin and destination with origin specified as rows and destination in columns.}
 
 \item{verbose}{boolean}
 }
@@ -37,8 +37,8 @@ a deme individual-level COI is considered.
 \details{
 Demes are assumed to be ordered throughout (i.e. the order needs to be consistent between N, m, mean_coi, and the rows and columns of the migration matrix).
 
-Migration matrix is assumed to be a distance matrix, where the user can specify the scalar through the
-\emph{dist_scalar} parameter
+Migration matrix is assumed to be a distance matrix that is either a rate or a probability. The program
+will coerce the matrix into a probability distribution between origin and destination based on the row-sums.
 
 
 }
