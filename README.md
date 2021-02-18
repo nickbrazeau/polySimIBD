@@ -1,4 +1,3 @@
-
 # polySimIBD
 
 <!-- badges: start -->
@@ -9,19 +8,15 @@
 
 The goal of `polySimIBD` is to perform forwards in-time simulation of malaria population genetics. The model uses a discrete-time, discrete-loci structured Wright Fisher approximation to account for (simplified) malaria transmission dynamics.   
 
-## Installation
-
-You can install the released version of `polySimIBD` from the Master branch of this repo with: 
-
-``` r
-remotes::install_github("nickbrazeau/polySimIBD")
-```
 
 ## Development
-This project is under active development. The Master branch will remain stable and any new code development, features, or functions will be merged from development branches and released as "News". 
+:warning: This project is under active development. As a result, parameter names and behaviors as well as output file formats may change. Releases will be noted in the "News" with any lack of backwards compatibility indicated by a full [version number change](https://r-pkgs.org/release.html#release-version).
 
 
-## Examples
-Please see our Vignettes tab and [Package Site](https://nickbrazeau.github.io/polySimIBD/) for examples on how to get started. 
+## Installation & Use
+Please see the [vignettes](https://nickbrazeau.github.io/polySimIBD/) for installation and use instructions. Thank you for your interest in our package! 
 
 
+<p align="center">
+<img src="https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/polysimibd_hex.png" width="200" height="200">
+</p>
