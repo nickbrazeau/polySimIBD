@@ -1,15 +1,12 @@
 ---
-output: html_document
-editor_options: 
-  chunk_output_type: console
----
----
 title: "Extension of Model for Spatial Demes"
 output: rmarkdown::html_vignette
 vignette: >
-%\VignetteIndexEntry{Extension of Model for Spatial Demes}
-%\VignetteEngine{knitr::rmarkdown}
-%\VignetteEncoding{UTF-8}
+  %\VignetteIndexEntry{Extension of Model for Spatial Demes}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -26,10 +23,10 @@ library(tidygraph) # useful for manipulations & visaulizations
 ```
 
 # Extending the Model for Space
-We extend the discrete-loci, discrete-time structured Wright Fisher model for space by considering spatial _demes_ as a collection of hosts. Hosts move between demes based on a migration matrix *M*. In the spirit of the Wright-Fisher, the number of hosts within the deme (_i.e._ deme size) does not change over time. As before, , where each host is a "micro-deme" in order to model complexity of infection. 
+We extend the discrete-loci, discrete-time structured Wright Fisher model for space by considering spatial _demes_ as a collection of hosts. Hosts move between demes based on a migration matrix *M*. In the spirit of the Wright-Fisher, the number of hosts within the deme (_i.e._ deme size) does not change over time. As before, *** , where each host is a "micro-deme" in order to model complexity of infection. 
 
 ## Forwards-in-time Description 
-The full mathematical formulation of the nonspatial model can be found in the Supplementary Section of [Verity, Aydemic, Brazeau _et al._ Nat Comms 2020 (PMC7192906), Biorxiv](https://www.nature.com/articles/s41467-020-15779-8). The spatial extension to the model is described in [Brazeau _et al._ Biorxiv]().    
+The full mathematical formulation of the nonspatial model can be found in the Supplementary Section of [Verity, Aydemir, Brazeau _et al._ Nat Comms 2020 (PMC7192906)](https://www.nature.com/articles/s41467-020-15779-8). The spatial extension to the model is described in [Brazeau _et al._ Biorxiv]().    
 
 As a brief lay summary, we assume that each deme (_hereafter_ macrodeme) is a subpopulation within a very large population ($\iota \in \nu$, where $\iota$ is an individual macrodeme and $\nu$ is the total number of macrodemes in the entire population) and that each macrodeme represents a collection of individual hosts. Then, as before, let each individual host be represented by a deme  (_hereafter_ macrodeme), or a subpopulation within this large macrodeme ($i \in N_{\iota}$, where $i$ is an individual host and $N_{\iota}$ is the total host population for that macrodeme).   
 
