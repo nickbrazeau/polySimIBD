@@ -16,3 +16,7 @@ Rcpp::List get_arg_cpp(Rcpp::List args);
 Rcpp::List subset_bvtree_cpp(std::vector<int> c,
                              std::vector<int> t,
                              std::vector<int> m);
+
+//------------------------------------------------
+// [[Rcpp::export]]
+Rcpp::List calc_between_IBD_cpp(Rcpp::List args);
