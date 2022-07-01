@@ -1,0 +1,82 @@
+---
+title: "Extension of Model for Spatial Demes"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Extension of Model for Spatial Demes}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(polySimIBD)
+library(ggplot2)
+library(tidygraph) # useful for manipulations & visaulizations
+```
+
+# Extending the Model for Space
+We extend the discrete-loci, discrete-time structured Wright Fisher model for space by considering spatial _demes_ as a collection of hosts. Hosts move between demes based on a migration matrix *M*. In the spirit of the Wright-Fisher, the number of hosts within the deme (_i.e._ deme size) does not change over time. As before, *** , where each host is a "micro-deme" in order to model complexity of infection. 
+
+## Forwards-in-time Description 
+The full mathematical formulation of the nonspatial model can be found in the Supplementary Section of [Verity, Aydemir, Brazeau _et al._ Nat Comms 2020 (PMC7192906)](https://www.nature.com/articles/s41467-020-15779-8). The spatial extension to the model is described in [Brazeau _et al._ Biorxiv]().    
+
+As a brief lay summary, we assume that each deme (_hereafter_ macrodeme) is a subpopulation within a very large population ($\iota \in \nu$, where $\iota$ is an individual macrodeme and $\nu$ is the total number of macrodemes in the entire population) and that each macrodeme represents a collection of individual hosts. Then, as before, let each individual host be represented by a deme  (_hereafter_ macrodeme), or a subpopulation within this large macrodeme ($i \in N_{\iota}$, where $i$ is an individual host and $N_{\iota}$ is the total host population for that macrodeme).   
+
+We then allow the $J$ parasites (that reside within the host microdeme) to mate at random with the previous generation of parasites ($t_{1-}$) and produce a large number of parasite progeny. During mating, genetic recombination has the potential to occur based on the length of the genome and the recombination rate, $\rho$. Progeny are then allowed to move to a new macrodeme or stay in the current macrodeme based on the migration matrix, $\mathbf{M}$. Within the macrodemes, the progeny are then allowed migrate to a new or the same host microdeme with a probability of $\frac{m}{N_{\iota}}$. Progeny are then culled down to a smaller number of parasites per host by drawing from a Poisson distribution with a mean COI. In essence, the nonspatial and spatil simulator only differ by an additional hierarchical level of "demes" (macrodemes versus microdemes).
+
+
+# Island Case
+Here, we will make a dummy case of two island populations (population A vs. B) that are only marginally connected.   
+
+Run the simulation:   
+```{r}
+# vectors must be ordered for population A and B
+demesizes <- c(10, 15)
+coimeans <- c(1.25, 1.25)
+m <- c(0.25, 0.25)
+migr_dist_mat <- matrix(0, ncol = 2, nrow = 2)
+diag(migr_dist_mat) <- 100
+swf <- polySimIBD::sim_swf(pos = sample(1:1e3, size = 50), 
+                           N = demesizes, 
+                           m = m, 
+                           mean_coi = coimeans, 
+                           migr_dist_mat = migr_dist_mat, 
+                           rho = 1e-2, 
+                           tlim = 10)
+```
+Pull out the ARG and then calculate the pairwise IBD.
+```{r}
+ARG <- polySimIBD::get_arg(swf)
+
+# here we are going to get all the pairwise IBD combinations for our hosts
+adj_graph <- t(combn(x = c(1:sum(demesizes)), m = 2)) %>% 
+  tibble::as_tibble(., .name_repair = "minimal") %>% 
+  magrittr::set_colnames(c("smpl1", "smpl2")) %>% 
+  dplyr::mutate(pairwiseIBD = purrr::map2_dbl(.x = smpl1, .y = smpl2, .f = function(x,  y){
+    polySimIBD:::quiet(
+      polySimIBD::get_realized_pairwise_ibd(swf = swf, host_index = c(x,y))
+    )
+  }))
+
+```
+
+Let's visualize our simple scenarios
+```{r}
+adj_graph %>% 
+  ggplot() + 
+  geom_tile(aes(x = smpl1, y = smpl2, fill = pairwiseIBD)) + 
+  scale_fill_viridis_c("Pairwise IBD") + 
+  xlab("Sample 1") + ylab("Sample 2") + 
+  labs(caption = "Samples 1:10 are on island A; Samples 11:25 are on island B") + 
+  theme_minimal()
+
+```
+As can be seen from the figure, samples 1-10, which reside on island A have no relatedness to samples 11-25 that reside on island by B as they have been completely isolated through our migration matrix. 

@@ -2,7 +2,9 @@ pandoc: 2.7.3
 pkgdown: 1.6.1.9000
 pkgdown_sha: 6094ac3dd80a1f3f1d4e2f47d0ed4716d51362b0
 articles:
-  modframework_dldtstructuredwf: modframework_dldtstructuredwf.html
+  installation: installation.html
+  orig_mod_framework: orig_mod_framework.html
   simdata: simdata.html
-last_built: 2020-11-07T13:49Z
+  spatial_extension: spatial_extension.html
+last_built: 2021-01-20T19:27Z
 

@@ -1,5 +1,5 @@
 #' plot the bvtrees
-#' @param ARGsim S4 object; The ARGsim object that was created from a structured Wright
+#' @param ARG S4 object; The ARG object that was created from a structured Wright
 #'        Fisher Simulation via `sim_structured_WF` and then processed with `get_ARG`.
 #' @param loci numeric vector; Loci to plot
 #' @import ggplot2

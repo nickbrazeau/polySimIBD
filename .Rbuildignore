@@ -11,3 +11,6 @@
 ^pkgdown$
 ^appveyor\.yml$
 ^R_ignore$
+^doc$
+^Meta$
+^SimPlay

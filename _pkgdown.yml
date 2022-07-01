@@ -1,1 +1,23 @@
-destination: docs
+title: polySimIBD
+template:
+  params:
+    bootswatch: flatly
+    
+navbar:
+  title: "polySimIBD"
+  left:
+    - text: "Vignettes"
+      menu:
+        - text: "Installation"
+          href: articles/installation.html
+        - text: "Original Model Framework"
+          href: articles/orig_mod_framework.html
+        - text: "Simulating Data"
+          href: articles/simdata.html
+        - text: "Spatial Extension"
+          href: articles/spatial_extension.html
+    - text: "Functions"
+      href: reference/index.html
+  right:
+   - icon: fa-github
+     href: https://github.com/nickbrazeau/polySimIBD

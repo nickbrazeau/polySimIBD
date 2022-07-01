@@ -15,7 +15,7 @@ get_realized_coi <- function(swf, host_index = NULL) {
   
   # checks
   assert_custom_class(swf, "swfsim")
-  assert_single_int(host_index)
+  assert_single_pos_int(host_index)
   
   # get ARG from swf and host_index
   arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
@@ -37,7 +37,7 @@ get_within_host_IBD <- function(swf, host_index = NULL) {
   
   # checks
   assert_custom_class(swf, "swfsim")
-  assert_single_int(host_index)
+  assert_single_pos_int(host_index)
   
   # get ARG from swf and host_index
   arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
@@ -63,7 +63,7 @@ get_within_host_IBD <- function(swf, host_index = NULL) {
 get_realized_pairwise_ibd <- function(swf, host_index = NULL) {
   # checks
   assert_custom_class(swf, "swfsim")
-  assert_int(host_index)
+  assert_pos_int(host_index)
   assert_length(host_index, 2)
   
   # get ARG from swf and host_index
