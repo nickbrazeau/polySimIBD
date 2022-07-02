@@ -265,7 +265,6 @@ Rcpp::List calc_between_IBD_cpp(Rcpp::List args) {
   // extract arguments
   vector<vector<int>> conn = rcpp_to_matrix_int(args["conn"]);
   vector<int> host_haplo_cnt = rcpp_to_vector_int(args["host_haplo_cnt"]);
-  vector<int> haplo_index = rcpp_to_vector_int(args["haplo_index"]);
   int haptot = host_haplo_cnt[0] + host_haplo_cnt[1];
   int L = conn.size(); // loci here are unique from upstream R filtering
 
@@ -278,7 +277,7 @@ Rcpp::List calc_between_IBD_cpp(Rcpp::List args) {
     // looking left to right
     for (int a = 0; a < host_haplo_cnt[0]; ++a) {
       for (int b = host_haplo_cnt[0]; b < haptot; ++b) {
-        if (haplo_index[a] == conn[l][b]) {
+        if (a == conn[l][b]) {
           ibd_numerator[l] = 1;
         }
       }
@@ -287,7 +286,7 @@ Rcpp::List calc_between_IBD_cpp(Rcpp::List args) {
     // looking right to left
     for (int b = host_haplo_cnt[0]; b < haptot; ++b) {
       for (int a = 0; a < host_haplo_cnt[0]; ++a) {
-        if (haplo_index[b] == conn[l][a]) {
+        if (b == conn[l][a]) {
           ibd_numerator[l] = 1;
         }
       }

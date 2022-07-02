@@ -99,21 +99,28 @@ get_realized_pairwise_ibd <- function(swf, host_index = NULL) {
   assert_vector(host_index)
   assert_pos_int(host_index, zero_allowed = FALSE)
   
+  # unqiue loci 
+  conn <- purrr::map(arg, "c")
+  uniconn <- unique(conn)
+  
+  
   # define arguments
   arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
-  conn <- purrr::map(arg, "c")
   haplo_index <- mapply(function(x) 1:x, swf$coi[host_index], SIMPLIFY = FALSE)
   host_haplo_cnt <- mapply(length, haplo_index)
   argums <- list(conn = conn, 
-                 host_haplo_cnt = host_haplo_cnt,
-                 host_index = rep(host_index, mapply(length, haplo_index)) - 1,
-                 haplo_index = unlist(haplo_index) - 1)
+                 host_haplo_cnt = host_haplo_cnt)
   
   # pass to efficient C++ function
   output_raw <- calc_between_IBD_cpp(argums)
   
   # tidy cpp output
   # TODO w/ numerator versus denominator
+  # TODO 
+  # figure out how to do with unique loci - tricky becuase loci may be ABAA and therefore when
+  # subsetting to unique will only show AB but reps would be wrong if the result was AAAB
+  
+  
   
   # out
   return(output_raw)
