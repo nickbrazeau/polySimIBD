@@ -27,8 +27,7 @@ Here, we will use the Structured Discrete-Loci, Discrete Time Wright Fisher mode
 
 
 # Simulating Data
-
-As Uncle Ben once said, "With great flexibility, comes great responsibility". We have tried to make `DLDTsWF` extremely flexible by allowing the user to interact with individual parasites. However, this does require some thought when it comes to combining data within-hosts. Below, we simulate data (as before) for a population of parasites. We then create the ARG for those parasites that are within Host 1 and Host 2. Finally, we collapse the parasite haplotypes from host 1 and 2 into "sequencing read counts", respectively.    
+We have tried to make `DLDTsWF` extremely flexible by allowing the user to interact with individual parasites. However, this does require some thought when it comes to combining data within-hosts. Below, we simulate data (as before) for a population of parasites. We then create the ARG for those parasites that are within Host 1 and Host 2. Finally, we collapse the parasite haplotypes from host 1 and 2 into "sequencing read counts", respectively.    
 
 ```{r}
 set.seed(1)
@@ -119,4 +118,4 @@ newvcfR <- new("vcfR", meta = meta, fix = as.matrix(fix), gt = gt)
 
 ```
 
-**Reminder** that as Uncle Ben once said, "With great flexibility, comes great responsibility". We leave it to the user to decide how to wrangle and combine this data per their project specifications! 
+**Reminder**, we leave it to the user to decide how to wrangle and combine this data per their project specifications! 

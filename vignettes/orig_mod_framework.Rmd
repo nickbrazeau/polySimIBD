@@ -38,7 +38,7 @@ In a similar framework, hosts can then be infected with monoclonal or polyclonal
   
 
 
-# A **very, very** Brief Primer on the Coalescent  
+# A Brief Primer on the Coalescent  
 Coalescent theory is one of the central pillars of population genetics and is a vast subject (see  Wakeley's classic textbook, Coalescent Theory: An Introduction). Essentially, coalescent theory provides a framework for how loci (genes, individuals, etc.) have been derived from a common ancestor backwards in time, classically using the assumptions of the Wright-Fisher model. One of the main assumptions of the coalescence, is that loci are independent and that no recombination is occurring between loci. To relax this assumption, we must consider the coalescence with recombination. In this framework, a single coalescent tree is no longer representative of the genome (_NB_: genomes are now combination of genes on intervals [0, L) ; [L, L_{+1}], see [Griffiths & Marjoram 1996](http://lamastex.org/recomb/ima.pdf) for further details). As a result, each loci in the gene interval has a marginal tree due recombination resulting in different genealogical histories of loci. The collection of these trees with respect to recombination breakpoints among loci in the gene interval is termed the Ancestral Recombination Graph (ARG). 
 
 
@@ -109,7 +109,7 @@ plot_coalescence_trees(ARG)
 ```
 
 # Adding Mutations 
-Finally, we can layer mutations on to each marginal tree (and the overall ARG) based on the total branch length of the coalescent tree and the user specificed per-recombination block mutation rate.
+Finally, we can layer mutations on to each marginal tree (and the overall ARG) based on the total branch length of the coalescent tree and the user specified per-recombination block mutation rate.
 ```{r}
 hapmat <- polySimIBD::layer_mutations_on_ARG(ARG, mutationrate = 0.1)
 hapmat <- cbind(POS = swfsim$pos, hapmat)
@@ -121,7 +121,7 @@ knitr::kable(hapmat)
 # Conclusion
 Up until this point, we have ignored within host COI and have only analyzed parasites as independent infections. In the next vignette [Simulating Data](https://nickbrazeau.github.io/polySimIBD/articles/simdata.html), we will explore how to convert our marginal tree and forward model into genomic data.   
   
-You may have noticed that our coalescent trees (`bvtree` class) always coalesce "right". This is intentional and an approach to optimize looping through ancestries to get the ARG. As a result, remember that not every intersection is a true node (e.g. lines can "jump" over other lines).
+You may have noticed that our coalescent trees (`bvtree` class) always coalesce "right-to-left". This is intentional and an approach to optimize looping through ancestries to get the ARG. As a result, remember that not every intersection is a true node (e.g. lines can "jump" over other lines).
 
 
 
