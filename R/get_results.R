@@ -7,11 +7,12 @@ setClass("bvtree",
 
 
 #' @title Extract Effective COI by Loci from SWF Simulation for a Single Host
-#' @inheritParams get_arg
+#' @inheritParams get_swf
 #' @details Only accepts a single host 
+#' @description TODO 
 #' @return vector of effective COI by loci
 #' @export
-get_realized_coi <- function(swf, host_index = NULL) {
+get_effective_coi <- function(swf, host_index = NULL) {
   
   # checks
   assert_custom_class(swf, "swfsim")
@@ -29,8 +30,9 @@ get_realized_coi <- function(swf, host_index = NULL) {
 
 
 #' @title Get Within-Host IBD from SWF Simulation
-#' @inheritParams get_arg
+#' @inheritParams get_swf
 #' @details Only accepts a single host 
+#' @description TODO
 #' @return double of within-host IBD
 #' @export
 get_within_host_IBD <- function(swf, host_index = NULL) {
@@ -55,11 +57,11 @@ get_within_host_IBD <- function(swf, host_index = NULL) {
 
 
 #' Extract haplotypes from ARG
-#' @param ARG set of bvtrees
+#' @param arg set of bvtrees
 #' @return hapmat numeric matrix; a matrix of mutliallelic haplotypes for each parasite considered. Loci are in
 #' rows and parasites (haplotypes) are in columns. 
 #' @export
-get_haplotype_matrix <- function(ARG){
+get_haplotype_matrix <- function(arg){
   
   # convert trees into matrix of alleles
   # each column is therefore a haplotype since we consider parasite by parasite
@@ -79,9 +81,32 @@ get_haplotype_matrix <- function(ARG){
 
 
 #------------------------------------------------
-#' @title Effective IBD by Loci from SWF for a Pair of Hosts
-#' @description Given an object \code{SWF}, ***
-#' @inheritParams get_arg
+#' @title Get Connection Intervals 
+#' @description Index where unique connections are in the entire genome for proper weighting
+#' @param uniqueconn unique bvtree connections from the ARG
+#' @param allconn all bvtree connections from the ARG
+#' @noRd
+#' @noMd
+
+get_conn_intervals <- function(uniqueconn, allconn){
+  names(uniqueconn) <- 1:length(uniqueconn)
+  intervals <- lapply(uniqueconn,
+                      function(uni){
+                        return(sapply(allconn, function(x){paste(uni, collapse = "") == paste(x, collapse = "")}))})
+  
+  mint <- rep(NA, length(allconn))
+  for(i in 1:length(intervals)) {
+    mint[intervals[[i]]] <- names(intervals)[i]
+  }
+  return(as.numeric(mint))
+}
+
+
+
+#' @title Effective IBD by Loci from ARG for a Pair of Hosts
+#' @description Given an object \code{ARG}, ***
+#' 
+#' @inheritParams get_swf
 #' @description Assumes that the minimum realized COI between the pairs of host determines
 #' the denominator for the between realized IBD
 #' @details  Only accepts a pair of hosts. Ignores mutations as interrupting IBD segments. 
@@ -89,36 +114,47 @@ get_haplotype_matrix <- function(ARG){
 #' @export
 
 
-get_realized_pairwise_ibd <- function(swf, host_index = NULL) {
+get_pairwise_ibd <- function(arg, host_index = NULL) {
   
   # check inputs and define defaults
-  assert_custom_class(swf, "swfsim")
-  if (is.null(host_index)) {
-    host_index <- 1:length(swf$coi)
-  }
+  assert_custom_class(arg, "argraph")
   assert_vector(host_index)
+  assert_noduplicates(host_index)
   assert_pos_int(host_index, zero_allowed = FALSE)
+  if(length(host_index) != 2) {
+    stop("host_index must be of length 2 for pairwise comparison", call. = FALSE)
+  }
   
-  # unqiue loci 
+  # subset to unique loci for speed 
   conn <- purrr::map(arg, "c")
   uniconn <- unique(conn)
-  
+  # store indices
+  conn_indices <- get_conn_intervals(uniqueconn = uniconn, allconn = conn)
   
   # define arguments
-  arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
   haplo_index <- mapply(function(x) 1:x, swf$coi[host_index], SIMPLIFY = FALSE)
   host_haplo_cnt <- mapply(length, haplo_index)
-  argums <- list(conn = conn, 
+  argums <- list(conn = uniconn, 
                  host_haplo_cnt = host_haplo_cnt)
   
-  # pass to efficient C++ function
+  # pass to efficient C++ function for quick between tree look up 
   output_raw <- calc_between_IBD_cpp(argums)
+  
+  #tidy raw
+  # catch if no btwn, no w/in 
+  if(sum(output_raw == 0)) { return(0)}
+  
+  # we define btwn_pairwise_ibd as: 
+  # (n_{coal-btwn} + n_{coal-win}) / (n_{strains1} * n{strains2})
+  # TODO 
+  #   per loci within IBD calc
+  #   remember will be for each host 
+  #   then need to weight by diff
+  
   
   # tidy cpp output
   # TODO w/ numerator versus denominator
   # TODO 
-  # figure out how to do with unique loci - tricky becuase loci may be ABAA and therefore when
-  # subsetting to unique will only show AB but reps would be wrong if the result was AAAB
   
   
   
