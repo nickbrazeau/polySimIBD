@@ -15,7 +15,7 @@ get_within_host_IBD(swf, host_index = NULL)
 double of within-host IBD
 }
 \description{
-Get Within-Host IBD from SWF Simulation
+TODO
 }
 \details{
 Only accepts a single host

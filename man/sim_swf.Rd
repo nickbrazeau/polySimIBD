@@ -4,7 +4,7 @@
 \alias{sim_swf}
 \title{The Structured Wright Fisher Model for IBD}
 \usage{
-sim_swf(pos, N, m, rho, mean_coi, tlim, migr_dist_mat = NULL, verbose = FALSE)
+sim_swf(pos, N, m, rho, mean_coi, tlim, migr_dist_mat = 1, verbose = FALSE)
 }
 \arguments{
 \item{pos}{vector; the genomic coordinates for chromosome and position of the sites}
@@ -19,7 +19,7 @@ sim_swf(pos, N, m, rho, mean_coi, tlim, migr_dist_mat = NULL, verbose = FALSE)
 
 \item{tlim}{numeric; the maximum number of generations to consider before exiting gracefully if all samples have not coalesced}
 
-\item{migr_dist_mat}{numeric matrix; Migrations rates or probabilities between origin and destination with origin specified as rows and destination in columns.}
+\item{migr_dist_mat}{numeric matrix; Migrations rates or probabilities between origin and destination with origin specified as rows and destination in columns. Default value of 1 indicates non-spatial model}
 
 \item{verbose}{boolean}
 }
