@@ -146,6 +146,9 @@ get_arg <- function(swf, host_index = NULL, haplo_index = NULL) {
     ARG[[l]]@z = order(t_temp) - 1
   }
   
+  # custom class
+  class(ARG) <- "argraph"
+  
   return(ARG)
 }
 
