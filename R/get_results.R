@@ -29,31 +29,117 @@ get_effective_coi <- function(swf, host_index = NULL) {
 }
 
 
-#' @title Get Within-Host IBD from SWF Simulation
+
 #' @inheritParams get_swf
 #' @details Only accepts a single host 
 #' @description TODO
 #' @return double of within-host IBD
 #' @export
-get_within_host_IBD <- function(swf, host_index = NULL) {
-  
+get_within_IBD <- function(swf, host_index = NULL) {
   # checks
   assert_custom_class(swf, "swfsim")
   assert_single_pos_int(host_index)
-  
   # get ARG from swf and host_index
+  # need to call ARG again to make extraction straightforward (eg don't know what user did to ARG upstream)
   arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
-  
   # get connections
   conn <- purrr::map(arg, "c")
-  # get effective IBD over loci 
+  # get within host IBD per loci 
   numerator <- purrr::map_dbl(conn, function(x){sum(x != -1)})
-  # -1 here for the SELF comparison
-  denom <-  (swf$coi[[host_index]]-1) * length(conn)
+  # -1 here for self comparison
+  denom <-  (swf$coi[[host_index]]-1)
+  # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info
+  wi <- diff(swf$pos)/sum(diff(swf$pos))
   # out
-  wthnIBD <- sum(numerator)/denom
+  wthnIBD <-sum( (numerator[1:(length(numerator) - 1)] / denom) * wi )
   return(wthnIBD)
 }
+
+
+
+#------------------------------------------------
+#' @title Get Connection Intervals 
+#' @description Index where unique connections are in the entire genome for proper weighting
+#' @param uniqueconn unique bvtree connections from the ARG
+#' @param allconn all bvtree connections from the ARG
+#' @noRd
+#' @noMd
+
+get_conn_intervals <- function(uniqueconn, allconn){
+  names(uniqueconn) <- 1:length(uniqueconn)
+  intervals <- lapply(uniqueconn,
+                      function(uni){
+                        return(sapply(allconn, function(x){paste(uni, collapse = "") == paste(x, collapse = "")}))})
+  mint <- rep(NA, length(allconn))
+  for(i in 1:length(intervals)) {
+    mint[intervals[[i]]] <- names(intervals)[i]
+  }
+  return(as.numeric(mint))
+}
+
+
+
+#' @title Between Host (pairwise) IBD 
+#' @description Given an object \code{swf}, ***
+#' @inheritParams get_swf
+#' @description ***
+#' @details  Only accepts a pair of hosts (i.e. pairwise). Ignores mutations as interrupting IBD segments. 
+#' @return ***
+#' @export
+get_pairwise_ibd <- function(swf, host_index = NULL) {
+  # check inputs and define defaults
+  assert_custom_class(swf, "swfsim")
+  assert_vector(host_index)
+  assert_noduplicates(host_index)
+  assert_pos_int(host_index, zero_allowed = FALSE)
+  if(length(host_index) != 2) {
+    stop("host_index must be of length 2 for pairwise comparison", call. = FALSE)
+  }
+  # get ARG from swf and host_index
+  # need to call ARG again to make extraction straightforward (eg don't know what user did to ARG upstream)
+  arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
+  # subset to unique loci for speed 
+  conn <- purrr::map(arg, "c")
+  uniconn <- unique(conn)
+  # store indices
+  conn_indices <- get_conn_intervals(uniqueconn = uniconn, allconn = conn)
+  # define arguments
+  haplo_index <- mapply(function(x) 1:x, swf$coi[host_index], SIMPLIFY = FALSE)
+  host_haplo_cnt <- mapply(length, haplo_index)
+  argums <- list(conn = uniconn, 
+                 host_haplo_cnt = host_haplo_cnt)
+  
+  # we define btwn_pairwise_ibd as: 
+  # (n_{coal-btwn} + n_{coal-win-btwn}) / (n_{strains1} * n{strains2})
+  # where w/in coal share a btwn coal 
+
+  # pass to efficient C++ function for quick between tree look up 
+  # to determine between host IBD
+  output_raw <- calc_between_IBD_cpp(argums)
+  
+  #tidy raw
+  # catch if no btwn, no w/in 
+  if(sum(output_raw == 0)) { return(0)}
+  
+  # within host IBD 
+ host1_wibd <- polySimIBD:::get_perloci_within_IBD(swf, host_index = host_index[1])
+ host2_wibd <- polySimIBD:::get_perloci_within_IBD(swf, host_index = host_index[2])
+ 
+ # numerator of btwn and w/in IBD
+  numerator <- # TODO 
+ 
+ # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info
+ wi <- diff(swf$pos)/sum(diff(swf$pos))
+  # TODO 
+  
+  
+  
+  # out
+  out <- # TODO 
+  return(out)
+}
+
+
 
 
 #' Extract haplotypes from ARG
@@ -78,92 +164,3 @@ get_haplotype_matrix <- function(arg){
   }, ARG))
   return(hap_mat)
 }
-
-
-#------------------------------------------------
-#' @title Get Connection Intervals 
-#' @description Index where unique connections are in the entire genome for proper weighting
-#' @param uniqueconn unique bvtree connections from the ARG
-#' @param allconn all bvtree connections from the ARG
-#' @noRd
-#' @noMd
-
-get_conn_intervals <- function(uniqueconn, allconn){
-  names(uniqueconn) <- 1:length(uniqueconn)
-  intervals <- lapply(uniqueconn,
-                      function(uni){
-                        return(sapply(allconn, function(x){paste(uni, collapse = "") == paste(x, collapse = "")}))})
-  
-  mint <- rep(NA, length(allconn))
-  for(i in 1:length(intervals)) {
-    mint[intervals[[i]]] <- names(intervals)[i]
-  }
-  return(as.numeric(mint))
-}
-
-
-
-#' @title Effective IBD by Loci from ARG for a Pair of Hosts
-#' @description Given an object \code{ARG}, ***
-#' 
-#' @inheritParams get_swf
-#' @description Assumes that the minimum realized COI between the pairs of host determines
-#' the denominator for the between realized IBD
-#' @details  Only accepts a pair of hosts. Ignores mutations as interrupting IBD segments. 
-#' @return ***
-#' @export
-
-
-get_pairwise_ibd <- function(arg, host_index = NULL) {
-  
-  # check inputs and define defaults
-  assert_custom_class(arg, "argraph")
-  assert_vector(host_index)
-  assert_noduplicates(host_index)
-  assert_pos_int(host_index, zero_allowed = FALSE)
-  if(length(host_index) != 2) {
-    stop("host_index must be of length 2 for pairwise comparison", call. = FALSE)
-  }
-  
-  # subset to unique loci for speed 
-  conn <- purrr::map(arg, "c")
-  uniconn <- unique(conn)
-  # store indices
-  conn_indices <- get_conn_intervals(uniqueconn = uniconn, allconn = conn)
-  
-  # define arguments
-  haplo_index <- mapply(function(x) 1:x, swf$coi[host_index], SIMPLIFY = FALSE)
-  host_haplo_cnt <- mapply(length, haplo_index)
-  argums <- list(conn = uniconn, 
-                 host_haplo_cnt = host_haplo_cnt)
-  
-  # pass to efficient C++ function for quick between tree look up 
-  output_raw <- calc_between_IBD_cpp(argums)
-  
-  #tidy raw
-  # catch if no btwn, no w/in 
-  if(sum(output_raw == 0)) { return(0)}
-  
-  # we define btwn_pairwise_ibd as: 
-  # (n_{coal-btwn} + n_{coal-win}) / (n_{strains1} * n{strains2})
-  # TODO 
-  #   per loci within IBD calc
-  #   remember will be for each host 
-  #   then need to weight by diff
-  
-  
-  # tidy cpp output
-  # TODO w/ numerator versus denominator
-  # TODO 
-  
-  
-  
-  # out
-  return(output_raw)
-}
-
-
-
-
-
-

@@ -269,29 +269,20 @@ Rcpp::List calc_between_IBD_cpp(Rcpp::List args) {
   int L = conn.size(); // loci here are unique from upstream R filtering
 
   // initialise IBD object for results
-    vector<int> ibd_numerator(L, 0);
+  vector<int> ibd_numerator(L, 0);
 
   // loop through loci
   for (int l = 0; l < L; ++l) {
     // always only two hosts for between IBD comparison
-    // looking left to right
-    for (int a = 0; a < host_haplo_cnt[0]; ++a) {
-      for (int b = host_haplo_cnt[0]; b < haptot; ++b) {
-        if (a == conn[l][b]) {
-          ibd_numerator[l] = 1;
-        }
-      }
-    } // end left to right loop
-
+    // NB default only looks right to left
     // looking right to left
     for (int b = host_haplo_cnt[0]; b < haptot; ++b) {
       for (int a = 0; a < host_haplo_cnt[0]; ++a) {
         if (b == conn[l][a]) {
-          ibd_numerator[l] = 1;
+          ibd_numerator[l] = +1;
         }
       }
     } // end right to left loop
-
   } // end loci loop
 
   // return as list
