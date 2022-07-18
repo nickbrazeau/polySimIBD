@@ -3,7 +3,6 @@
 
 # files for future manuscript
 ^sandbox$
-^simulations$
 ^\.travis\.yml$
 ^codecov\.yml$
 ^_pkgdown\.yml$
@@ -13,4 +12,3 @@
 ^R_ignore$
 ^doc$
 ^Meta$
-^SimPlay
