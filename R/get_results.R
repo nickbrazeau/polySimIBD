@@ -183,12 +183,13 @@ get_pairwise_ibd <- function(swf, host_index = NULL) {
   # expand out unique loci intervals from above
   outputraw <- outputraw[conn_indices]
   win_smpl1 <- win_smpl1[conn_indices]
-  win_smplw <- win_smplw[conn_indices]
+  win_smpl2 <- win_smpl2[conn_indices]
   
   # numerator of btwn and w/in IBD
   numerator <- output_raw + win_smpl1 + win_smpl2
   
-  # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info
+  # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info - ie burn first loci
+  numerator <- numerator[-1]
   wi <- diff(swf$pos)/sum(diff(swf$pos))
   # weighted average
   return( sum( (numerator / prod(swf$coi[host_index]))*wi ) )
@@ -199,7 +200,7 @@ get_pairwise_ibd <- function(swf, host_index = NULL) {
 #------------------------------------------------
 #' Extract haplotypes from ARG
 #' @param arg set of bvtrees
-#' @return hapmat numeric matrix; a matrix of mutliallelic haplotypes for each parasite considered. Loci are in
+#' @return hapmat numeric matrix; a matrix of multiallelic haplotypes for each parasite considered. Loci are in
 #' rows and parasites (haplotypes) are in columns. 
 #' @export
 get_haplotype_matrix <- function(arg){
