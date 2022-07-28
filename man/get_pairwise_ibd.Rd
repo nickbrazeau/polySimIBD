@@ -2,22 +2,23 @@
 % Please edit documentation in R/get_results.R
 \name{get_pairwise_ibd}
 \alias{get_pairwise_ibd}
-\title{Effective IBD by Loci from ARG for a Pair of Hosts}
+\title{Calculate Between Host (pairwise) IBD}
 \usage{
-get_pairwise_ibd(arg, host_index = NULL)
+get_pairwise_ibd(swf, host_index = NULL)
 }
 \arguments{
+\item{swf}{result of forwards simulation using the function \code{sim_swf()}}
+
 \item{host_index}{a vector of target hosts. Defaults to all hosts}
 }
 \value{
 
 }
 \description{
-Given an object \code{ARG}, ***
+Given an object \code{swf}, ***
 
-Assumes that the minimum realized COI between the pairs of host determines
-the denominator for the between realized IBD
+
 }
 \details{
-Only accepts a pair of hosts. Ignores mutations as interrupting IBD segments.
+Only accepts a pair of hosts (i.e. pairwise). Ignores mutations as interrupting IBD segments.
 }

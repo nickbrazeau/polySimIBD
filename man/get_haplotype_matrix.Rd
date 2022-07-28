@@ -4,10 +4,10 @@
 \alias{get_haplotype_matrix}
 \title{Extract haplotypes from ARG}
 \usage{
-get_haplotype_matrix(ARG)
+get_haplotype_matrix(arg)
 }
 \arguments{
-\item{ARG}{set of bvtrees}
+\item{arg}{set of bvtrees}
 }
 \value{
 hapmat numeric matrix; a matrix of mutliallelic haplotypes for each parasite considered. Loci are in
