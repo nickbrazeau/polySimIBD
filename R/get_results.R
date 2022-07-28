@@ -35,7 +35,7 @@ get_effective_coi <- function(swf, host_index = NULL) {
 #' @description TODO
 #' @return double of within-host IBD
 #' @export
-get_within_IBD <- function(swf, host_index = NULL) {
+get_within_ibd <- function(swf, host_index = NULL) {
   # checks
   assert_custom_class(swf, "swfsim")
   assert_single_pos_int(host_index)
@@ -140,8 +140,7 @@ get_pairwise_ibd <- function(swf, host_index = NULL) {
   # subset to unique loci for speed 
   conn <- purrr::map(arg, "c")
   uniconn <- unique(conn)
-  # store indices for unique loci locations
-  conn_indices <- get_conn_intervals(uniqueconn = uniconn, allconn = conn)
+  
   # define arguments for fast cpp function 
   argums <- list(conn = uniconn, 
                  host_haplo_cnt = swf$coi[host_index])
@@ -152,16 +151,21 @@ get_pairwise_ibd <- function(swf, host_index = NULL) {
   
   # pass to efficient C++ function for quick between tree look up 
   # to determine between host IBD
-  output_raw <- calc_between_IBD_cpp(argums)
+  output_raw <- calc_between_IBD_cpp(argums)$ibd_numerator
   
   #tidy raw
-  # catch if no btwn, no w/in 
+  # catch if no btwn, no w/in or extra work needed
   if(sum(output_raw == 0)) { return(0)}
+  # if within, need to do additional work 
+  
+  
+  # find the locations of unique loci locations for later expansion
+  conn_indices <- polySimIBD:::get_conn_intervals(uniqueconn = uniconn, allconn = conn)
   
   # subset to relevant haploindices in bvtrees for correct w/in IBD calculation 
   # i.e. only within IBD that has a pairwise connection, or btwn smpl connection, contributes to 
   # overall calculation of pairwise IBD 
-  relconn <- lapply(uniconn, get_withinIBD_bvtree_subset, 
+  relconn <- lapply(uniconn, polySimIBD:::get_withinIBD_bvtree_subset, 
                     coi1 = swf$coi[host_index][1],
                     coi2 = swf$coi[host_index][2])
   wunniconn <- mapply(function(x, y){return(x[y])}, x = uniconn, y = relconn, SIMPLIFY = F)
@@ -176,10 +180,10 @@ get_pairwise_ibd <- function(swf, host_index = NULL) {
     z <- x[ y %in% swf$coi[host_index][1]:sum(swf$coi[host_index]) ]
     return(sum(z != -1)) }, SIMPLIFY = T)
   
-  
-  # TODO 
-  # need to expand out conn intervals from above
-  # conn_indices
+  # expand out unique loci intervals from above
+  outputraw <- outputraw[conn_indices]
+  win_smpl1 <- win_smpl1[conn_indices]
+  win_smplw <- win_smplw[conn_indices]
   
   # numerator of btwn and w/in IBD
   numerator <- output_raw + win_smpl1 + win_smpl2
