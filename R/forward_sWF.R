@@ -9,7 +9,7 @@
 #' @param N numeric numeric; The number of individuals to consider in each deme
 #' @param m numeric numeric; Probability of internal migration where m represents the probability of moving from host_{origin} to host_{new} by m*(1-1/N) of each deme
 #' @param mean_coi numeric vector; The lambda of a right-shifted Poisson process, 1 + Pos(lambda) representing the average COI of each deme
-#' @param migr_dist_mat numeric matrix; Migrations rates or probabilities between origin and destination with origin specified as rows and destination in columns. 
+#' @param migr_dist_mat numeric matrix; Migrations rates or probabilities between origin and destination with origin specified as rows and destination in columns. Default value of 1 indicates non-spatial model
 #' @param rho numeric; expected recombination rate
 #' @param tlim numeric; the maximum number of generations to consider before exiting gracefully if all samples have not coalesced
 #' @param verbose boolean
@@ -27,12 +27,13 @@
 #' @export
 
 sim_swf <- function(pos, N, m, rho, mean_coi, tlim,
-                    migr_dist_mat = NULL, 
+                    migr_dist_mat = 1, 
                     verbose = FALSE){
   
   # assertions
   assert_vector(pos)
   assert_numeric(pos)
+  assert_increasing(pos)
   if (length(migr_dist_mat) == 1) {
     assert_eq(migr_dist_mat, 1, 
               message = "Distance matrix can be set to 1 to indicate a non-spatial model. Otherwise, needs to be a matrix")
@@ -145,6 +146,9 @@ get_arg <- function(swf, host_index = NULL, haplo_index = NULL) {
     ARG[[l]]@z = order(t_temp) - 1
   }
   
+  # custom class
+  class(ARG) <- "argraph"
+  
   return(ARG)
 }
 
@@ -191,3 +195,5 @@ subset_bvtree <- function(bvtree, s) {
   
   return(bvtree)
 }
+
+

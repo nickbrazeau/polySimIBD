@@ -13,3 +13,7 @@ subset_bvtree_cpp <- function(c, t, m) {
     .Call(`_polySimIBD_subset_bvtree_cpp`, c, t, m)
 }
 
+calc_between_IBD_cpp <- function(args) {
+    .Call(`_polySimIBD_calc_between_IBD_cpp`, args)
+}
+
