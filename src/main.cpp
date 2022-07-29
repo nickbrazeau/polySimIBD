@@ -275,15 +275,14 @@ Rcpp::List calc_between_IBD_cpp(Rcpp::List args) {
   for (int l = 0; l < L; ++l) {
     // always only two hosts for between IBD comparison
     // NB default only looks right to left
-    // looking right to left
-    for (int b = host_haplo_cnt[0]; b < haptot; ++b) {
-      for (int a = 0; a < host_haplo_cnt[0]; ++a) {
-        if (b == conn[l][a]) {
+    for (int b = host_haplo_cnt[0]; b < haptot; ++b) { // loop through sample two
+      for (int a = 0; a < host_haplo_cnt[0]; ++a) { // to determine if connectin in smpl 1 (c = 0:(COI[1]-1))
+        if (a == conn[l][b]) {
           ibd_numerator[l] = +1;
         }
       }
-    } // end right to left loop
-  } // end loci loop
+    } // end pairwise compare loop
+  } // end loci loop 
 
   // return as list
   return Rcpp::List::create(Rcpp::Named("ibd_numerator") = ibd_numerator);

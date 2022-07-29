@@ -78,7 +78,7 @@ get_conn_intervals <- function(uniqueconn, allconn){
 }
 
 #------------------------------------------------
-#' @title Calculate Between Host (pairwise) IBD 
+#' @title Identify sub-trees recursively from root 
 #' @inheritParams bvtree
 #' @param int internal identification of root indices 
 #' @description Internal function: Recursively loop through tree starting with root to find haplo-indices in the "bvtrees c slot" that are connected
@@ -107,7 +107,7 @@ get_withinIBD_bvtree_subset <- function(c, coi1, coi2) {
   # find roots
   roots <- which(c == -1)
   # subset to tree based on roots 
-  subset_trees <- lapply(roots, get_bvtree_from_root, c = c)
+  subset_trees <- lapply(roots, polySimIBD:::get_conn_from_root, c = c)
   # get btwn conn
   btwnconn <- which(c[(coi1+1):(coi2+coi1)] %in% 0:(coi1-1)) + coi1
   
@@ -155,7 +155,7 @@ get_pairwise_ibd <- function(swf, host_index = NULL) {
   
   #tidy raw
   # catch if no btwn, no w/in or extra work needed
-  if(sum(output_raw == 0)) { return(0)}
+  if(sum(output_raw) == 0) { return(0)}
   # if within, need to do additional work 
   
   
@@ -165,23 +165,35 @@ get_pairwise_ibd <- function(swf, host_index = NULL) {
   # subset to relevant haploindices in bvtrees for correct w/in IBD calculation 
   # i.e. only within IBD that has a pairwise connection, or btwn smpl connection, contributes to 
   # overall calculation of pairwise IBD 
-  relconn <- lapply(uniconn, polySimIBD:::get_withinIBD_bvtree_subset, 
-                    coi1 = swf$coi[host_index][1],
-                    coi2 = swf$coi[host_index][2])
-  wunniconn <- mapply(function(x, y){return(x[y])}, x = uniconn, y = relconn, SIMPLIFY = F)
+  haploind <- lapply(uniconn, polySimIBD:::get_withinIBD_bvtree_subset, 
+                     coi1 = swf$coi[host_index][1],
+                     coi2 = swf$coi[host_index][2])
+  # subset to relevant haploindices for sample 1 based on original COI 
+  win_smpl1 <- mapply(function(x, y){
+    x[ y %in% 1:swf$coi[host_index][1] ]
+  }, 
+  x = uniconn, 
+  y = haploind, 
+  SIMPLIFY = F)
+  # loop through now for w/in calc smpl1 
+  win_smpl1 <- sapply(win_smpl1, function(x){
+    sum(x %in% 0:(swf$coi[host_index][1]-1))
+  })
   
-  # need to still respect COI, which is [ ] below 
-  # within host IBD for smpl 1
-  win_smpl1 <- mapply(x = wunniconn, y = relconn, function(x,y){
-    z <- x[ y %in% 1:swf$coi[host_index][1] ]
-    return(sum(z != -1)) }, SIMPLIFY = T)
-  # within host IBD for smpl 1
-  win_smpl2 <- mapply(x = wunniconn, y = relconn, function(x,y){
-    z <- x[ y %in% swf$coi[host_index][1]:sum(swf$coi[host_index]) ]
-    return(sum(z != -1)) }, SIMPLIFY = T)
+  # subset to relevant haploindices for sample 2 based on original COI 
+  win_smpl2 <- mapply(function(x, y){
+    x[ y %in% (swf$coi[host_index][1]+1):sum(swf$coi[host_index]) ]
+  }, 
+  x = uniconn, 
+  y = haploind, 
+  SIMPLIFY = F)
+  # loop through now for w/in calc smpl2 
+  win_smpl2 <- sapply(win_smpl2, function(x){
+    sum(x %in% swf$coi[host_index][1]:(sum(swf$coi[host_index])-1))
+  })
   
   # expand out unique loci intervals from above
-  outputraw <- outputraw[conn_indices]
+  output_raw <- output_raw[conn_indices]
   win_smpl1 <- win_smpl1[conn_indices]
   win_smpl2 <- win_smpl2[conn_indices]
   
