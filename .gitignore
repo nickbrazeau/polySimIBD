@@ -5,6 +5,7 @@ inst/doc
 
 # extra user files from me
 sandbox/
+internal_checks/
 R_ignore/NatComms_VerityAB2019_Sims/results/
 *.jpg
 *.svg

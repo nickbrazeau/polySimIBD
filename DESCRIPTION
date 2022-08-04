@@ -7,7 +7,7 @@ Authors@R: as.person(c(
     "Bob Verity <r.verity@imperial.ac.uk> [aut]"
   ))
 Description: Unique features of the malaria life-cycle and transmission dynamics requires extensions 
-             of typical population genetic simulators. Using a discrete-loci, discrete-time structured 
+             of typical population genetic simulators. Using a spatial discrete-loci, discrete-time structured 
              Wright Fisher framework, we simulate malaria population genetics forwards in time. Users
              are then able to capture the full Ancestral Recombination Graph.
 License: MIT + file LICENSE
