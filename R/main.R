@@ -1,5 +1,5 @@
 #' -------------------------------------------------------------------------------------------
-#' plot the ARG by Loci 
+#' plot the ARG by loci from swf simulator 
 #' @inheritParams get_arg
 #' @inheritParams sim_swf
 #' @param swf
@@ -7,15 +7,16 @@
 #' @param haplo_index
 #' @param tlim
 #' @param loci numeric vector; specific loci for plotting 
-#' @import ggplot
-#' @return a list of ggplots (layer: geom_segments) of the requested loci 
+#' @import ggplot2
+#' @return a list of ggplots (layer: geom_segments) of the requested loci across selected hosts or haplotypes from the simulation
 #' @export
 
-function(swf, loci, host_index, haplo_index, tlim) {
+plotARG <- function(swf, loci, host_index = NULL, 
+                    haplo_index = NULL, tlim) {
   arg <- polySimIBD::get_arg(swf, host_index = host_index, haplo_index = haplo_index)
   argsubset = arg[loci]
   # pull out COI
-  argplots <- purrr::map(arg, plot_bvtree, group = rep(host_index, times = swf$coi[host_index]),
+  argplots <- purrr::map(argsubset, plot_bvtree, group = rep(host_index, times = swf$coi[host_index]),
                          tlim = tlim)
   # out
   return(argplots)
@@ -24,9 +25,10 @@ function(swf, loci, host_index, haplo_index, tlim) {
 #' -------------------------------------------------------------------------------------------
 #' plot the bvtree
 #' @param bvtree 
-#' @import ggplot
+#' @import ggplot2
 #' @return ggplot object of geom_segments
-#' @export
+#' @noMd
+#' @noRd
 
 plot_bvtree <- function(bvtree, group, tlim){
   # coerce this into a tidy format
@@ -70,8 +72,7 @@ plot_bvtree <- function(bvtree, group, tlim){
     return(plotObj)
   }
   # out 
-  plotout <- make_marginal_tree_plot(plotdf)
-  return(plotout)
+  return(make_marginal_tree_plot(x = plotdf, tlim = tlim))
 }
 
 
