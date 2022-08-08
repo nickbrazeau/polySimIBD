@@ -57,6 +57,9 @@ get_within_ibd <- function(swf, host_index = NULL) {
 
 
 
+
+
+
 #------------------------------------------------
 #' @title Get Connection Intervals 
 #' @description Index where unique connections are in the entire genome for proper weighting
@@ -106,7 +109,7 @@ get_conn_from_root <- function(root, c) {
 get_withinIBD_bvtree_subset <- function(c, coi1, coi2) {
   # find roots
   roots <- which(c == -1)
-  # subset to tree based on roots 
+  # subset to subtree based on roots (ie extract out tree that is based connected to root)
   subset_trees <- lapply(roots, polySimIBD:::get_conn_from_root, c = c)
   # get btwn conn
   btwnconn <- which(c[(coi1+1):(coi2+coi1)] %in% 0:(coi1-1)) + coi1
@@ -117,15 +120,63 @@ get_withinIBD_bvtree_subset <- function(c, coi1, coi2) {
   return(sort(unique(unlist(subset_trees))))
 }
 
+
+
 #------------------------------------------------
-#' @title Calculate Between Host (pairwise) IBD 
+#' @title Calculate Between Host (pairwise) IBD by Interhost Relatedness
+#' @inheritParams get_arg
+#' @description TODO
+#' @return double of between-host IBD
+#' @export
+get_pairwise_in_ibd <- function(swf, host_index = NULL) {
+  # check inputs and define defaults
+  assert_custom_class(swf, "swfsim")
+  assert_vector(host_index)
+  assert_noduplicates(host_index)
+  assert_pos_int(host_index, zero_allowed = FALSE)
+  if(length(host_index) != 2) {
+    stop("host_index must be of length 2 for pairwise comparison", call. = FALSE)
+  }
+  # get ARG from swf and host_index
+  # need to call ARG again to make extraction straightforward (eg don't know what user did to ARG upstream)
+  arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
+  # extract connectins 
+  conn <- purrr::map(arg, "c")
+  # find the locations of unique loci locations for later expansion
+  conn_indices <- polySimIBD:::get_conn_intervals(uniqueconn = uniconn, allconn = conn)
+  # subset to unique loci for speed 
+  uniconn <- unique(conn)
+  
+  # get between connections per loci for pair 
+  conn_loci <- function(bvtree, swf){
+    # bvtree always looks from right to left
+    c2 <- bvtree[ (swf$coi[host_index[1]]+1):(swf$coi[host_index[1]] + swf$coi[host_index[2]]) ]
+    # out
+    return(any(c2 %in% 0:(swf$coi[host_index[1]]-1))) # if any between connections, this loci is considered to be in IBD 
+  }
+  # apply function  
+  lociIBD <- sapply(uniconn, conn_loci, swf = swf) 
+  # expand out unique loci intervals from above
+  numerator <- lociIBD[conn_indices]
+  
+  # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info - ie burn first loci
+  numerator <- numerator[-1]
+  wi <- diff(swf$pos)/sum(diff(swf$pos))
+  # weighted average
+  return( sum( (numerator / length(conn))*wi ) )
+  
+}
+
+
+#------------------------------------------------
+#' @title Calculate Between Host (pairwise) IBD accounting for COI
 #' @description Given an object \code{swf}, ***
 #' @inheritParams get_arg
 #' @description ***
 #' @details  Only accepts a pair of hosts (i.e. pairwise). Ignores mutations as interrupting IBD segments. 
 #' @return ***
 #' @export
-get_pairwise_ibd <- function(swf, host_index = NULL) {
+get_pairwise_coi_ibd <- function(swf, host_index = NULL) {
   # check inputs and define defaults
   assert_custom_class(swf, "swfsim")
   assert_vector(host_index)
@@ -151,7 +202,7 @@ get_pairwise_ibd <- function(swf, host_index = NULL) {
   
   # pass to efficient C++ function for quick between tree look up 
   # to determine between host IBD
-  output_raw <- calc_between_IBD_cpp(argums)$ibd_numerator
+  output_raw <- calc_between_coi_IBD_cpp(argums)$ibd_numerator
   
   #tidy raw
   # catch if no btwn, no w/in or extra work needed
@@ -170,7 +221,8 @@ get_pairwise_ibd <- function(swf, host_index = NULL) {
                      coi2 = swf$coi[host_index][2])
   # subset to relevant haploindices for sample 1 based on original COI 
   win_smpl1 <- mapply(function(x, y){
-    x[ y %in% 1:swf$coi[host_index][1] ]
+    smpl1_haplo_ind_rel <- which(y %in% 1:swf$coi[host_index][1])
+    return(x[smpl1_haplo_ind_rel])
   }, 
   x = uniconn, 
   y = haploind, 
@@ -182,7 +234,8 @@ get_pairwise_ibd <- function(swf, host_index = NULL) {
   
   # subset to relevant haploindices for sample 2 based on original COI 
   win_smpl2 <- mapply(function(x, y){
-    x[ y %in% (swf$coi[host_index][1]+1):sum(swf$coi[host_index]) ]
+    smpl2_haplo_ind_rel <- which(y %in% (swf$coi[host_index][1]+1):sum(swf$coi[host_index]))
+    return(x[smpl2_haplo_ind_rel])
   }, 
   x = uniconn, 
   y = haploind, 
