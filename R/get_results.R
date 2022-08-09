@@ -55,9 +55,60 @@ get_within_ibd <- function(swf, host_index = NULL) {
   return(wthnIBD)
 }
 
-
-
-
+#------------------------------------------------
+#' @title Calculate Between Host (pairwise) IBD by Interhost Relatedness
+#' @inheritParams get_arg
+#' @description Between host, or pairwise, IBD as presented in 
+#' Verity et al. 2020 (erity realized ibd (PMC7192906). The calculation 
+#' ignores intra-host relatedness and does not account for COI. Instead, 
+#' if there is any recent coalescence between any of the strains between 
+#' host 1 and host 2, the locus is condered to be IBD
+#' @return double of between-host IBD
+#' @export
+get_pairwise_bv_ibd <- function(swf, host_index = NULL) {
+  # check inputs and define defaults
+  assert_custom_class(swf, "swfsim")
+  assert_vector(host_index)
+  assert_noduplicates(host_index)
+  assert_pos_int(host_index, zero_allowed = FALSE)
+  if(length(host_index) != 2) {
+    stop("host_index must be of length 2 for pairwise comparison", call. = FALSE)
+  }
+  # get ARG from swf and host_index
+  # need to call ARG again to make extraction straightforward (eg don't know what user did to ARG upstream)
+  arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
+  # extract connectins 
+  conn <- purrr::map(arg, "c")
+  # subset to unique loci for speed 
+  uniconn <- unique(conn)
+  # find the locations of unique loci locations for later expansion
+  conn_indices <- polySimIBD:::get_conn_intervals(uniqueconn = uniconn, allconn = conn)
+  
+  # get between connections per locus for pair 
+  # bvtrees point left --  ignring w/in ibd - if any between ibd, then locus is ibd 
+  get_loci_pairwise_ibd <- function(conni, this_coi) {
+    smpl1con <- conni[1:this_coi[1]]
+    smpl2con <- conni[(this_coi[1]+1):(cumsum(this_coi)[2])]
+    # get IBD connections between 1 and 2
+    pwconn <- which(smpl2con %in% 0:(this_coi[1]-1) )
+    # if any, IBD
+    pwconn <- sum(pwconn)
+    return(pwconn >= 1)
+  }
+  
+  # iterate through/apply function
+  lociIBD <- purrr::map_dbl(.x = uniconn,
+                            .f = get_loci_pairwise_ibd, this_coi = swf$coi[host_index])
+  # expand out unique loci intervals from above
+  numerator <- lociIBD[conn_indices]
+  
+  # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info - ie burn first loci
+  numerator <- numerator[-1]
+  wi <- diff(swf$pos)/sum(diff(swf$pos))
+  # weighted average (each loci, denom is 1)
+  return( sum( numerator*wi ) )
+  
+}
 
 
 #------------------------------------------------
@@ -118,53 +169,6 @@ get_withinIBD_bvtree_subset <- function(c, coi1, coi2) {
   subset_trees <- subset_trees[ sapply(subset_trees, function(x, btwn){any(x %in% btwn)}, btwn = btwnconn) ]
   # out
   return(sort(unique(unlist(subset_trees))))
-}
-
-
-
-#------------------------------------------------
-#' @title Calculate Between Host (pairwise) IBD by Interhost Relatedness
-#' @inheritParams get_arg
-#' @description TODO
-#' @return double of between-host IBD
-#' @export
-get_pairwise_in_ibd <- function(swf, host_index = NULL) {
-  # check inputs and define defaults
-  assert_custom_class(swf, "swfsim")
-  assert_vector(host_index)
-  assert_noduplicates(host_index)
-  assert_pos_int(host_index, zero_allowed = FALSE)
-  if(length(host_index) != 2) {
-    stop("host_index must be of length 2 for pairwise comparison", call. = FALSE)
-  }
-  # get ARG from swf and host_index
-  # need to call ARG again to make extraction straightforward (eg don't know what user did to ARG upstream)
-  arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
-  # extract connectins 
-  conn <- purrr::map(arg, "c")
-  # find the locations of unique loci locations for later expansion
-  conn_indices <- polySimIBD:::get_conn_intervals(uniqueconn = uniconn, allconn = conn)
-  # subset to unique loci for speed 
-  uniconn <- unique(conn)
-  
-  # get between connections per loci for pair 
-  conn_loci <- function(bvtree, swf){
-    # bvtree always looks from right to left
-    c2 <- bvtree[ (swf$coi[host_index[1]]+1):(swf$coi[host_index[1]] + swf$coi[host_index[2]]) ]
-    # out
-    return(any(c2 %in% 0:(swf$coi[host_index[1]]-1))) # if any between connections, this loci is considered to be in IBD 
-  }
-  # apply function  
-  lociIBD <- sapply(uniconn, conn_loci, swf = swf) 
-  # expand out unique loci intervals from above
-  numerator <- lociIBD[conn_indices]
-  
-  # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info - ie burn first loci
-  numerator <- numerator[-1]
-  wi <- diff(swf$pos)/sum(diff(swf$pos))
-  # weighted average
-  return( sum( (numerator / length(conn))*wi ) )
-  
 }
 
 
