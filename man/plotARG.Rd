@@ -4,7 +4,13 @@
 \alias{plotARG}
 \title{plot the ARG by loci from swf simulator}
 \usage{
-plotARG(swf, loci, host_index = NULL, haplo_index = NULL, tlim)
+plotARG(
+  swf,
+  loci,
+  host_index = 1:length(swf$coi),
+  haplo_index = NULL,
+  tlim = 999
+)
 }
 \arguments{
 \item{swf}{result of forwards simulation using the function \code{sim_swf()}}

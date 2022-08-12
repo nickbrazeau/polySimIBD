@@ -52,7 +52,7 @@ swfsim <- polySimIBD::sim_swf(pos = pos,
 ARG <- polySimIBD::get_arg(swfsim)
 
 # layer on mutations
-parasite.hapmat <- polySimIBD::layer_mutations_on_ARG(ARG, mutationrate = 0.1)
+parasite.hapmat <- polySimIBD::layer_mutations_on_ARG(arg = ARG, mutationrate = 0.1)
 ```
 
 We now have created a matrix of haplotypes that has dimensions Loci x Parasites. We know which parasites belong to which hosts (i.e. which columns) by our `host1parasites` and `host2parasites` vectors. Using this information, we are going to simulate "reads" for the parasites within our host and collapse them to form a (non-referent) Within Sample Allele Frequency Matrix.

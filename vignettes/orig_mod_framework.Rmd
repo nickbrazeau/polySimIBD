@@ -66,7 +66,7 @@ Users are able to specify loci positions, `pos`, the number of Hosts in the popu
 ```{r}
 set.seed(1)
 swfsim <- sim_swf(pos = seq(1, 1e3, 1e2),
-                  N = 2, 
+                  N = 5, 
                   m = 0.5,
                   rho = 1e-3, 
                   mean_coi = 2,
@@ -102,12 +102,14 @@ The `get_arg` function takes the output from the discrete-loci, discrete-time st
 
 
 # Visualizing the Simulation
-Here, we will visualize the maringal tree for each loci. Users are able to specify which loci to visualize. Of note, you will only be able to visualize the marginal trees for the parasites that you created the ARG for in the previous section.
-
+Here, we will use the function `plotARG` to make a plot of the marginal tree for each loci. The function returns the ARG as a list of marginal tree plots per loci. Users are able to specify loci that they want to visualize either in the function or as an item of the list (shown below). Note, users need to add the $t_{lim}$, specifying the definition of recent coalescence that they used in the original simulation for ideal plotting. In addition, users can subset the marginal trees to specific hosts or haplotypes with the `host_index` or `haplo_index` arguments.   
 ```{r, fig.align = 'center', fig.width = 6, fig.height = 4, fig.retina = 5}
-plot_coalescence_trees(ARG)
+marginal_tree_list <- plotARG(swf = swfsim, host_index = c(1,2), tlim = 10)
+marginal_tree_list[[1]]
 ```
-
+  
+You may have noticed that our coalescent trees (`bvtree` class) always coalesce "right-to-left". This is intentional and an approach to optimize looping through ancestries to get the ARG. As a result, remember that not every intersection is a true node (e.g. lines can "jump" over other lines).
+  
 # Adding Mutations 
 Finally, we can layer mutations on to each marginal tree (and the overall ARG) based on the total branch length of the coalescent tree and the user specified per-recombination block mutation rate.
 ```{r}
@@ -121,7 +123,7 @@ knitr::kable(hapmat)
 # Conclusion
 Up until this point, we have ignored within host COI and have only analyzed parasites as independent infections. In the next vignette [Simulating Data](https://nickbrazeau.github.io/polySimIBD/articles/simdata.html), we will explore how to convert our marginal tree and forward model into genomic data.   
   
-You may have noticed that our coalescent trees (`bvtree` class) always coalesce "right-to-left". This is intentional and an approach to optimize looping through ancestries to get the ARG. As a result, remember that not every intersection is a true node (e.g. lines can "jump" over other lines).
+
 
 
 

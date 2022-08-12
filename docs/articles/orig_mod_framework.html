@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,14 +33,14 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">polySimIBD</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Vignettes
      
     <span class="caret"></span>
@@ -64,8 +66,8 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/nickbrazeau/polySimIBD">
-    <span class="fas fa-github"></span>
+  <a href="https://github.com/nickbrazeau/polySimIBD" class="external-link">
+    <span class="fa fa-github"></span>
      
   </a>
 </li>
@@ -79,13 +81,13 @@
 
       
 
-      </header><script src="orig_mod_framework_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Structured DTWF Malaria Model Overview</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/nickbrazeau/polySimIBD/blob/master/vignettes/orig_mod_framework.Rmd"><code>vignettes/orig_mod_framework.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nickbrazeau/polySimIBD/blob/HEAD/vignettes/orig_mod_framework.Rmd" class="external-link"><code>vignettes/orig_mod_framework.Rmd</code></a></small>
       <div class="hidden name"><code>orig_mod_framework.Rmd</code></div>
 
     </div>
@@ -93,106 +95,248 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nickbrazeau/polySimIBD">polySimIBD</a></span><span class="op">)</span></code></pre></div>
-<div id="purpose" class="section level1">
-<h1 class="hasAnchor">
-<a href="#purpose" class="anchor"></a>Purpose</h1>
-<p>The purpose of the <code>polySimIBD</code> package is to perform forwards in-time simulation of malaria population genetics. The model uses a discrete-time, discrete-loci structured Wright Fisher approximation to account for (simplified) malaria transmission dynamics.</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nickbrazeau/polySimIBD" class="external-link">polySimIBD</a></span><span class="op">)</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="purpose">Purpose<a class="anchor" aria-label="anchor" href="#purpose"></a>
+</h2>
+<p>The purpose of the <code>polySimIBD</code> package is to perform
+forwards in-time simulation of malaria population genetics. The model
+uses a discrete-time, discrete-loci structured Wright Fisher
+approximation to account for (simplified) malaria transmission
+dynamics.</p>
 </div>
-<div id="a-brief-primer-on-malaria-genetics" class="section level1">
-<h1 class="hasAnchor">
-<a href="#a-brief-primer-on-malaria-genetics" class="anchor"></a>A Brief Primer on Malaria Genetics</h1>
-<p>The need for a malaria-specific simulator is primarily due to the complex life-cycle of malaria and the phenomenon of multiple strains potentially infecting a single human host (“Complexity of Infection, or Multiplicity of Infection”). As part of the malaria life-cycle, parasite ploidy switches from haploid in the human host to diploid in the mosquito vector midgut. It is during this diploid stage that recombination occurs between parasites. However, not all recombination results in unique progeny, or unique haplotypes. For example, if only a single haplotype is present in the mosquito midgut (i.e. a monoclonal infection), all recombination events will “look” the same, as there is no variation for recombination to act upon. In contrast, if more than one haplotype is present in the mosquito midgut (i.e. a polyclonal infection), recombination will produce unique progeny.</p>
-<p>In a similar framework, hosts can then be infected with monoclonal or polyclonal infections depending on the number of infectious bites they receive and the number of unique haplotypes within the mosquito vector at the time of the infectious bite. Polyclonal infections can result either from:</p>
+<div class="section level2">
+<h2 id="a-brief-primer-on-malaria-genetics">A Brief Primer on Malaria Genetics<a class="anchor" aria-label="anchor" href="#a-brief-primer-on-malaria-genetics"></a>
+</h2>
+<p>The need for a malaria-specific simulator is primarily due to the
+complex life-cycle of malaria and the phenomenon of multiple strains
+potentially infecting a single human host (“Complexity of Infection, or
+Multiplicity of Infection”). As part of the malaria life-cycle, parasite
+ploidy switches from haploid in the human host to diploid in the
+mosquito vector midgut. It is during this diploid stage that
+recombination occurs between parasites. However, not all recombination
+results in unique progeny, or unique haplotypes. For example, if only a
+single haplotype is present in the mosquito midgut (i.e. a monoclonal
+infection), all recombination events will “look” the same, as there is
+no variation for recombination to act upon. In contrast, if more than
+one haplotype is present in the mosquito midgut (i.e. a polyclonal
+infection), recombination will produce unique progeny.</p>
+<p>In a similar framework, hosts can then be infected with monoclonal or
+polyclonal infections depending on the number of infectious bites they
+receive and the number of unique haplotypes within the mosquito vector
+at the time of the infectious bite. Polyclonal infections can result
+either from:</p>
 <ol style="list-style-type: decimal">
-<li>Multiple infectious bites transferring unique haplotypes (Superinfection)</li>
-<li>A single infectious bite transferring multiple haplotypes (Co-Transmission)</li>
+<li>Multiple infectious bites transferring unique haplotypes
+(Superinfection)</li>
+<li>A single infectious bite transferring multiple haplotypes
+(Co-Transmission)</li>
 </ol>
 <p align="center">
-<img src="https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/cotransmission_superinfxn.png" title="fig:" width="500" alt="Schematic of the DL-DT sWF Malaria Model"></p>
+</p>
+<div class="figure">
+<img src="https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/cotransmission_superinfxn.png" width="500" alt=""><p class="caption">Schematic of the DL-DT sWF Malaria Model</p>
 </div>
-<div id="a-very-very-brief-primer-on-the-coalescent" class="section level1">
-<h1 class="hasAnchor">
-<a href="#a-very-very-brief-primer-on-the-coalescent" class="anchor"></a>A <strong>very, very</strong> Brief Primer on the Coalescent</h1>
-<p>Coalescent theory is one of the central pillars of population genetics and is a vast subject (see Wakeley’s classic textbook, Coalescent Theory: An Introduction). Essentially, coalescent theory provides a framework for how loci (genes, individuals, etc.) have been derived from a common ancestor backwards in time, classically using the assumptions of the Wright-Fisher model. One of the main assumptions of the coalescence, is that loci are independent and that no recombination is occurring between loci. To relax this assumption, we must consider the coalescence with recombination. In this framework, a single coalescent tree is no longer representative of the genome (<em>NB</em>: genomes are now combination of genes on intervals [0, L) ; [L, L_{+1}], see <a href="http://lamastex.org/recomb/ima.pdf">Griffiths &amp; Marjoram 1996</a> for further details). As a result, each loci in the gene interval has a marginal tree due recombination resulting in different genealogical histories of loci. The collection of these trees with respect to recombination breakpoints among loci in the gene interval is termed the Ancestral Recombination Graph (ARG).</p>
+
+</div>
+<div class="section level2">
+<h2 id="a-brief-primer-on-the-coalescent">A Brief Primer on the Coalescent<a class="anchor" aria-label="anchor" href="#a-brief-primer-on-the-coalescent"></a>
+</h2>
+<p>Coalescent theory is one of the central pillars of population
+genetics and is a vast subject (see Wakeley’s classic textbook,
+Coalescent Theory: An Introduction). Essentially, coalescent theory
+provides a framework for how loci (genes, individuals, etc.) have been
+derived from a common ancestor backwards in time, classically using the
+assumptions of the Wright-Fisher model. One of the main assumptions of
+the coalescence, is that loci are independent and that no recombination
+is occurring between loci. To relax this assumption, we must consider
+the coalescence with recombination. In this framework, a single
+coalescent tree is no longer representative of the genome (<em>NB</em>:
+genomes are now combination of genes on intervals [0, L) ; [L, L_{+1}],
+see <a href="http://lamastex.org/recomb/ima.pdf" class="external-link">Griffiths &amp;
+Marjoram 1996</a> for further details). As a result, each loci in the
+gene interval has a marginal tree due recombination resulting in
+different genealogical histories of loci. The collection of these trees
+with respect to recombination breakpoints among loci in the gene
+interval is termed the Ancestral Recombination Graph (ARG).</p>
 <p align="center">
-<img src="https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/arg.png" title="fig:" width="500" alt="ARG for Three Samples with Two Discrete Loci"></p>
+</p>
+<div class="figure">
+<img src="https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/arg.png" width="500" alt=""><p class="caption">ARG for Three Samples with Two Discrete Loci</p>
 </div>
-<div id="model-formulation" class="section level1">
-<h1 class="hasAnchor">
-<a href="#model-formulation" class="anchor"></a>Model Formulation</h1>
-<p>The full mathematical formulation of this (nonspatial) model can be found in the Supplementary Section of <a href="https://www.nature.com/articles/s41467-020-15779-8">Verity, Aydemic, Brazeau <em>et al.</em> Nat Comms 2020 (PMC7192906), Biorxiv</a>. As a brief lay summary, we assume that each individual host can be represented by a deme, or a subpopulation within a large population (<span class="math inline">\(i \in N\)</span>, where <span class="math inline">\(i\)</span> is an individual host and <span class="math inline">\(N\)</span> is the total host population). We then allow the <span class="math inline">\(J\)</span> parasites (that reside within the host population) to mate at random with the previous generation of parasites (<span class="math inline">\(t_{1-}\)</span>) and produce a large number of parasite progeny. During mating, genetic recombination has the potential to occur based on the length of the genome and the recombination rate, <span class="math inline">\(\rho\)</span>. Progeny are then allowed to migrate to a new or the same host with a probability of <span class="math inline">\(\frac{m}{N}\)</span>. Progeny are then culled down to a smaller number of parasites per host by drawing from a Poisson distribution with a mean COI (schematic below). Overall, the simulator is best described as a discrete-loci, discrete-time structured Wright Fisher model.</p>
+
+</div>
+<div class="section level2">
+<h2 id="model-formulation">Model Formulation<a class="anchor" aria-label="anchor" href="#model-formulation"></a>
+</h2>
+<p>The full mathematical formulation of this (nonspatial) model can be
+found in the Supplementary Section of <a href="https://www.nature.com/articles/s41467-020-15779-8" class="external-link">Verity,
+Aydemic, Brazeau <em>et al.</em> Nat Comms 2020 (PMC7192906),
+Biorxiv</a>. As a brief lay summary, we assume that each individual host
+can be represented by a deme, or a subpopulation within a large
+population (<span class="math inline">\(i \in N\)</span>, where <span class="math inline">\(i\)</span> is an individual host and <span class="math inline">\(N\)</span> is the total host population). We then
+allow the <span class="math inline">\(J\)</span> parasites (that reside
+within the host population) to mate at random with the previous
+generation of parasites (<span class="math inline">\(t_{1-}\)</span>)
+and produce a large number of parasite progeny. During mating, genetic
+recombination has the potential to occur based on the length of the
+genome and the recombination rate, <span class="math inline">\(\rho\)</span>. Progeny are then allowed to migrate
+to a new or the same host with a probability of <span class="math inline">\(\frac{m}{N}\)</span>. Progeny are then culled down
+to a smaller number of parasites per host by drawing from a Poisson
+distribution with a mean COI (schematic below). Overall, the simulator
+is best described as a discrete-loci, discrete-time structured Wright
+Fisher model.</p>
 <p align="center">
-<img src="https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/sWFmodelframework.png" title="fig:" width="500" alt="Schematic of the DL-DT sWF Malaria Model"></p>
-<p>As can be seen from the schematic, the user-specified probability of migration, <span class="math inline">\(m\)</span>, has an effect on whether or not the transmission dynamic favors Superinfection (“panmictic”) or Contransmission (“independent”) setting.</p>
+</p>
+<div class="figure">
+<img src="https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/sWFmodelframework.png" width="500" alt=""><p class="caption">Schematic of the DL-DT sWF Malaria Model</p>
 </div>
-<div id="understanding-the-simulator" class="section level1">
-<h1 class="hasAnchor">
-<a href="#understanding-the-simulator" class="anchor"></a>Understanding the Simulator</h1>
-<p>Users are able to specify loci positions, <code>pos</code>, the number of Hosts in the population, <code>N</code>, the probability of migration, <code>m</code>, the recombination rate, <code>rho</code>, and the Mean COI for host parasite burden (culling of the progeny), <code>mean_coi</code>. Finally, users have the option to let the model run forwards in time until all parasites have coalesced to a single common ancestor (<code>tlim = Inf</code>), or can set a limit on the number of generations that we simulate (<code>tlim = &lt;integer&gt;</code>).</p>
+
+<p>As can be seen from the schematic, the user-specified probability of
+migration, <span class="math inline">\(m\)</span>, has an effect on
+whether or not the transmission dynamic favors Superinfection
+(“panmictic”) or Contransmission (“independent”) setting.</p>
+</div>
+<div class="section level2">
+<h2 id="understanding-the-simulator">Understanding the Simulator<a class="anchor" aria-label="anchor" href="#understanding-the-simulator"></a>
+</h2>
+<p>Users are able to specify loci positions, <code>pos</code>, the
+number of Hosts in the population, <code>N</code>, the probability of
+migration, <code>m</code>, the recombination rate, <code>rho</code>, and
+the Mean COI for host parasite burden (culling of the progeny),
+<code>mean_coi</code>. Finally, users have the option to let the model
+run forwards in time until all parasites have coalesced to a single
+common ancestor (<code>tlim = Inf</code>), or can set a limit on the
+number of generations that we simulate
+(<code>tlim = &lt;integer&gt;</code>).</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
-<span class="va">swfsim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_swf.html">sim_swf</a></span><span class="op">(</span>pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1e3</span>, <span class="fl">1e2</span><span class="op">)</span>,
-                  N <span class="op">=</span> <span class="fl">2</span>, 
-                  m <span class="op">=</span> <span class="fl">0.5</span>,
-                  rho <span class="op">=</span> <span class="fl">1e-3</span>, 
-                  mean_coi <span class="op">=</span> <span class="fl">2</span>,
-                  migr_dist_mat <span class="op">=</span> <span class="fl">1</span>, <span class="co"># nonspatial</span>
-                  tlim <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>
-<span class="co">#&gt; completed in 0.000166 seconds</span></code></pre></div>
-<p>The discrete-loci, discrete-time structured Wright Fisher simulation outputs six objets: 1. A vector of COIs, where each item in the vector is the number of parasites within a given host 2. A list of recombination blocks for each generation for each haplotype 3. The host and parental assignments for the “maternal” and “paternal” haplotype, respectively.</p>
-<p>The output of this function is largely for internal use and is intended to be parsed with the <code>get_arg</code> function (next section).</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">swfsim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sim_swf.html">sim_swf</a></span><span class="op">(</span>pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1e3</span>, <span class="fl">1e2</span><span class="op">)</span>,</span>
+<span>                  N <span class="op">=</span> <span class="fl">5</span>, </span>
+<span>                  m <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>                  rho <span class="op">=</span> <span class="fl">1e-3</span>, </span>
+<span>                  mean_coi <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>                  migr_dist_mat <span class="op">=</span> <span class="fl">1</span>, <span class="co"># nonspatial</span></span>
+<span>                  tlim <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="co">#&gt; completed in 0.000165 seconds</span></span></code></pre></div>
+<p>The discrete-loci, discrete-time structured Wright Fisher simulation
+outputs six objets: 1. A vector of COIs, where each item in the vector
+is the number of parasites within a given host 2. A list of
+recombination blocks for each generation for each haplotype 3. The host
+and parental assignments for the “maternal” and “paternal” haplotype,
+respectively.</p>
+<p>The output of this function is largely for internal use and is
+intended to be parsed with the <code>get_arg</code> function (next
+section).</p>
 </div>
-<div id="getting-the-arg" class="section level1">
-<h1 class="hasAnchor">
-<a href="#getting-the-arg" class="anchor"></a>Getting the ARG</h1>
-<p>Using the ancestry matrices produced above, we can derive the most recent common ancestor (MRCA) and the time of MRCA coalescent event for each parasite (i.e. haplotype) at each discrete loci. As such, we are recreating a marginal tree for each loci and then collectively storing the entire set of marginal trees, termed the ancestral recombination graph.</p>
+<div class="section level2">
+<h2 id="getting-the-arg">Getting the ARG<a class="anchor" aria-label="anchor" href="#getting-the-arg"></a>
+</h2>
+<p>Using the ancestry matrices produced above, we can derive the most
+recent common ancestor (MRCA) and the time of MRCA coalescent event for
+each parasite (i.e. haplotype) at each discrete loci. As such, we are
+recreating a marginal tree for each loci and then collectively storing
+the entire set of marginal trees, termed the ancestral recombination
+graph.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ARG</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_arg.html">get_arg</a></span><span class="op">(</span><span class="va">swfsim</span><span class="op">)</span>
-<span class="co">#&gt; completed in 0.000052 seconds</span></code></pre></div>
-<p>The <code>get_arg</code> function takes the output from the discrete-loci, discrete-time structured Wright Fisher simulation above and produces <code>bv_trees</code>, an S4 class, for each loci.</p>
-<div id="bv_tree-class" class="section level3">
-<h3 class="hasAnchor">
-<a href="#bv_tree-class" class="anchor"></a><code>bv_tree</code> Class</h3>
-<p>The <code>bv_tree</code> class is a lightweight representation of a marginal tree. The <code>bv_tree</code> class contains three slots:</p>
+<code class="sourceCode R"><span><span class="va">ARG</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_arg.html">get_arg</a></span><span class="op">(</span><span class="va">swfsim</span><span class="op">)</span></span>
+<span><span class="co">#&gt; completed in 0.000087 seconds</span></span></code></pre></div>
+<p>The <code>get_arg</code> function takes the output from the
+discrete-loci, discrete-time structured Wright Fisher simulation above
+and produces <code>bv_trees</code>, an S4 class, for each loci.</p>
+<div class="section level4">
+<h4 id="bv_tree-class">
+<code>bv_tree</code> Class<a class="anchor" aria-label="anchor" href="#bv_tree-class"></a>
+</h4>
+<p>The <code>bv_tree</code> class is a lightweight representation of a
+marginal tree. The <code>bv_tree</code> class contains three slots:</p>
 <ol style="list-style-type: decimal">
 <li>
-<code>c</code>: The node connection for each haplotype (each haplotype is an element in a vector)</li>
+<code>c</code>: The node connection for each haplotype (each
+haplotype is an element in a vector)</li>
 <li>
-<code>t</code>: The timing of the node connection (time to MRCA)</li>
+<code>t</code>: The timing of the node connection (time to
+MRCA)</li>
 <li>
-<code>z</code>: The order of coalescence for each set of haplotypes</li>
+<code>z</code>: The order of coalescence for each set of
+haplotypes</li>
 </ol>
 </div>
 </div>
-<div id="visualizing-the-simulation" class="section level1">
-<h1 class="hasAnchor">
-<a href="#visualizing-the-simulation" class="anchor"></a>Visualizing the Simulation</h1>
-<p>Here, we will visualize the maringal tree for each loci. Users are able to specify which loci to visualize. Of note, you will only be able to visualize the marginal trees for the parasites that you created the ARG for in the previous section.</p>
+<div class="section level2">
+<h2 id="visualizing-the-simulation">Visualizing the Simulation<a class="anchor" aria-label="anchor" href="#visualizing-the-simulation"></a>
+</h2>
+<p>Here, we will use the function <code>plotARG</code> to make a plot of
+the marginal tree for each loci. The function returns the ARG as a list
+of marginal tree plots per loci. Users are able to specify loci that
+they want to visualize either in the function or as an item of the list
+(shown below). Note, users need to add the <span class="math inline">\(t_{lim}\)</span>, specifying the definition of
+recent coalescence that they used in the original simulation for ideal
+plotting. In addition, users can subset the marginal trees to specific
+hosts or haplotypes with the <code>host_index</code> or
+<code>haplo_index</code> arguments.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_coalescence_trees.html">plot_coalescence_trees</a></span><span class="op">(</span><span class="va">ARG</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">marginal_tree_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plotARG.html">plotARG</a></span><span class="op">(</span>swf <span class="op">=</span> <span class="va">swfsim</span>, host_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, tlim <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="va">marginal_tree_list</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
 <p><img src="orig_mod_framework_files/figure-html/unnamed-chunk-4-1.png" width="576" style="display: block; margin: auto;"></p>
+<p>You may have noticed that our coalescent trees (<code>bvtree</code>
+class) always coalesce “right-to-left”. This is intentional and an
+approach to optimize looping through ancestries to get the ARG. As a
+result, remember that not every intersection is a true node (e.g. lines
+can “jump” over other lines).</p>
 </div>
-<div id="adding-mutations" class="section level1">
-<h1 class="hasAnchor">
-<a href="#adding-mutations" class="anchor"></a>Adding Mutations</h1>
-<p>Finally, we can layer mutations on to each marginal tree (and the overall ARG) based on the total branch length of the coalescent tree and the user specificed per-recombination block mutation rate.</p>
+<div class="section level2">
+<h2 id="adding-mutations">Adding Mutations<a class="anchor" aria-label="anchor" href="#adding-mutations"></a>
+</h2>
+<p>Finally, we can layer mutations on to each marginal tree (and the
+overall ARG) based on the total branch length of the coalescent tree and
+the user specified per-recombination block mutation rate.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">hapmat</span> <span class="op">&lt;-</span> <span class="fu">polySimIBD</span><span class="fu">::</span><span class="fu"><a href="../reference/layer_mutations_on_ARG.html">layer_mutations_on_ARG</a></span><span class="op">(</span><span class="va">ARG</span>, mutationrate <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span>
-<span class="va">hapmat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span>POS <span class="op">=</span> <span class="va">swfsim</span><span class="op">$</span><span class="va">pos</span>, <span class="va">hapmat</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">hapmat</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"POS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"parasite"</span>, <span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">hapmat</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">hapmat</span><span class="op">)</span></code></pre></div>
-<table class="table">
+<code class="sourceCode R"><span><span class="va">hapmat</span> <span class="op">&lt;-</span> <span class="fu">polySimIBD</span><span class="fu">::</span><span class="fu"><a href="../reference/layer_mutations_on_ARG.html">layer_mutations_on_ARG</a></span><span class="op">(</span><span class="va">ARG</span>, mutationrate <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
+<span><span class="va">hapmat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span>POS <span class="op">=</span> <span class="va">swfsim</span><span class="op">$</span><span class="va">pos</span>, <span class="va">hapmat</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">hapmat</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"POS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"parasite"</span>, <span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">hapmat</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">hapmat</span><span class="op">)</span></span></code></pre></div>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="3%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="9%">
+<col width="9%">
+</colgroup>
 <thead><tr class="header">
 <th align="right">POS</th>
 <th align="right">parasite1</th>
 <th align="right">parasite2</th>
 <th align="right">parasite3</th>
+<th align="right">parasite4</th>
+<th align="right">parasite5</th>
+<th align="right">parasite6</th>
+<th align="right">parasite7</th>
+<th align="right">parasite8</th>
+<th align="right">parasite9</th>
+<th align="right">parasite10</th>
+<th align="right">parasite11</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="right">1</td>
 <td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
 <td align="right">1</td>
 <td align="right">1</td>
 </tr>
@@ -201,63 +345,137 @@
 <td align="right">0</td>
 <td align="right">1</td>
 <td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="right">201</td>
 <td align="right">0</td>
-<td align="right">1</td>
-<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="right">301</td>
 <td align="right">0</td>
+<td align="right">0</td>
 <td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">2</td>
 <td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
 <td align="right">401</td>
 <td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
 <td align="right">1</td>
-<td align="right">1</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="right">501</td>
 <td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
 <td align="right">1</td>
-<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">3</td>
 </tr>
 <tr class="odd">
 <td align="right">601</td>
 <td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">2</td>
 <td align="right">0</td>
+<td align="right">3</td>
+<td align="right">3</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="right">701</td>
 <td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
 <td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">2</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="right">801</td>
 <td align="right">0</td>
 <td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
 <td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="right">901</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">3</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="conclusion" class="section level1">
-<h1 class="hasAnchor">
-<a href="#conclusion" class="anchor"></a>Conclusion</h1>
-<p>Up until this point, we have ignored within host COI and have only analyzed parasites as independent infections. In the next vignette <a href="https://nickbrazeau.github.io/polySimIBD/articles/simdata.html">Simulating Data</a>, we will explore how to convert our marginal tree and forward model into genomic data.</p>
-<p>You may have noticed that our coalescent trees (<code>bvtree</code> class) always coalesce “right”. This is intentional and an approach to optimize looping through ancestries to get the ARG. As a result, remember that not every intersection is a true node (e.g. lines can “jump” over other lines).</p>
+<div class="section level2">
+<h2 id="conclusion">Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
+</h2>
+<p>Up until this point, we have ignored within host COI and have only
+analyzed parasites as independent infections. In the next vignette <a href="https://nickbrazeau.github.io/polySimIBD/articles/simdata.html" class="external-link">Simulating
+Data</a>, we will explore how to convert our marginal tree and forward
+model into genomic data.</p>
 </div>
   </div>
 
@@ -272,11 +490,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Nick Brazeau, Bob Verity.</p>
+  <p></p>
+<p>Developed by Nick Brazeau, Bob Verity.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer>
@@ -284,6 +504,8 @@
 
   
 
+
+  
 
   </body>
 </html>

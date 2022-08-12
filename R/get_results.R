@@ -266,26 +266,3 @@ get_pairwise_coi_ibd <- function(swf, host_index = NULL) {
 
 
 
-#------------------------------------------------
-#' Extract haplotypes from ARG
-#' @param arg set of bvtrees
-#' @return hapmat numeric matrix; a matrix of multiallelic haplotypes for each parasite considered. Loci are in
-#' rows and parasites (haplotypes) are in columns. 
-#' @export
-get_haplotype_matrix <- function(arg){
-  
-  # convert trees into matrix of alleles
-  # each column is therefore a haplotype since we consider parasite by parasite
-  hap_mat <- t(mapply(function(x) {
-    c <- x@c
-    ret <- c
-    ret[ret == -1] <- 1:sum(ret == -1)
-    while (any(c != -1)) {
-      w <- which(c == -1)
-      c[-w] <- c[c[-w]+1]
-      ret[-w] <- ret[ret[-w]+1]
-    }
-    return(ret)
-  }, ARG))
-  return(hap_mat)
-}

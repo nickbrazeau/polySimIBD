@@ -11,9 +11,9 @@
 #' @return a list of ggplots (layer: geom_segments) of the requested loci across selected hosts or haplotypes from the simulation
 #' @export
 
-plotARG <- function(swf, loci, host_index = NULL, 
-                    haplo_index = NULL, tlim) {
-  arg <- polySimIBD::get_arg(swf, host_index = host_index, haplo_index = haplo_index)
+plotARG <- function(swf, loci, host_index = 1:length(swf$coi), 
+                    haplo_index = NULL, tlim = 999) {
+  arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf, host_index = host_index, haplo_index = haplo_index))
   argsubset = arg[loci]
   # pull out COI
   argplots <- purrr::map(argsubset, plot_bvtree, group = rep(host_index, times = swf$coi[host_index]),
@@ -78,10 +78,33 @@ plot_bvtree <- function(bvtree, group, tlim){
 }
 
 
+#------------------------------------------------
+#' Extract haplotypes from ARG
+#' @param arg set of bvtrees
+#' @return hapmat numeric matrix; a matrix of multiallelic haplotypes for each parasite considered. Loci are in
+#' rows and parasites (haplotypes) are in columns. 
+#' @export
+extract_haplotype_matrix <- function(arg){
+  
+  # convert trees into matrix of alleles
+  # each column is therefore a haplotype since we consider parasite by parasite
+  hap_mat <- t(mapply(function(x) {
+    c <- x@c
+    ret <- c
+    ret[ret == -1] <- 1:sum(ret == -1)
+    while (any(c != -1)) {
+      w <- which(c == -1)
+      c[-w] <- c[c[-w]+1]
+      ret[-w] <- ret[ret[-w]+1]
+    }
+    return(ret)
+  }, ARG))
+  return(hap_mat)
+}
 
 #' -------------------------------------------------------------------------------------------
 #' Layer Mutations onto the ARG for Each Loci
-#' @param ARG set of bvtree; a set of bvtrees 
+#' @inheritParams extract_haplotype_matrix 
 #' @param mutationrate numeric; the genome-wide per-generation mutation rate
 #' 
 #' @details The mutation model approximates an infinite allele model in time which is then collapsed into a single loci. 
@@ -95,14 +118,14 @@ plot_bvtree <- function(bvtree, group, tlim){
 #' @export
 
 
-layer_mutations_on_ARG <- function(mutationrate, ARG){
-  
+layer_mutations_on_ARG <- function(arg, mutationrate){
+
   # assertions
   assert_numeric(mutationrate)
   assert_custom_class(ARG[[1]], "bvtree", message  =  "Elements within the %s must inherit from class '%s'")
   
   # get haplotype matrix
-  hapmat <- polySimIBD::get_haplotype_matrix(ARG = ARG)
+  hapmat <- polySimIBD::extract_haplotype_matrix(arg = ARG)
   
   
   # NB, to keep alleles unique, we will start counting after the point of the genealogy alleles

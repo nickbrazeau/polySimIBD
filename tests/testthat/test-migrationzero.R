@@ -23,7 +23,7 @@ test_that("migration zero model with 1 deme", {
 test_that("migration zero model with multiple demes deme", {
   migmat <- matrix(0, 2, 2)
   diag(migmat) <- 1
-  swf <- polySimIBD::sim_swf(pos = sample(1:1e3, size = 50), 
+  swf <- polySimIBD::sim_swf(pos = sort(sample(1:1e3, size = 50)), 
                              N = c(10, 10), 
                              m = c(0, 0), 
                              mean_coi = c(2, 2),  
@@ -36,7 +36,7 @@ test_that("migration zero model with multiple demes deme", {
     magrittr::set_colnames(c("smpl1", "smpl2")) %>% 
     dplyr::mutate(pairwiseIBD = purrr::map2_dbl(.x = smpl1, .y = smpl2, .f = function(x,  y){
       polySimIBD:::quiet(
-        polySimIBD::get_realized_pairwise_ibd(swf = swf, host_index = c(x,y))
+        polySimIBD::get_pairwise_coi_ibd(swf = swf, host_index = c(x,y))
       )
     }))
   # no migration, no co-mingling of hosts, no ibd sharing

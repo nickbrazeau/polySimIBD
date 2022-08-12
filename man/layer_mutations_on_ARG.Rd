@@ -4,12 +4,12 @@
 \alias{layer_mutations_on_ARG}
 \title{Layer Mutations onto the ARG for Each Loci}
 \usage{
-layer_mutations_on_ARG(mutationrate, ARG)
+layer_mutations_on_ARG(arg, mutationrate)
 }
 \arguments{
-\item{mutationrate}{numeric; the genome-wide per-generation mutation rate}
+\item{arg}{set of bvtrees}
 
-\item{ARG}{set of bvtree; a set of bvtrees}
+\item{mutationrate}{numeric; the genome-wide per-generation mutation rate}
 }
 \value{
 hapmat numeric matrix; a matrix of mutliallelic haplotypes for each parasite considered. Loci are in
