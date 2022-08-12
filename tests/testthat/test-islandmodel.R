@@ -5,7 +5,7 @@ test_that("island model returns two islands", {
   m <- c(0.25, 0.25)
   migr_dist_mat <- matrix(0, ncol = 2, nrow = 2)
   diag(migr_dist_mat) <- 100
-  swf <- polySimIBD::sim_swf(pos = sample(1:1e3, size = 50), 
+  swf <- polySimIBD::sim_swf(pos = sort(sample(1:1e3, size = 50)), 
                              N = demesizes, 
                              m = m, 
                              mean_coi = coimeans, 
@@ -19,7 +19,7 @@ test_that("island model returns two islands", {
     magrittr::set_colnames(c("smpl1", "smpl2")) %>% 
     dplyr::mutate(pairwiseIBD = purrr::map2_dbl(.x = smpl1, .y = smpl2, .f = function(x,  y){
       polySimIBD:::quiet(
-        polySimIBD::get_realized_pairwise_ibd(swf = swf, host_index = c(x,y))
+        polySimIBD::get_pairwise_coi_ibd(swf = swf, host_index = c(x,y))
       )
     }))
   

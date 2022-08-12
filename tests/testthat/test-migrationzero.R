@@ -1,5 +1,5 @@
 test_that("migration zero model with 1 deme", {
-  swf <- polySimIBD::sim_swf(pos = sample(1:1e3, size = 50), 
+  swf <- polySimIBD::sim_swf(pos = sort(sample(1:1e3, size = 50)), 
                              N = 25, 
                              m = 0, 
                              mean_coi = 2, 
@@ -12,7 +12,7 @@ test_that("migration zero model with 1 deme", {
     magrittr::set_colnames(c("smpl1", "smpl2")) %>% 
     dplyr::mutate(pairwiseIBD = purrr::map2_dbl(.x = smpl1, .y = smpl2, .f = function(x,  y){
       polySimIBD:::quiet(
-        polySimIBD::get_realized_pairwise_ibd(swf = swf, host_index = c(x,y))
+        polySimIBD::get_pairwise_coi_ibd(swf = swf, host_index = c(x,y))
       )
     }))
   # no migration, no co-mingling of hosts, no ibd sharing
