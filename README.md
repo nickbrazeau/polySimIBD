@@ -16,5 +16,5 @@ Please see the [vignettes](https://nickbrazeau.github.io/polySimIBD/) for instal
 
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/polysimibd_hex.png" width="200" height="200">
+<img src="https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/polysimibd_hexbadge.png" width="350" height="350">
 </p>
