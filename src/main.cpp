@@ -261,7 +261,7 @@ Rcpp::List subset_bvtree_cpp(vector<int> c,
 
 //------------------------------------------------
 // efficient loop through ARG backwards in time to calculate IBD
-Rcpp::List calc_between_IBD_cpp(Rcpp::List args) {
+Rcpp::List calc_between_coi_IBD_cpp(Rcpp::List args) {
   // extract arguments
   vector<vector<int>> conn = rcpp_to_matrix_int(args["conn"]);
   vector<int> host_haplo_cnt = rcpp_to_vector_int(args["host_haplo_cnt"]);
