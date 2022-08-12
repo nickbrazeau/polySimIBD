@@ -2,7 +2,7 @@
 title: "Simulating Genomic Data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Simulating Data}
+  %\VignetteIndexEntry{Simulating Genomic Data}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
   editor_options: 
