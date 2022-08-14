@@ -12,4 +12,4 @@ coverage:
         threshold: 1%
         
 ignore:
-  "R/assertions.R""
+  "R/assertions.R"
