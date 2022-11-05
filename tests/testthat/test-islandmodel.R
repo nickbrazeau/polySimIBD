@@ -9,7 +9,7 @@ test_that("island model returns two islands", {
                              N = demesizes, 
                              m = m, 
                              mean_coi = coimeans, 
-                             migr_dist_mat = migr_dist_mat, 
+                             migr_mat = migr_dist_mat, 
                              rho = 1e-2, 
                              tlim = 10)
   

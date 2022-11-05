@@ -7,7 +7,7 @@ testthat::test_that("model runs", {
                              N = N, 
                              m = m, 
                              mean_coi = mean_coi, 
-                             migr_dist_mat = migr_dist_mat, 
+                             migr_mat = migr_dist_mat, 
                              rho = 1e-2, 
                              tlim = 2)
   

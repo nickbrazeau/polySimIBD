@@ -3,7 +3,7 @@ test_that("migration zero model with 1 deme", {
                              N = 25, 
                              m = 0, 
                              mean_coi = 2, 
-                             migr_dist_mat = 1, 
+                             migr_mat = 1, 
                              rho = 1e-2, 
                              tlim = 10)
   
@@ -27,7 +27,7 @@ test_that("migration zero model with multiple demes deme", {
                              N = c(10, 10), 
                              m = c(0, 0), 
                              mean_coi = c(2, 2),  
-                             migr_dist_mat = migmat,
+                             migr_mat = migmat,
                              rho = 1e-2, 
                              tlim = 10)
   

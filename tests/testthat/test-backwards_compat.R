@@ -3,7 +3,7 @@ testthat::test_that("Confirming deme spatial model is backwards compatible with 
                              N = 20, 
                              m = 0.5, 
                              mean_coi = 1, 
-                             migr_dist_mat = 1, 
+                             migr_mat = 1, 
                              rho = 1e-2, 
                              tlim = 2)
   ARG <- polySimIBD::get_arg(swf = swf, host_index = c(1,2))
