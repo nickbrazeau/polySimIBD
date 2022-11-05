@@ -44,7 +44,7 @@ swfsim <- polySimIBD::sim_swf(pos = pos,
                               m = m,
                               rho = rho, 
                               mean_coi = mean_coi,
-                              migr_dist_mat = 1, # nonspatial
+                              migr_mat = 1, # nonspatial
                               tlim = 10)
 
 
