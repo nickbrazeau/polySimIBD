@@ -68,7 +68,7 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim,
   
   # calculate migration rates and probability from distance matrix
   if (is.matrix(migr_mat)) {
-    if(all(rowSums(migr_mat) != 1)) { # if not probability, assume that it is rates
+    if(any(rowSums(migr_mat) != 1)) { # if not probability, assume that it is rates
       migr_mat <- 1 - exp(-migr_mat)
       migr_mat <- migr_mat/rowSums(migr_mat)
     } 
