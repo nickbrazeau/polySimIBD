@@ -92,8 +92,7 @@ get_pairwise_bv_ibd <- function(swf, host_index = NULL) {
     # get IBD connections between 1 and 2
     pwconn <- which(smpl2con %in% 0:(this_coi[1]-1) )
     # if any, IBD
-    pwconn <- sum(pwconn)
-    return(pwconn >= 1)
+    return(sum(pwconn) >= 1)
   }
   
   # iterate through/apply function
@@ -170,99 +169,4 @@ get_withinIBD_bvtree_subset <- function(c, coi1, coi2) {
   # out
   return(sort(unique(unlist(subset_trees))))
 }
-
-
-#------------------------------------------------
-#' @title Calculate Between Host (pairwise) IBD accounting for COI
-#' @description Given an object \code{swf}, ***
-#' @inheritParams get_arg
-#' @description ***
-#' @details  Only accepts a pair of hosts (i.e. pairwise). Ignores mutations as interrupting IBD segments. 
-#' @return ***
-#' @export
-get_pairwise_coi_ibd <- function(swf, host_index = NULL) {
-  # check inputs and define defaults
-  assert_custom_class(swf, "swfsim")
-  assert_vector(host_index)
-  assert_noduplicates(host_index)
-  assert_pos_int(host_index, zero_allowed = FALSE)
-  if(length(host_index) != 2) {
-    stop("host_index must be of length 2 for pairwise comparison", call. = FALSE)
-  }
-  # get ARG from swf and host_index
-  # need to call ARG again to make extraction straightforward (eg don't know what user did to ARG upstream)
-  arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
-  # subset to unique loci for speed 
-  conn <- purrr::map(arg, "c")
-  uniconn <- unique(conn)
-  
-  # define arguments for fast cpp function 
-  argums <- list(conn = uniconn, 
-                 host_haplo_cnt = swf$coi[host_index])
-  
-  # we define btwn_pairwise_ibd as: 
-  # (n_{coal-btwn} + n_{coal-win-btwn}) / (n_{strains1} * n{strains2})
-  # where w/in coal share a btwn coal 
-  
-  # pass to efficient C++ function for quick between tree look up 
-  # to determine between host IBD
-  output_raw <- calc_between_coi_IBD_cpp(argums)$ibd_numerator
-  
-  #tidy raw
-  # catch if no btwn, no w/in or extra work needed
-  if(sum(output_raw) == 0) { return(0)}
-  # if within, need to do additional work 
-  
-  
-  # find the locations of unique loci locations for later expansion
-  conn_indices <- polySimIBD:::get_conn_intervals(uniqueconn = uniconn, allconn = conn)
-  
-  # subset to relevant haploindices in bvtrees for correct w/in IBD calculation 
-  # i.e. only within IBD that has a pairwise connection, or btwn smpl connection, contributes to 
-  # overall calculation of pairwise IBD 
-  haploind <- lapply(uniconn, polySimIBD:::get_withinIBD_bvtree_subset, 
-                     coi1 = swf$coi[host_index][1],
-                     coi2 = swf$coi[host_index][2])
-  # subset to relevant haploindices for sample 1 based on original COI 
-  win_smpl1 <- mapply(function(x, y){
-    smpl1_haplo_ind_rel <- which(y %in% 1:swf$coi[host_index][1])
-    return(x[smpl1_haplo_ind_rel])
-  }, 
-  x = uniconn, 
-  y = haploind, 
-  SIMPLIFY = F)
-  # loop through now for w/in calc smpl1 
-  win_smpl1 <- sapply(win_smpl1, function(x){
-    sum(x %in% 0:(swf$coi[host_index][1]-1))
-  })
-  
-  # subset to relevant haploindices for sample 2 based on original COI 
-  win_smpl2 <- mapply(function(x, y){
-    smpl2_haplo_ind_rel <- which(y %in% (swf$coi[host_index][1]+1):sum(swf$coi[host_index]))
-    return(x[smpl2_haplo_ind_rel])
-  }, 
-  x = uniconn, 
-  y = haploind, 
-  SIMPLIFY = F)
-  # loop through now for w/in calc smpl2 
-  win_smpl2 <- sapply(win_smpl2, function(x){
-    sum(x %in% swf$coi[host_index][1]:(sum(swf$coi[host_index])-1))
-  })
-  
-  # expand out unique loci intervals from above
-  output_raw <- output_raw[conn_indices]
-  win_smpl1 <- win_smpl1[conn_indices]
-  win_smpl2 <- win_smpl2[conn_indices]
-  
-  # numerator of btwn and w/in IBD
-  numerator <- output_raw + win_smpl1 + win_smpl2
-  
-  # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info - ie burn first loci
-  numerator <- numerator[-1]
-  wi <- diff(swf$pos)/sum(diff(swf$pos))
-  # weighted average
-  return( sum( (numerator / prod(swf$coi[host_index]))*wi ) )
-}
-
-
 
