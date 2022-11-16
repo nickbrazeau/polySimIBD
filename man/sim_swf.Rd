@@ -19,7 +19,7 @@ sim_swf(pos, N, m, rho, mean_coi, tlim, migr_mat = 1, verbose = FALSE)
 
 \item{tlim}{numeric; the maximum number of generations to consider before exiting gracefully if all samples have not coalesced}
 
-\item{migr_mat}{numeric matrix; Migrations rates or probabilities between origin and destination with origin specified as rows and destination in columns. Default value of 1 indicates non-spatial model. Note, if probability matrix, rows must sum to 1 (valid marginal probability); otherwise, values will be assumed to be rates and converted to probabilities}
+\item{migr_mat}{numeric matrix; Migrations rates or probabilities between destination and origin. Note, because this is a Wright-Fisher model, we are drawing parents and therefore migration matrix is parameterized towards "where one came from" versus "where one is headed": origin specified as columns and destination in rows Default value of 1 indicates non-spatial model. Note, if probability matrix, rows must sum to 1 (valid marginal probability); otherwise, values will be assumed to be rates and converted to probabilities}
 
 \item{verbose}{boolean}
 }

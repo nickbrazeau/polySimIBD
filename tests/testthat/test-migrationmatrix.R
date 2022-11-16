@@ -93,7 +93,7 @@ test_that("migration matrix with only one", {
 
 
 
-test_that("migration matrix behaves as from-to format", {
+test_that("migration matrix behaves as to-from format", {
   #............................................................
   # make framework
   #...........................................................
@@ -167,7 +167,7 @@ test_that("migration matrix behaves as from-to format", {
 
 
 
-test_that("migration matrix in sink only allows for transitivity", { 
+test_that("migration matrix in source only allows for transitivity", { 
   obitwo <- matrix(0, 7, 7)
   obitwo[2,4] <- 2
   obitwo[7,4] <- 2
