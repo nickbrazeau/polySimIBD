@@ -184,11 +184,11 @@ connections between populations A and B).</p>
 <span>                           migr_mat <span class="op">=</span> <span class="va">migr_dist_mat</span>, </span>
 <span>                           rho <span class="op">=</span> <span class="fl">1e-2</span>, </span>
 <span>                           tlim <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="co">#&gt; completed in 0.000849 seconds</span></span></code></pre></div>
+<span><span class="co">#&gt; completed in 0.000940 seconds</span></span></code></pre></div>
 <p>Pull out the ARG and then calculate the pairwise IBD.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ARG</span> <span class="op">&lt;-</span> <span class="fu">polySimIBD</span><span class="fu">::</span><span class="fu"><a href="../reference/get_arg.html">get_arg</a></span><span class="op">(</span><span class="va">swf</span><span class="op">)</span></span>
-<span><span class="co">#&gt; completed in 0.001152 seconds</span></span>
+<span><span class="co">#&gt; completed in 0.000926 seconds</span></span>
 <span></span>
 <span><span class="co"># here we are going to get all the pairwise IBD combinations for our hosts</span></span>
 <span><span class="va">adj_graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/combn.html" class="external-link">combn</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">demesizes</span><span class="op">)</span><span class="op">)</span>, m <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
