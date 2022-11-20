@@ -16,15 +16,13 @@ test_that("migration matrix as a diagonal is only within IBD", {
     return(polySimIBD::get_pairwise_bv_ibd(swf = swf, host_index = hosts))
   }, swf = diagnl_sim)
   
-  
-  
   #............................................................
   # tidyout
   #...........................................................
   j1 <- tibble::tibble(smpl1 = 1:25, 
-                         deme1 = sort(rep(1:5, 5)))
+                       deme1 = sort(rep(1:5, 5)))
   j2 <- tibble::tibble(smpl2 = 1:25, 
-                         deme2 = sort(rep(1:5, 5)))
+                       deme2 = sort(rep(1:5, 5)))
   comb_hosts_df <- tibble::as_tibble(comb_hosts_df)
   colnames(comb_hosts_df) <- c("smpl1", "smpl2")
   comb_hosts_df <- comb_hosts_df %>% 
@@ -39,9 +37,54 @@ test_that("migration matrix as a diagonal is only within IBD", {
   
   testthat::expect_equal(nrow(diagnl_comb_hosts_df), 0)
   
-  
-  })
+})
 
+
+
+test_that("migration matrix with zero on diagonal is only between IBD", {
+  # NB in large population, shouldn't draw same parent 
+  no_diagnl <- matrix(10, 5, 5)
+  diag(no_diagnl) <- 0
+  
+  no_diagnl_sim <- polySimIBD::sim_swf(pos =  sort(sample(1.664e6, 1e3)),
+                                       migr_mat = no_diagnl,
+                                       N =         rep(1e2, 5),
+                                       m =         rep(0.25, 5),
+                                       rho =       7.4e-7,
+                                       mean_coi =  rep(2, 5),
+                                       tlim =      10)
+  
+  comb_hosts_df <- t(combn(1:1e2, 2))
+  # down sample for memory
+  rws <- sample(1:nrow(comb_hosts_df), size = 50)
+  comb_hosts_df <- comb_hosts_df[rws,]
+  comb_hosts_list <- split(comb_hosts_df, 1:nrow(comb_hosts_df))
+  no_diagnl_ibd <- purrr::map_dbl(comb_hosts_list, function(hosts, swf) {
+    return(polySimIBD::get_pairwise_bv_ibd(swf = swf, host_index = hosts))
+  }, swf = no_diagnl_sim)
+  
+  #............................................................
+  # tidyout
+  #...........................................................
+  j1 <- tibble::tibble(smpl1 = 1:1e2, 
+                       deme1 = sort(rep(1:5, 1e2/5)))
+  j2 <- tibble::tibble(smpl2 = 1:1e2, 
+                       deme2 = sort(rep(1:5, 1e2/5)))
+  comb_hosts_df <- tibble::as_tibble(comb_hosts_df)
+  colnames(comb_hosts_df) <- c("smpl1", "smpl2")
+  comb_hosts_df <- comb_hosts_df %>% 
+    dplyr::left_join(., j1) %>% 
+    dplyr::left_join(., j2)
+  
+  # no diagonal  
+  no_diagnl_comb_hosts_df <- comb_hosts_df %>% 
+    dplyr::mutate(ibd = no_diagnl_ibd) %>% 
+    dplyr::filter(deme1 == deme2) %>% 
+    dplyr::filter(ibd > 0)
+  
+  testthat::expect_equal(nrow(no_diagnl_comb_hosts_df), 0)
+  
+})
 
 
 
@@ -64,8 +107,6 @@ test_that("migration matrix with only one", {
     return(polySimIBD::get_pairwise_bv_ibd(swf = swf, host_index = hosts))
   }, swf = obione_sim)
   
-  
-  
   #............................................................
   # tidyout
   #...........................................................
@@ -87,7 +128,6 @@ test_that("migration matrix with only one", {
     dplyr::filter(ibd > 0)
   
   testthat::expect_equal(nrow(obione_comb_hosts_df), 0)
-  
   
 })
 
@@ -120,12 +160,12 @@ test_that("migration matrix behaves as to-from format", {
   # simulate
   #......................
   spring_swfsim <- polySimIBD::sim_swf(pos =  sort(sample(1.664e6, 1e3)),
-                                migr_mat = spring,
-                                N =         rep(5, 7),
-                                m =         rep(0.25, 7),
-                                rho =       7.4e-7,
-                                mean_coi =  rep(2, 7),
-                                tlim =      10)
+                                       migr_mat = spring,
+                                       N =         rep(5, 7),
+                                       m =         rep(0.25, 7),
+                                       rho =       7.4e-7,
+                                       mean_coi =  rep(2, 7),
+                                       tlim =      10)
   
   
   #............................................................
@@ -212,9 +252,7 @@ test_that("migration matrix in source only allows for transitivity", {
     dplyr::filter(deme1 != 2) %>% # allow for transitivity  
     dplyr::filter(ibd > 0)
   
-  
   # sink causes transitivity 
   testthat::expect_equal(nrow(ret), 0)
   
-  
-  })
+})

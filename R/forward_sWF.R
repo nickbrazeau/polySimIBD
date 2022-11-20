@@ -6,7 +6,7 @@
 #' a deme individual-level COI is considered.
 #'
 #' @param pos vector; the genomic coordinates for chromosome and position of the sites
-#' @param N numeric numeric; The number of individuals to consider in each deme
+#' @param N integer vector; The number of individuals to consider in each deme
 #' @param m numeric numeric; Probability of internal migration where m represents the probability of moving from host_{origin} to host_{new} by m*(1-1/N) of each deme
 #' @param mean_coi numeric vector; The lambda of a right-shifted Poisson process, 1 + Pos(lambda) representing the average COI of each deme
 #' @param migr_mat numeric matrix; Migrations rates or probabilities between destination and origin. Note, because this is a Wright-Fisher model, we are drawing parents and therefore migration matrix is parameterized towards "where one came from" versus "where one is headed": origin specified as columns and destination in rows Default value of 1 indicates non-spatial model. Note, if probability matrix, rows must sum to 1 (valid marginal probability); otherwise, values will be assumed to be rates and converted to probabilities
