@@ -76,6 +76,7 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim){
 #' @param haplo_index a list of target haplotypes within the hosts specified by
 #'   \code{host_index}. Defaults to all haplotypes within the specified hosts
 #'
+#' @importFrom methods new
 #' @export
 
 get_arg <- function(swf, host_index = NULL, haplo_index = NULL) {
@@ -103,7 +104,7 @@ get_arg <- function(swf, host_index = NULL, haplo_index = NULL) {
   
   # create a list of bvtrees
   L <- length(output_raw$coalesce_target)
-  ARG <- lapply(1:L, function(x) return(new("bvtree")))
+  ARG <- lapply(1:L, function(x) return(methods::new("bvtree")))
   for (l in 1:L) {
     ARG[[l]]@c = output_raw$coalesce_target[[l]]
     ARG[[l]]@t = output_raw$coalesce_time[[l]]

@@ -23,14 +23,18 @@ Imports:
     purrr,
     broom,
     cowplot,
-    Rcpp
+    Rcpp,
+    RColorBrewer,
+    tibble,
+    testthat,
+    methods
 Suggests: 
     knitr,
     rmarkdown,
     covr
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 LinkingTo: 
     Rcpp
 SystemRequirements: C++11

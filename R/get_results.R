@@ -18,10 +18,11 @@ get_realized_coi <- function(swf, host_index = NULL) {
   assert_single_int(host_index)
   
   # get ARG from swf and host_index
-  arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
+  arg <- quiet(get_arg(swf = swf, host_index = host_index))
   
   # get connections
   conn <- purrr::map(arg, "c")
+  
   # get effective COI over loci 
   effCOI <- purrr::map_dbl(conn, function(x){sum(x == -1)})
   return(effCOI)
@@ -40,14 +41,17 @@ get_within_host_IBD <- function(swf, host_index = NULL) {
   assert_single_int(host_index)
   
   # get ARG from swf and host_index
-  arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
+  arg <- quiet(get_arg(swf = swf, host_index = host_index))
   
   # get connections
   conn <- purrr::map(arg, "c")
+  
   # get effective IBD over loci 
   numerator <- purrr::map_dbl(conn, function(x){sum(x != -1)})
+  
   # -1 here for the SELF comparison
   denom <-  (swf$coi[[host_index]]-1) * length(conn)
+  
   # out
   wthnIBD <- sum(numerator)/denom
   return(wthnIBD)
@@ -67,12 +71,12 @@ get_realized_pairwise_ibd <- function(swf, host_index = NULL) {
   assert_length(host_index, 2)
   
   # get ARG from swf and host_index
-  arg <- polySimIBD::get_arg(swf = swf, host_index = host_index)
+  arg <- get_arg(swf = swf, host_index = host_index)
   # take max as it return loci effective COI. Absolute max is 
   # how many strains we could observe (even over few loci)
-  coi1 <- polySimIBD::get_realized_coi(swf = swf, host_index = host_index[[1]])
+  coi1 <- get_realized_coi(swf = swf, host_index = host_index[[1]])
   coi1 <- max(coi1)
-  coi2 <- polySimIBD::get_realized_coi(swf = swf, host_index = host_index[[2]])
+  coi2 <- get_realized_coi(swf = swf, host_index = host_index[[2]])
   coi2 <- max(coi2)
   
   # get connections

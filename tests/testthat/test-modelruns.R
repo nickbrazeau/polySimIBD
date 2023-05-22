@@ -6,5 +6,6 @@ test_that("model runs", {
                                 mean_coi =  2,
                                 tlim = 10)
   ARG <- polySimIBD::get_arg(swfsim, host_index = c(1:2))
-  testthat::expect_gt(length(ARG), 0)
+  
+  expect_gt(length(ARG), 0)
 })

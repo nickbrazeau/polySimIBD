@@ -7,14 +7,14 @@
 plot_coalescence_trees(ARG, loci = NULL)
 }
 \arguments{
-\item{loci}{numeric vector; Loci to plot}
-
-\item{ARGsim}{S4 object; The ARGsim object that was created from a structured Wright
+\item{ARG}{S4 object; The ARG object that was created from a structured Wright
 Fisher Simulation via \code{sim_structured_WF} and then processed with \code{get_ARG}.}
+
+\item{loci}{numeric vector; Loci to plot}
 }
 \value{
 ggplot object of geom_segments
 }
 \description{
-plot the bvtrees
+Produces a ggplot of bvtrees at every locus.
 }

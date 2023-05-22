@@ -10,6 +10,7 @@
 #'
 #' @return hapmat numeric matrix; a matrix of mutliallelic haplotypes for each parasite considered. Loci are in
 #' rows and parasites (haplotypes) are in columns. 
+#' @importFrom stats rpois runif
 #' @export
 
 

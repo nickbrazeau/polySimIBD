@@ -44,6 +44,7 @@
 #'
 #' @return List of non-referent within-sample allele frequency dataframe (unphased) and phased vectors
 #'         of non-referent within-sample allele counts, overall coverage, strain proportions, and the biallelic haplotype matrix.
+#' @importFrom stats rbeta
 #' @export
 
 sim_biallelic <- function(COIs = c(1,1),
