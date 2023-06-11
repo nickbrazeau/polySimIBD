@@ -5,17 +5,18 @@
 setClass("bvtree",
          slots=list(c="numeric", t="numeric", z="numeric"))
 
-
+#------------------------------------------------
 #' @title Extract Effective COI by Loci from SWF Simulation for a Single Host
 #' @inheritParams get_arg
 #' @details Only accepts a single host 
+#' @description TODO 
 #' @return vector of effective COI by loci
 #' @export
-get_realized_coi <- function(swf, host_index = NULL) {
+get_effective_coi <- function(swf, host_index = NULL) {
   
   # checks
   assert_custom_class(swf, "swfsim")
-  assert_single_int(host_index)
+  assert_single_pos_int(host_index)
   
   # get ARG from swf and host_index
   arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
@@ -27,135 +28,145 @@ get_realized_coi <- function(swf, host_index = NULL) {
   return(effCOI)
 }
 
-
-#' @title Get Within-Host IBD from SWF Simulation
+#------------------------------------------------
+#' @title Calculate Within-Host IBD 
 #' @inheritParams get_arg
 #' @details Only accepts a single host 
+#' @description TODO
 #' @return double of within-host IBD
 #' @export
-get_within_host_IBD <- function(swf, host_index = NULL) {
-  
+get_within_ibd <- function(swf, host_index = NULL) {
   # checks
   assert_custom_class(swf, "swfsim")
-  assert_single_int(host_index)
-  
+  assert_single_pos_int(host_index)
   # get ARG from swf and host_index
+  # need to call ARG again to make extraction straightforward (eg don't know what user did to ARG upstream)
   arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
-  
   # get connections
   conn <- purrr::map(arg, "c")
-  # get effective IBD over loci 
-  numerator <- purrr::map_dbl(conn, function(x){sum(x != -1)})
-  # -1 here for the SELF comparison
-  denom <-  (swf$coi[[host_index]]-1) * length(conn)
+  # get within host IBD per loci 
+  numerator <- sapply(conn, function(x){sum(x != -1)})
+  # -1 here for self comparison
+  denom <-  (swf$coi[[host_index]]-1)
+  # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info
+  wi <- diff(swf$pos)/sum(diff(swf$pos))
   # out
-  wthnIBD <- sum(numerator)/denom
+  wthnIBD <-sum( (numerator[1:(length(numerator) - 1)] / denom) * wi )
   return(wthnIBD)
 }
 
-#' @title  Effective IBD by Loci from SWF Simulation for a Pair of Hosts
+#------------------------------------------------
+#' @title Calculate Between Host (pairwise) IBD by Interhost Relatedness
 #' @inheritParams get_arg
-#' @description Assumes that the minimum realized COI between the pairs of host determines
-#' the denominator for the between realized IBD
-#' @details  Only accepts a pair of hosts. Ignores mutations as interrupting IBD segments. 
-#' @return double of pairwise IBD 
+#' @description Between host, or pairwise, IBD as presented in 
+#' Verity et al. 2020 (erity realized ibd (PMC7192906). The calculation 
+#' ignores intra-host relatedness and does not account for COI. Instead, 
+#' if there is any recent coalescence between any of the strains between 
+#' host 1 and host 2, the locus is condered to be IBD
+#' @return double of between-host IBD
 #' @export
-get_realized_pairwise_ibd <- function(swf, host_index = NULL) {
-  # checks
+get_pairwise_bv_ibd <- function(swf, host_index = NULL) {
+  # check inputs and define defaults
   assert_custom_class(swf, "swfsim")
-  assert_int(host_index)
-  assert_length(host_index, 2)
-  
+  assert_vector(host_index)
+  assert_noduplicates(host_index)
+  assert_pos_int(host_index, zero_allowed = FALSE)
+  if(length(host_index) != 2) {
+    stop("host_index must be of length 2 for pairwise comparison", call. = FALSE)
+  }
   # get ARG from swf and host_index
-  arg <- polySimIBD::get_arg(swf = swf, host_index = host_index)
-  # take max as it return loci effective COI. Absolute max is 
-  # how many strains we could observe (even over few loci)
-  coi1 <- polySimIBD::get_realized_coi(swf = swf, host_index = host_index[[1]])
-  coi1 <- max(coi1)
-  coi2 <- polySimIBD::get_realized_coi(swf = swf, host_index = host_index[[2]])
-  coi2 <- max(coi2)
-  
-  # get connections
+  # need to call ARG again to make extraction straightforward (eg don't know what user did to ARG upstream)
+  arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
+  # extract connectins 
   conn <- purrr::map(arg, "c")
-  # get timing of connections
-  tm <- purrr::map(arg, "t")
+  # subset to unique loci for speed 
+  uniconn <- unique(conn)
+  # find the locations of unique loci locations for later expansion
+  conn_indices <- polySimIBD:::get_conn_intervals(uniqueconn = uniconn, allconn = conn)
   
-  #......................
-  # get pairwise ibd internal function
-  #......................
-  get_pairwise_ibd <- function(conni, tmi, this_coi) {
+  # get between connections per locus for pair 
+  # bvtrees point left --  ignring w/in ibd - if any between ibd, then locus is ibd 
+  get_loci_pairwise_ibd <- function(conni, this_coi) {
     smpl1con <- conni[1:this_coi[1]]
     smpl2con <- conni[(this_coi[1]+1):(cumsum(this_coi)[2])]
-    # get IBD
-    # connections between 1 and 2
+    # get IBD connections between 1 and 2
     pwconn <- which(smpl2con %in% 0:(this_coi[1]-1) )
-    locimatches <- rep(1, length(pwconn))
-    # note we are 0 based in connections
-    # note bvtrees always point left
-    # catch if there are multiple matches within sample 2 to the pairwise
-    # this is a coalescent tree that looks like below if host COI is 2,2
-    # c: -1 -1 1 2
-    # t: -1 -1 5 1
-    if (length(pwconn) != 0) {
-      for (i in 1:length(pwconn)) {
-        haplotypeindex <- this_coi[1] + pwconn[i] - 1 # -1 for 0-based
-        internalconn <- which(smpl2con %in% haplotypeindex )
-        if (length(internalconn) != 0) {
-          for (i in 1:length(internalconn)) {
-            internalhaplotypeplace <- this_coi[1] + internalconn[i] # here 1-based in R
-            if (tmi[internalhaplotypeplace] < tmi[this_coi[1] + internalconn[i]]) { # here 1-based in R
-              locimatches[i] <- locimatches[i] + 1
-            }
-          }
-        }
-      }
-    }
-    return(sum(locimatches))
+    # if any, IBD
+    return(sum(pwconn) >= 1)
   }
   
-  #......................
-  # get numerator and denominator 
-  # NB liftover such that the effective COI determines the max pairwise relat
-  # as well as the denom
-  #......................
-  effCOI <- c(coi1, coi2)
-  numerator <- purrr::map2_dbl(.x = conn, .y = tm,
-                               .f = get_pairwise_ibd, this_coi = swf$coi[host_index])
-  numerator <- ifelse(numerator > min(effCOI), min(effCOI), numerator)
-  pairwiseIBD <- sum(numerator)/(min(effCOI) * length(conn)) # min combn * num Loci
+  # iterate through/apply function
+  lociIBD <- purrr::map_dbl(.x = uniconn,
+                            .f = get_loci_pairwise_ibd, this_coi = swf$coi[host_index])
+  # expand out unique loci intervals from above
+  numerator <- lociIBD[conn_indices]
   
+  # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info - ie burn first loci
+  numerator <- numerator[-1]
+  wi <- diff(swf$pos)/sum(diff(swf$pos))
+  # weighted average (each loci, denom is 1)
+  return( sum( numerator*wi ) )
+  
+}
+
+
+#------------------------------------------------
+#' @title Get Connection Intervals 
+#' @description Index where unique connections are in the entire genome for proper weighting
+#' @param uniqueconn unique bvtree connections from the ARG
+#' @param allconn all bvtree connections from the ARG
+#' @noRd
+#' @noMd
+
+get_conn_intervals <- function(uniqueconn, allconn){
+  names(uniqueconn) <- 1:length(uniqueconn)
+  intervals <- lapply(uniqueconn,
+                      function(uni){
+                        return(sapply(allconn, function(x){paste(uni, collapse = "") == paste(x, collapse = "")}))})
+  mint <- rep(NA, length(allconn))
+  for(i in 1:length(intervals)) {
+    mint[intervals[[i]]] <- names(intervals)[i]
+  }
+  return(as.numeric(mint))
+}
+
+#------------------------------------------------
+#' @title Identify sub-trees recursively from root 
+#' @inheritParams bvtree
+#' @param int internal identification of root indices 
+#' @description Internal function: Recursively loop through tree starting with root to find haplo-indices in the "bvtrees c slot" that are connected
+#' @noMd
+#' @noRd
+get_conn_from_root <- function(root, c) {
+  # init
+  tree <- newroot <- root
+  #   
+  while(length(newroot) != 0) {
+    newroot <- which(c %in% (newroot-1)) # match c value and update new root 
+    tree <- c(tree, newroot)
+  }
   # out
-  return(pairwiseIBD)
+  return(tree)
 }
 
+#------------------------------------------------
+#' @title Find relevant connections for within IBD calculation
+#' @inheritParams bvtree
+#' @description Internal function: subset bvtree "c" slot to haplo-indices that contain a between sample connections and therefore contribute to within-sample IBD in a pairwise comparison 
+#' @noMd
+#' @noRd
 
-#' Extract haplotypes from ARG
-#' @param ARG set of bvtrees
-#' @return hapmat numeric matrix; a matrix of mutliallelic haplotypes for each parasite considered. Loci are in
-#' rows and parasites (haplotypes) are in columns. 
-#' @export
-get_haplotype_matrix <- function(ARG){
+get_withinIBD_bvtree_subset <- function(c, coi1, coi2) {
+  # find roots
+  roots <- which(c == -1)
+  # subset to subtree based on roots (ie extract out tree that is based connected to root)
+  subset_trees <- lapply(roots, polySimIBD:::get_conn_from_root, c = c)
+  # get btwn conn
+  btwnconn <- which(c[(coi1+1):(coi2+coi1)] %in% 0:(coi1-1)) + coi1
   
-  # convert trees into matrix of alleles
-  # each column is therefore a haplotype since we consider parasite by parasite
-  hap_mat <- t(mapply(function(x) {
-    c <- x@c
-    ret <- c
-    ret[ret == -1] <- 1:sum(ret == -1)
-    while (any(c != -1)) {
-      w <- which(c == -1)
-      c[-w] <- c[c[-w]+1]
-      ret[-w] <- ret[ret[-w]+1]
-    }
-    return(ret)
-  }, ARG))
-  return(hap_mat)
+  # drop spmls w/ no btwn 
+  subset_trees <- subset_trees[ sapply(subset_trees, function(x, btwn){any(x %in% btwn)}, btwn = btwnconn) ]
+  # out
+  return(sort(unique(unlist(subset_trees))))
 }
-
-
-
-
-
-
-
 

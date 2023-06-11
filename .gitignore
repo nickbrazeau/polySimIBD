@@ -5,12 +5,12 @@ inst/doc
 
 # extra user files from me
 sandbox/
-simdata/
+internal_checks/
+R_ignore/NatComms_VerityAB2019_Sims/results/
 *.jpg
 *.svg
 simulations/*.html
-LL_sim_results/
+Meta
 
 # mac files
 .DS_Store
-R_ignore/NatComms_VerityAB2019_Sims/results/

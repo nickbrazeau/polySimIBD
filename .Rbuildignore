@@ -1,13 +1,14 @@
 ^polySimIBD\.Rproj$
 ^\.Rproj\.user$
 
-# files for future manuscript
+# internal files and RMD misc
 ^sandbox$
-^simulations$
-^\.travis\.yml$
+^internal_checks$
 ^codecov\.yml$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
-^appveyor\.yml$
 ^R_ignore$
+^doc$
+^Meta$
+^\.github$

@@ -1,13 +1,13 @@
 Package: polySimIBD
 Type: Package
 Title: Structured Wright Fisher Simulator for Malarai Genetics
-Version: 0.1.0
+Version: 0.6.0
 Authors@R: as.person(c(
     "Nick Brazeau <nbrazeau@med.unc.edu> [aut, cre]", 
     "Bob Verity <r.verity@imperial.ac.uk> [aut]"
   ))
 Description: Unique features of the malaria life-cycle and transmission dynamics requires extensions 
-             of typical population genetic simulators. Using a discrete-loci, discrete-time structured 
+             of typical population genetic simulators. Using a spatial discrete-loci, discrete-time structured 
              Wright Fisher framework, we simulate malaria population genetics forwards in time. Users
              are then able to capture the full Ancestral Recombination Graph.
 License: MIT + file LICENSE
@@ -16,6 +16,7 @@ LazyData: true
 URL: https://github.com/nickbrazeau/polySimIBD
 BugReports: https://github.com/nickbrazeau/polySimIBD/issues
 Imports:
+    tibble,
     ggplot2,
     magrittr,
     tidyr,
@@ -23,14 +24,18 @@ Imports:
     purrr,
     broom,
     cowplot,
-    Rcpp
+    Rcpp,
+    methods
 Suggests: 
     knitr,
     rmarkdown,
-    covr
+    covr,
+    testthat,
+    tidygraph,
+    ggraph
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.1
 LinkingTo: 
     Rcpp
 SystemRequirements: C++11
