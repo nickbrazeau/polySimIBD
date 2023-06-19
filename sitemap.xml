@@ -55,7 +55,10 @@
     <loc>/reference/pipe.html</loc>
   </url>
   <url>
-    <loc>/reference/plotARG.html</loc>
+    <loc>/reference/plot_barcodes.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot_coalescence_trees.html</loc>
   </url>
   <url>
     <loc>/reference/polySimIBD.html</loc>
