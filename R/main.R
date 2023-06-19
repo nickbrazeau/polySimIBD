@@ -1,82 +1,3 @@
-#' -------------------------------------------------------------------------------------------
-#' plot the ARG by loci from swf simulator 
-#' @inheritParams get_arg
-#' @inheritParams sim_swf
-#' @param swf
-#' @param host_index
-#' @param haplo_index
-#' @param tlim
-#' @param loci numeric vector; specific loci for plotting 
-#' @import ggplot2
-#' @return a list of ggplots (layer: geom_segments) of the requested loci across selected hosts or haplotypes from the simulation
-#' @export
-
-plotARG <- function(swf, loci, host_index = 1:length(swf$coi), 
-                    haplo_index = NULL, tlim = 999) {
-  arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf, host_index = host_index, haplo_index = haplo_index))
-  argsubset = arg[loci]
-  # pull out COI
-  argplots <- purrr::map(argsubset, plot_bvtree, group = rep(host_index, times = swf$coi[host_index]),
-                         tlim = tlim)
-  # out
-  return(argplots)
-}
-
-#' -------------------------------------------------------------------------------------------
-#' plot the bvtree
-#' @param bvtree 
-#' @import ggplot2
-#' @return ggplot object of geom_segments
-#' @noMd
-#' @noRd
-
-plot_bvtree <- function(bvtree, group, tlim){
-  # coerce this into a tidy format
-  tree.tidy <-  tibble::tibble(
-    c = bvtree@c,
-    t = bvtree@t,
-    z = bvtree@z
-  ) 
-  # tidy up inputs
-  plotdf <- tree.tidy %>%
-    dplyr::mutate(time = ifelse(t == -1, Inf, t),
-                  haplotype = seq(from = 0, to = (length(t)-1), by = 1),
-                  conn = ifelse(t == Inf, NA, c),
-                  membership = factor(paste0("host", group),
-                                      levels = unique(paste0("host", group))))
-  # marginal tree 
-  make_marginal_tree_plot <- function(x, tlim){
-    # get nonroots
-    nonroots <- x %>% 
-      dplyr::filter(conn != -1)
-    # plot
-    plotObj <- ggplot() +
-      geom_segment(data = nonroots,
-                   aes(x = haplotype, xend = conn,
-                       y = time, yend = time), # horizontal lines
-                   show.legend = F, size = 1) +
-      geom_segment(data = x,
-                   aes(x = haplotype, xend = haplotype,
-                       y = 0, yend = time, color = membership),
-                   size = 1) +  # vertical lines
-      xlab("Haplotypes") + ylab("Generations") +
-      theme_bw() +
-      theme(axis.title = element_text(family = "Helvetica", face = "bold", size = 16),
-            axis.text.x = element_blank(),
-            axis.text.y = element_text(family = "Helvetica", face = "bold", size = 16),
-            legend.position = "right",
-            panel.grid = element_blank(),
-            panel.border = element_blank(),
-            axis.line = element_line(color = "#bdbdbd", size = 1.1))   + 
-      ylim(0, tlim) +
-      ggplot2::scale_color_viridis_d("Host (by COI)")
-    
-    return(plotObj)
-  }
-  # out 
-  return(make_marginal_tree_plot(x = plotdf, tlim = tlim))
-}
-
 
 #------------------------------------------------
 #' Extract haplotypes from ARG
@@ -115,6 +36,7 @@ extract_haplotype_matrix <- function(arg){
 #'
 #' @return hapmat numeric matrix; a matrix of mutliallelic haplotypes for each parasite considered. Loci are in
 #' rows and parasites (haplotypes) are in columns. 
+#' @importFrom stats rpois runif
 #' @export
 
 
@@ -252,6 +174,7 @@ layer_mutations_on_ARG <- function(arg, mutationrate){
 #'
 #' @return List of non-referent within-sample allele frequency dataframe (unphased) and phased vectors
 #'         of non-referent within-sample allele counts, overall coverage, strain proportions, and the biallelic haplotype matrix.
+#' @importFrom stats rbeta
 #' @export
 
 sim_biallelic <- function(COIs = c(1,1),

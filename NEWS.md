@@ -1,4 +1,4 @@
-# polySimIBD v0.6.0
+# polySimIBD v1.0.0
 Extension of the discrete-time discrete-loci structured Wright-Fisher Model for spatial "meta-populations". This model now assumes that there are spatial "meta-demes" and within each deme there are multiple hosts, each of who is considered as a "micro-deme" to model COI.
 
 

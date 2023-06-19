@@ -19,7 +19,7 @@ a deme individual-level COI is considered."><!-- mathjax --><script src="https:/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">polySimIBD</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
@@ -83,7 +83,7 @@ a deme individual-level COI is considered.</p>
 
 
 <dt>N</dt>
-<dd><p>numeric numeric; The number of individuals to consider in each deme</p></dd>
+<dd><p>integer vector; The number of individuals to consider in each deme</p></dd>
 
 
 <dt>m</dt>
@@ -103,7 +103,7 @@ a deme individual-level COI is considered.</p>
 
 
 <dt>migr_mat</dt>
-<dd><p>numeric matrix; Migrations rates or probabilities between origin and destination with origin specified as rows and destination in columns. Default value of 1 indicates non-spatial model. Note, if probability matrix, rows must sum to 1 (valid marginal probability); otherwise, values will be assumed to be rates and converted to probabilities</p></dd>
+<dd><p>numeric matrix; Migrations rates or probabilities between destination and origin. Note, because this is a Wright-Fisher model, we are drawing parents and therefore migration matrix is parameterized towards "where one came from" versus "where one is headed": origin specified as columns and destination in rows Default value of 1 indicates non-spatial model. Note, if probability matrix, rows must sum to 1 (valid marginal probability); otherwise, values will be assumed to be rates and converted to probabilities</p></dd>
 
 
 <dt>verbose</dt>
@@ -140,7 +140,7 @@ will coerce the matrix into a probability distribution between origin and destin
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

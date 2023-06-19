@@ -114,7 +114,7 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim,
 #' @param host_index a vector of target hosts. Defaults to all hosts
 #' @param haplo_index a list of target haplotypes within the hosts specified by
 #'   \code{host_index}. Defaults to all haplotypes within the specified hosts
-#'
+#' @importFrom methods new
 #' @export
 
 get_arg <- function(swf, host_index = NULL, haplo_index = NULL) {

@@ -9,7 +9,7 @@ sim_swf(pos, N, m, rho, mean_coi, tlim, migr_mat = 1, verbose = FALSE)
 \arguments{
 \item{pos}{vector; the genomic coordinates for chromosome and position of the sites}
 
-\item{N}{numeric numeric; The number of individuals to consider in each deme}
+\item{N}{integer vector; The number of individuals to consider in each deme}
 
 \item{m}{numeric numeric; Probability of internal migration where m represents the probability of moving from host_{origin} to host_{new} by m*(1-1/N) of each deme}
 
