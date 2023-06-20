@@ -40,5 +40,5 @@ Demes are assumed to be ordered throughout (i.e. the order needs to be consisten
 Migration matrix is assumed to be a distance matrix that is either a rate or a probability. The program
 will coerce the matrix into a probability distribution between origin and destination based on the row-sums.
 
-
+This function is intended to be fed into the \link{get_arg} function for interpretability.
 }

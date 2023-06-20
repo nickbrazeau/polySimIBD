@@ -16,11 +16,11 @@ hapmat numeric matrix; a matrix of mutliallelic haplotypes for each parasite con
 rows and parasites (haplotypes) are in columns.
 }
 \description{
-Layer Mutations onto the ARG for Each Loci
-}
-\details{
 The mutation model approximates an infinite allele model in time which is then collapsed into a single loci.
 Mutations are drawn with respect to the mutation rate and overall tree length from a poisson model. Mutations are
 then "droppped" onto the tree following a uniform distribution. Mutations that happen upstream (i.e. are ancestral)
 are carried along the tree branch to produce the final haplotypes for each parasite node.
+}
+\details{
+
 }

@@ -1,0 +1,17 @@
+citHeader("To cite polySimIBD in publications use:")
+
+citEntry(
+  entry    = "Article",
+  title    = "The impact of antimalarial resistance on the genetic structure of Plasmodium falciparum in the DRC",
+  author   = "Verity R, Aydemir O, Brazeau NF, Watson OJ, Hathaway NJ, Mwandagalirwa MK, Marsh PW, Thwai K, Fulton T, Denton M, Morgan AP, Parr JB, Tumwebaze PK, Conrad M, Rosenthal PJ, Ishengoma DS, Ngondi J, Gutman J, Mulenga M, Norris DE, Moss WJ, Mensah BA, Myers-Hansen JL, Ghansah A, Tshefu AK, Ghani AC, Meshnick SR, Bailey JA, Juliano JJ",
+  journal  = "Nature Commununications",
+  year     = 2020,
+  volume   = 11,
+  number   = 1,
+  pages    = 2107,
+  url      = "https://pubmed.ncbi.nlm.nih.gov/32355199/",
+  textVersion = paste(
+
+  )
+)
+

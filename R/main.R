@@ -1,6 +1,6 @@
 
 #------------------------------------------------
-#' Extract haplotypes from ARG
+#' @title Extract haplotypes from ARG
 #' @param arg set of bvtrees
 #' @return hapmat numeric matrix; a matrix of multiallelic haplotypes for each parasite considered. Loci are in
 #' rows and parasites (haplotypes) are in columns. 
@@ -24,16 +24,13 @@ extract_haplotype_matrix <- function(arg){
 }
 
 #' -------------------------------------------------------------------------------------------
-#' Layer Mutations onto the ARG for Each Loci
+#' @title Layer Mutations onto the ARG for Each Loci
 #' @inheritParams extract_haplotype_matrix 
 #' @param mutationrate numeric; the genome-wide per-generation mutation rate
-#' 
-#' @details The mutation model approximates an infinite allele model in time which is then collapsed into a single loci. 
+#' @description The mutation model approximates an infinite allele model in time which is then collapsed into a single loci. 
 #' Mutations are drawn with respect to the mutation rate and overall tree length from a poisson model. Mutations are
 #' then "droppped" onto the tree following a uniform distribution. Mutations that happen upstream (i.e. are ancestral)
 #' are carried along the tree branch to produce the final haplotypes for each parasite node.
-#'
-#'
 #' @return hapmat numeric matrix; a matrix of mutliallelic haplotypes for each parasite considered. Loci are in
 #' rows and parasites (haplotypes) are in columns. 
 #' @importFrom stats rpois runif
@@ -132,7 +129,7 @@ layer_mutations_on_ARG <- function(arg, mutationrate){
 #' @title Simulate biallelic data
 #'
 #' @description Simulate biallelic data from a simple statistical model. Inputs
-#'   include the complexity of infection (COI) and some parameters dicating skew and error
+#'   include the complexity of infection and some parameters dictating skew and error
 #'   distributions. Outputs include the phased haplotypes and the un-phased read
 #'   count and coverage data.
 #'
@@ -146,10 +143,10 @@ layer_mutations_on_ARG <- function(arg, mutationrate){
 #'     \item The "true" within-sample allele frequency at every locus is
 #'     obtained by multiplying haplotypes by their strain proportions, and
 #'     summing over haplotypes. Errors are introduced through the equation
-#'     \deqn{wsaf_error = wsaf*(1-e) + (1-wsaf)*e}where \eqn{wsaf} is the WSAF
+#'     \deqn{wsaf_{error} = wsaf*(1-e) + (1-wsaf)*e} where \eqn{wsaf} is the WSAF
 #'     without error and \eqn{e} is the error parameter \code{epsilon}.
 #'     \item Final read counts are drawn from a beta-binomial distribution with
-#'     expectation \eqn{w_error}. The raw number of draws is given by the
+#'     expectation \eqn{w_{error}}. The raw number of draws is given by the
 #'     \code{coverage}, and the skew of the distribution is given by the
 #'     \code{overdispersion} parameter. If \code{overdispersion = 0} then the
 #'     distribution is binomial, rather than beta-binomial.

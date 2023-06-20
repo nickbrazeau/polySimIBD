@@ -1,6 +1,6 @@
 Package: polySimIBD
 Type: Package
-Title: Structured Wright Fisher Simulator for Malarai Genetics
+Title: Structured Wright Fisher Simulator for Malaria Genetics
 Version: 1.0.0
 Authors@R: as.person(c(
     "Nick Brazeau <nbrazeau@med.unc.edu> [aut, cre]", 
