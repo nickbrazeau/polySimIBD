@@ -23,7 +23,7 @@ test_that("migration matrix as a diagonal is only within IBD", {
                        deme1 = sort(rep(1:5, 5)))
   j2 <- tibble::tibble(smpl2 = 1:25, 
                        deme2 = sort(rep(1:5, 5)))
-  comb_hosts_df <- tibble::as_tibble(comb_hosts_df)
+  comb_hosts_df <- tibble::as_tibble(comb_hosts_df, .name_repair = "minimal")
   colnames(comb_hosts_df) <- c("smpl1", "smpl2")
   comb_hosts_df <- comb_hosts_df %>% 
     dplyr::left_join(., j1) %>% 

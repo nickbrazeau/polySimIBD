@@ -9,7 +9,7 @@ sim_swf(pos, N, m, rho, mean_coi, tlim, migr_mat = 1, verbose = FALSE)
 \arguments{
 \item{pos}{vector; the genomic coordinates for chromosome and position of the sites}
 
-\item{N}{numeric numeric; The number of individuals to consider in each deme}
+\item{N}{integer vector; The number of individuals to consider in each deme}
 
 \item{m}{numeric numeric; Probability of internal migration where m represents the probability of moving from host_{origin} to host_{new} by m*(1-1/N) of each deme}
 
@@ -40,5 +40,5 @@ Demes are assumed to be ordered throughout (i.e. the order needs to be consisten
 Migration matrix is assumed to be a distance matrix that is either a rate or a probability. The program
 will coerce the matrix into a probability distribution between origin and destination based on the row-sums.
 
-
+This function is intended to be fed into the \link{get_arg} function for interpretability.
 }

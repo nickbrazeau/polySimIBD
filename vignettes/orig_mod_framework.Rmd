@@ -102,10 +102,9 @@ The `get_arg` function takes the output from the discrete-loci, discrete-time st
 
 
 # Visualizing the Simulation
-Here, we will use the function `plotARG` to make a plot of the marginal tree for each loci. The function returns the ARG as a list of marginal tree plots per loci. Users are able to specify loci that they want to visualize either in the function or as an item of the list (shown below). Note, users need to add the $t_{lim}$, specifying the definition of recent coalescence that they used in the original simulation for ideal plotting. In addition, users can subset the marginal trees to specific hosts or haplotypes with the `host_index` or `haplo_index` arguments.   
+Here, we will use the function `plot_coalescence_trees` to make a plot of the marginal tree for each loci, per the user specifications. Note, users have previously limited the TMRCA with the $t_{lim}$ option, specifying the definition of IBD as recent coalescence.   
 ```{r, fig.align = 'center', fig.width = 6, fig.height = 4, fig.retina = 5}
-marginal_tree_list <- plotARG(swf = swfsim, host_index = c(1,2), tlim = 10)
-marginal_tree_list[[1]]
+plot_coalescence_trees(ARG = ARG, loci = 1)
 ```
   
 You may have noticed that our coalescent trees (`bvtree` class) always coalesce "right-to-left". This is intentional and an approach to optimize looping through ancestries to get the ARG. As a result, remember that not every intersection is a true node (e.g. lines can "jump" over other lines).

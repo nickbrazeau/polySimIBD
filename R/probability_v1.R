@@ -5,7 +5,7 @@
 #'   parameters.
 #'
 #' @param shape vector of shape parameters.
-#'
+#' @importFrom stats rgamma
 #' @export
 
 rdirichlet <- function(shape = rep(1,3)) {
@@ -22,7 +22,7 @@ rdirichlet <- function(shape = rep(1,3)) {
 #' @param k number of binomial trials.
 #' @param alpha first shape parameter of beta distribution.
 #' @param beta second shape parameter of beta distribution.
-#'
+#' @importFrom stats rbeta rbinom
 #' @export
 
 rbetabinom <- function(n = 1, k = 10, alpha = 1, beta = 1) {

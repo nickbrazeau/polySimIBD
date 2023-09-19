@@ -1,10 +1,5 @@
 #------------------------------------------------
 #' @title The Structured Wright Fisher Model for IBD
-#'
-#' @description Simulate a population forwards with recombination that approximates the Structured Wright Fisher Process
-#' and tracks haplotype identity by descent where individuals represent demes, such that within
-#' a deme individual-level COI is considered.
-#'
 #' @param pos vector; the genomic coordinates for chromosome and position of the sites
 #' @param N integer vector; The number of individuals to consider in each deme
 #' @param m numeric numeric; Probability of internal migration where m represents the probability of moving from host_{origin} to host_{new} by m*(1-1/N) of each deme
@@ -13,16 +8,17 @@
 #' @param rho numeric; expected recombination rate
 #' @param tlim numeric; the maximum number of generations to consider before exiting gracefully if all samples have not coalesced
 #' @param verbose boolean
-#' 
 #' @return Returns a list of length six that contains the COI of each individual. A recombination list of length of tlim
 #' where each element contains the recombination block -- as a boolean -- of the two parental haplotypes.   
 #'  (the number of generations it took for all lineages to coalesce). Finally, there are lists for the parental host 
 #'  and parental haplotype assignments for the "paternal" and "maternal" haplotypes (1 and 2), respectively. 
-#'  
+#' @description Simulate a population forwards with recombination that approximates the Structured Wright Fisher Process
+#' and tracks haplotype identity by descent where individuals represent demes, such that within
+#' a deme individual-level COI is considered.
 #' @details Demes are assumed to be ordered throughout (i.e. the order needs to be consistent between N, m, mean_coi, and the rows and columns of the migration matrix).
 #' @details Migration matrix is assumed to be a distance matrix that is either a rate or a probability. The program
 #'          will coerce the matrix into a probability distribution between origin and destination based on the row-sums. 
-#' @details This function is intended to be fed into the \code{\link(polysimIBD::get_arg}} function for interpretability. 
+#' @details This function is intended to be fed into the [polySimIBD::get_arg] function for interpretability. 
 #'
 #' @export
 
@@ -114,7 +110,7 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim,
 #' @param host_index a vector of target hosts. Defaults to all hosts
 #' @param haplo_index a list of target haplotypes within the hosts specified by
 #'   \code{host_index}. Defaults to all haplotypes within the specified hosts
-#'
+#' @importFrom methods new
 #' @export
 
 get_arg <- function(swf, host_index = NULL, haplo_index = NULL) {

@@ -1,7 +1,7 @@
 Package: polySimIBD
 Type: Package
-Title: Structured Wright Fisher Simulator for Malarai Genetics
-Version: 0.6.0
+Title: Structured Wright Fisher Simulator for Malaria Genetics
+Version: 1.0.0
 Authors@R: as.person(c(
     "Nick Brazeau <nbrazeau@med.unc.edu> [aut, cre]", 
     "Bob Verity <r.verity@imperial.ac.uk> [aut]"
@@ -25,7 +25,8 @@ Imports:
     broom,
     cowplot,
     Rcpp,
-    methods
+    methods,
+    RColorBrewer
 Suggests: 
     knitr,
     rmarkdown,
@@ -35,7 +36,7 @@ Suggests:
     ggraph
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 LinkingTo: 
     Rcpp
 SystemRequirements: C++11
