@@ -1,7 +1,7 @@
 #' @title Convert `bvtree` to Newick Tree Format
-#' @param bvtree S3 class; internal class for the `polySimIBD`: package \link{bvtree}
+#' @param bvtree S3 class; internal class for the `polySimIBD`: package \code{bvtree}
 #' @inheritParams sim_swf
-#' @description Recursively converts `bvtree` to Newick tree format for compatibility with other downstream packages
+#' @description Recursively converts \code{bvtree} to Newick tree format for compatibility with other downstream packages
 #' @details Note, the overall TMRCA is set to the \code{tlim}, which in Newick format looks inappropriately rooted 
 #' @returns Newick String 
 #' @export

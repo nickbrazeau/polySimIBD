@@ -15,11 +15,11 @@ setClass("bvtree",
 get_effective_coi <- function(swf, host_index = NULL) {
   
   # checks
-  assert_class(swf, "swfsim")
-  assert_single_pos_int(host_index)
+  goodegg::assert_class(swf, "swfsim")
+  goodegg::assert_single_pos_int(host_index)
   
   # get ARG from swf and host_index
-  arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
+  arg <- polySimIBD::get_arg(swf = swf, host_index = host_index)
   
   # get connections
   conn <- purrr::map(arg, "c")
@@ -37,11 +37,11 @@ get_effective_coi <- function(swf, host_index = NULL) {
 #' @export
 get_within_ibd <- function(swf, host_index = NULL) {
   # checks
-  assert_class(swf, "swfsim")
-  assert_single_pos_int(host_index)
+  goodegg::assert_class(swf, "swfsim")
+  goodegg::assert_single_pos_int(host_index)
   # get ARG from swf and host_index
   # need to call ARG again to make extraction straightforward (eg don't know what user did to ARG upstream)
-  arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
+  arg <- polySimIBD::get_arg(swf = swf, host_index = host_index)
   # get connections
   conn <- purrr::map(arg, "c")
   # get within host IBD per loci 
@@ -67,22 +67,22 @@ get_within_ibd <- function(swf, host_index = NULL) {
 #' @export
 get_pairwise_bv_ibd <- function(swf, host_index = NULL) {
   # check inputs and define defaults
-  assert_class(swf, "swfsim")
-  assert_vector(host_index)
-  assert_noduplicates(host_index)
-  assert_pos_int(host_index, zero_allowed = FALSE)
+  goodegg::assert_class(swf, "swfsim")
+  goodegg::assert_vector(host_index)
+  goodegg::assert_noduplicates(host_index)
+  goodegg::assert_pos_int(host_index, zero_allowed = FALSE)
   if(length(host_index) != 2) {
     stop("host_index must be of length 2 for pairwise comparison", call. = FALSE)
   }
   # get ARG from swf and host_index
   # need to call ARG again to make extraction straightforward (eg don't know what user did to ARG upstream)
-  arg <- polySimIBD:::quiet(polySimIBD::get_arg(swf = swf, host_index = host_index))
+  arg <- polySimIBD::get_arg(swf = swf, host_index = host_index)
   # extract connectins 
   conn <- purrr::map(arg, "c")
   # subset to unique loci for speed 
   uniconn <- unique(conn)
   # find the locations of unique loci locations for later expansion
-  conn_indices <- polySimIBD:::get_conn_intervals(uniqueconn = uniconn, allconn = conn)
+  conn_indices <- get_conn_intervals(uniqueconn = uniconn, allconn = conn)
   
   # get between connections per locus for pair 
   # bvtrees point left --  ignring w/in ibd - if any between ibd, then locus is ibd 
@@ -113,10 +113,10 @@ get_pairwise_bv_ibd <- function(swf, host_index = NULL) {
 #------------------------------------------------
 #' @title Get Connection Intervals 
 #' @description Index where unique connections are in the entire genome for proper weighting
+#' @details Internal function, not intended for general use
 #' @param uniqueconn unique bvtree connections from the ARG
 #' @param allconn all bvtree connections from the ARG
-#' @noRd
-#' @noMd
+#' @export
 
 get_conn_intervals <- function(uniqueconn, allconn){
   names(uniqueconn) <- 1:length(uniqueconn)
@@ -132,11 +132,11 @@ get_conn_intervals <- function(uniqueconn, allconn){
 
 #------------------------------------------------
 #' @title Identify sub-trees recursively from root 
-#' @inheritParams bvtree
-#' @param int internal identification of root indices 
+#' @param root internal identification of root indices 
+#' @param c connections from bvtree slot
 #' @description Internal function: Recursively loop through tree starting with root to find haplo-indices in the "bvtrees c slot" that are connected
-#' @noMd
-#' @noRd
+#' @details Internal function, not intended for general use
+#' @export
 get_conn_from_root <- function(root, c) {
   # init
   tree <- newroot <- root
@@ -160,7 +160,7 @@ get_withinIBD_bvtree_subset <- function(c, coi1, coi2) {
   # find roots
   roots <- which(c == -1)
   # subset to subtree based on roots (ie extract out tree that is based connected to root)
-  subset_trees <- lapply(roots, polySimIBD:::get_conn_from_root, c = c)
+  subset_trees <- lapply(roots, get_conn_from_root, c = c)
   # get btwn conn
   btwnconn <- which(c[(coi1+1):(coi2+coi1)] %in% 0:(coi1-1)) + coi1
   

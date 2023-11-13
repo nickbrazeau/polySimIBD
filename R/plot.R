@@ -10,11 +10,11 @@
 
 more_colors <- function (n = 5, raw_cols = RColorBrewer::brewer.pal(10, "Paired")) {
   
-  assert_single_pos_int(n, zero_allowed = FALSE)
-  assert_string(raw_cols)
-  assert_vector(raw_cols)
+  goodegg::assert_single_pos_int(n, zero_allowed = FALSE)
+  goodegg::assert_string(raw_cols)
+  goodegg::assert_vector(raw_cols)
   
-  my_palette <- colorRampPalette(raw_cols)
+  my_palette <- grDevices::colorRampPalette(raw_cols)
   if (n <= 2) {
     return(my_palette(3)[1:n])
   }
@@ -50,9 +50,9 @@ plot_barcodes <- function(hapmat, coi) {
   width <- hap_ID <- NULL
   
   # assertions
-  assert_matrix(hapmat)
-  assert_vector(coi)
-  assert_eq(sum(coi), ncol(hapmat))
+  goodegg::assert_matrix(hapmat)
+  goodegg::assert_vector(coi)
+  goodegg::assert_eq(sum(coi), ncol(hapmat))
   
   # give each observed haplotype a unique index and compute the vector of these
   # indices
@@ -92,9 +92,9 @@ plot_barcodes <- function(hapmat, coi) {
   
   # plot
   df_hap %>%
-    ggplot(aes(width = width)) + theme_void() +
-    geom_bar(aes(x = cumsum(width) - width / 2, y = 1, fill = hap_ID),
+    ggplot2::ggplot(aes(width = width)) + ggplot2::theme_void() +
+    ggplot2::geom_bar(aes(x = cumsum(width) - width / 2, y = 1, fill = hap_ID),
              col = "black", stat = "identity") +
-    scale_fill_manual(values = df_hap$col, guide = "none") +
-    ylim(c(-3, 3))
+    ggplot2::scale_fill_manual(values = df_hap$col, guide = "none") +
+    ggplot2::ylim(c(-3, 3))
 }

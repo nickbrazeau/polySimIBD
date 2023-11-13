@@ -7,7 +7,7 @@
 bvtreeToNewick(bvtree, tlim = 10)
 }
 \arguments{
-\item{bvtree}{S3 class; internal class for the \code{polySimIBD}: package \link{bvtree}}
+\item{bvtree}{S3 class; internal class for the \code{polySimIBD}: package \code{bvtree}}
 
 \item{tlim}{numeric; the maximum number of generations to consider before exiting gracefully if all samples have not coalesced}
 }
