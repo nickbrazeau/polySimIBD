@@ -27,32 +27,32 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim,
                     verbose = FALSE){
   
   # assertions
-  assert_vector(pos)
-  assert_numeric(pos)
-  assert_increasing(pos)
+  goodegg::assert_vector(pos)
+  goodegg::assert_numeric(pos)
+  goodegg::assert_increasing(pos)
   if (length(migr_mat) == 1) {
-    assert_eq(migr_mat, 1, 
+    goodegg::assert_eq(migr_mat, 1, 
               message = "Distance matrix can be set to 1 to indicate a non-spatial model. Otherwise, needs to be a matrix")
-    assert_length(N, 1,
+    goodegg::assert_length(N, 1,
               message = "If non-spatial model considered, deme size is of length 1") 
-    assert_length(m, 1,
+    goodegg::assert_length(m, 1,
               message = "If non-spatial model considered, internal migration rates is of length 1") 
-    assert_length(mean_coi, 1,
+    goodegg::assert_length(mean_coi, 1,
               message = "If non-spatial model considered, mean coi is of length 1") 
   } else {
-    assert_matrix(migr_mat)
-    assert_eq(ncol(migr_mat), length(N),
+    goodegg::assert_matrix(migr_mat)
+    goodegg::assert_eq(ncol(migr_mat), length(N),
               message = "Migration matrix and deme sizes must be of same relative dimensions. In other words, you need to specify a deme size for every deme")
-    assert_eq(ncol(migr_mat), length(m),
+    goodegg::assert_eq(ncol(migr_mat), length(m),
               message = "Migration matrix and internal migration rates must be of same relative dimensions. In other words, you need to specify a deme size for internal migration")
-    assert_eq(ncol(migr_mat), length(mean_coi),
+    goodegg::assert_eq(ncol(migr_mat), length(mean_coi),
               message = "Migration matrix and mean COI must be of same relative dimensions. In other words, you need to specify a mean COI for every deme")
   }
-  assert_pos_int(N, zero_allowed = FALSE)
-  assert_bounded(m, left = 0, right = 1)
-  assert_bounded(rho, left = 0, right = 1, inclusive_left = FALSE, inclusive_right = FALSE)
-  assert_pos(mean_coi, zero_allowed = FALSE)
-  assert_single_pos_int(tlim, zero_allowed = FALSE)
+  goodegg::assert_pos_int(N, zero_allowed = FALSE)
+  goodegg::assert_bounded(m, left = 0, right = 1)
+  goodegg::assert_bounded(rho, left = 0, right = 1, inclusive_left = FALSE, inclusive_right = FALSE)
+  goodegg::assert_pos(mean_coi, zero_allowed = FALSE)
+  goodegg::assert_single_pos_int(tlim, zero_allowed = FALSE)
   
   
   # precalculate probability of an odd number of recombination events between
@@ -116,18 +116,18 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim,
 get_arg <- function(swf, host_index = NULL, haplo_index = NULL) {
   
   # check inputs and define defaults
-  assert_custom_class(swf, "swfsim")
+  goodegg::assert_custom_class(swf, "swfsim")
   if (is.null(host_index)) {
     host_index <- 1:length(swf$coi)
   }
   if (is.null(haplo_index)) {
     haplo_index <- mapply(function(x) 1:x, swf$coi[host_index], SIMPLIFY = FALSE)
   }
-  assert_vector(host_index)
-  assert_pos_int(host_index, zero_allowed = FALSE)
-  assert_list(haplo_index)
-  assert_same_length(host_index, haplo_index)
-  assert_pos_int(unlist(haplo_index), zero_allowed = FALSE)
+  goodegg::assert_vector(host_index)
+  goodegg::assert_pos_int(host_index, zero_allowed = FALSE)
+  goodegg::assert_list(haplo_index)
+  goodegg::assert_same_length(host_index, haplo_index)
+  goodegg::assert_pos_int(unlist(haplo_index), zero_allowed = FALSE)
   
   # define arguments
   args <- c(swf, list(host_index = rep(host_index, mapply(length, haplo_index)) - 1,
@@ -168,12 +168,12 @@ get_arg <- function(swf, host_index = NULL, haplo_index = NULL) {
 subset_bvtree <- function(bvtree, s) {
   
   # check inputs
-  assert_custom_class(bvtree, "bvtree")
-  assert_vector(s)
-  assert_gr(length(s), 1)
-  assert_noduplicates(s)
-  assert_pos_int(s, zero_allowed = FALSE)
-  assert_leq(s, length(bvtree@c))
+  goodegg::assert_custom_class(bvtree, "bvtree")
+  goodegg::assert_vector(s)
+  goodegg::assert_gr(length(s), 1)
+  goodegg::assert_noduplicates(s)
+  goodegg::assert_pos_int(s, zero_allowed = FALSE)
+  goodegg::assert_leq(s, length(bvtree@c))
   
   # create mask vector
   m <- rep(0, length(bvtree@c))
