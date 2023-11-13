@@ -31,10 +31,19 @@
     <loc>/news/index.html</loc>
   </url>
   <url>
+    <loc>/reference/bvtreeToNewick.html</loc>
+  </url>
+  <url>
     <loc>/reference/extract_haplotype_matrix.html</loc>
   </url>
   <url>
     <loc>/reference/get_arg.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_conn_from_root.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_conn_intervals.html</loc>
   </url>
   <url>
     <loc>/reference/get_effective_coi.html</loc>
@@ -56,9 +65,6 @@
   </url>
   <url>
     <loc>/reference/plot_barcodes.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plot_coalescence_trees.html</loc>
   </url>
   <url>
     <loc>/reference/polySimIBD.html</loc>
