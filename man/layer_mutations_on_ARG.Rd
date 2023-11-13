@@ -21,6 +21,3 @@ Mutations are drawn with respect to the mutation rate and overall tree length fr
 then "droppped" onto the tree following a uniform distribution. Mutations that happen upstream (i.e. are ancestral)
 are carried along the tree branch to produce the final haplotypes for each parasite node.
 }
-\details{
-
-}
