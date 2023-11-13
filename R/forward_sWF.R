@@ -116,7 +116,7 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim,
 get_arg <- function(swf, host_index = NULL, haplo_index = NULL) {
   
   # check inputs and define defaults
-  goodegg::assert_custom_class(swf, "swfsim")
+  goodegg::assert_class(swf, "swfsim")
   if (is.null(host_index)) {
     host_index <- 1:length(swf$coi)
   }
@@ -168,7 +168,7 @@ get_arg <- function(swf, host_index = NULL, haplo_index = NULL) {
 subset_bvtree <- function(bvtree, s) {
   
   # check inputs
-  goodegg::assert_custom_class(bvtree, "bvtree")
+  goodegg::assert_class(bvtree, "bvtree")
   goodegg::assert_vector(s)
   goodegg::assert_gr(length(s), 1)
   goodegg::assert_noduplicates(s)

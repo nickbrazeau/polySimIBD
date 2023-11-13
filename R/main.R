@@ -23,7 +23,7 @@ extract_haplotype_matrix <- function(arg){
   return(hap_mat)
 }
 
-#' -------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------
 #' @title Layer Mutations onto the ARG for Each Loci
 #' @inheritParams extract_haplotype_matrix 
 #' @param mutationrate numeric; the genome-wide per-generation mutation rate
@@ -41,7 +41,7 @@ layer_mutations_on_ARG <- function(arg, mutationrate){
 
   # assertions
   assert_numeric(mutationrate)
-  assert_custom_class(ARG[[1]], "bvtree", message  =  "Elements within the %s must inherit from class '%s'")
+  assert_class(ARG[[1]], "bvtree", message  =  "Elements within the %s must inherit from class '%s'")
   
   # get haplotype matrix
   hapmat <- polySimIBD::extract_haplotype_matrix(arg = ARG)
@@ -125,7 +125,7 @@ layer_mutations_on_ARG <- function(arg, mutationrate){
 
 
 
-#' -------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------
 #' @title Simulate biallelic data
 #'
 #' @description Simulate biallelic data from a simple statistical model. Inputs

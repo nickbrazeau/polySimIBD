@@ -15,7 +15,7 @@ setClass("bvtree",
 get_effective_coi <- function(swf, host_index = NULL) {
   
   # checks
-  assert_custom_class(swf, "swfsim")
+  assert_class(swf, "swfsim")
   assert_single_pos_int(host_index)
   
   # get ARG from swf and host_index
@@ -37,7 +37,7 @@ get_effective_coi <- function(swf, host_index = NULL) {
 #' @export
 get_within_ibd <- function(swf, host_index = NULL) {
   # checks
-  assert_custom_class(swf, "swfsim")
+  assert_class(swf, "swfsim")
   assert_single_pos_int(host_index)
   # get ARG from swf and host_index
   # need to call ARG again to make extraction straightforward (eg don't know what user did to ARG upstream)
@@ -67,7 +67,7 @@ get_within_ibd <- function(swf, host_index = NULL) {
 #' @export
 get_pairwise_bv_ibd <- function(swf, host_index = NULL) {
   # check inputs and define defaults
-  assert_custom_class(swf, "swfsim")
+  assert_class(swf, "swfsim")
   assert_vector(host_index)
   assert_noduplicates(host_index)
   assert_pos_int(host_index, zero_allowed = FALSE)
