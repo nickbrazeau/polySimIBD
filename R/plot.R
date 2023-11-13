@@ -36,10 +36,10 @@ more_colors <- function (n = 5, raw_cols = RColorBrewer::brewer.pal(10, "Paired"
 #' 
 #' @description Produces a ggplot of barcode counts, in which width
 #'   indicates the number of times each barcode was seen, and all completely
-#'   unique barcodes (only seen once) are indicated in grey.
+#'   unique barcodes (only seen once) are indicated in grey
 #' 
-#' @param hapmat a matrix of haplotypes.
-#' @param coi a vector of COIs per sample.
+#' @param hapmat matrix; a matrix of haplotypes
+#' @param coi numeric vector; a vector of COIs per sample
 #' 
 #' @importFrom grDevices grey
 #' @export
