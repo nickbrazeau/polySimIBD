@@ -43,18 +43,18 @@ test_that("migration matrix as a diagonal is only within IBD", {
 
 test_that("migration matrix with zero on diagonal is only between IBD", {
   # NB in large population, shouldn't draw same parent 
-  no_diagnl <- matrix(10, 5, 5)
+  no_diagnl <- matrix(1, 5, 5)
   diag(no_diagnl) <- 0
   
   no_diagnl_sim <- polySimIBD::sim_swf(pos =  sort(sample(1.664e6, 1e3)),
                                        migr_mat = no_diagnl,
-                                       N =         rep(1e2, 5),
+                                       N =         rep(1e3, 5),
                                        m =         rep(0.25, 5),
                                        rho =       7.4e-7,
                                        mean_coi =  rep(2, 5),
                                        tlim =      10)
   
-  comb_hosts_df <- t(combn(1:1e2, 2))
+  comb_hosts_df <- t(combn(1:1e3, 2))
   # down sample for memory
   rws <- sample(1:nrow(comb_hosts_df), size = 50)
   comb_hosts_df <- comb_hosts_df[rws,]
@@ -66,11 +66,11 @@ test_that("migration matrix with zero on diagonal is only between IBD", {
   #............................................................
   # tidyout
   #...........................................................
-  j1 <- tibble::tibble(smpl1 = 1:1e2, 
-                       deme1 = sort(rep(1:5, 1e2/5)))
-  j2 <- tibble::tibble(smpl2 = 1:1e2, 
-                       deme2 = sort(rep(1:5, 1e2/5)))
-  comb_hosts_df <- tibble::as_tibble(comb_hosts_df)
+  j1 <- tibble::tibble(smpl1 = 1:1e3, 
+                       deme1 = sort(rep(1:5, 1e3/5)))
+  j2 <- tibble::tibble(smpl2 = 1:1e3, 
+                       deme2 = sort(rep(1:5, 1e3/5)))
+  comb_hosts_df <- tibble::as_tibble(comb_hosts_df, .name_repair = "minimal")
   colnames(comb_hosts_df) <- c("smpl1", "smpl2")
   comb_hosts_df <- comb_hosts_df %>% 
     dplyr::left_join(., j1) %>% 

@@ -218,7 +218,7 @@ number of generations that we simulate
 <span>                  mean_coi <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>                  migr_mat <span class="op">=</span> <span class="fl">1</span>, <span class="co"># nonspatial</span></span>
 <span>                  tlim <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="co">#&gt; completed in 0.000078 seconds</span></span></code></pre></div>
+<span><span class="co">#&gt; completed in 0.000271 seconds</span></span></code></pre></div>
 <p>The discrete-loci, discrete-time structured Wright Fisher simulation
 outputs six objets: 1. A vector of COIs, where each item in the vector
 is the number of parasites within a given host 2. A list of
@@ -239,8 +239,8 @@ recreating a marginal tree for each loci and then collectively storing
 the entire set of marginal trees, termed the ancestral recombination
 graph.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ARG</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_arg.html">get_arg</a></span><span class="op">(</span><span class="va">swfsim</span><span class="op">)</span></span>
-<span><span class="co">#&gt; completed in 0.000030 seconds</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">ARG</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_arg.html">get_arg</a></span><span class="op">(</span><span class="va">swfsim</span>, host_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; completed in 0.000134 seconds</span></span></code></pre></div>
 <p>The <code>get_arg</code> function takes the output from the
 discrete-loci, discrete-time structured Wright Fisher simulation above
 and produces <code>bv_trees</code>, an S4 class, for each loci.</p>
@@ -261,24 +261,10 @@ MRCA)</li>
 <code>z</code>: The order of coalescence for each set of
 haplotypes</li>
 </ol>
-</div>
-</div>
-<div class="section level2">
-<h2 id="visualizing-the-simulation">Visualizing the Simulation<a class="anchor" aria-label="anchor" href="#visualizing-the-simulation"></a>
-</h2>
-<p>Here, we will use the function <code>plot_coalescence_trees</code> to
-make a plot of the marginal tree for each loci, per the user
-specifications. Note, users have previously limited the TMRCA with the
-<span class="math inline">\(t_{lim}\)</span> option, specifying the
-definition of IBD as recent coalescence.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_coalescence_trees.html">plot_coalescence_trees</a></span><span class="op">(</span>ARG <span class="op">=</span> <span class="va">ARG</span>, loci <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="orig_mod_framework_files/figure-html/unnamed-chunk-4-1.png" width="576" style="display: block; margin: auto;"></p>
 <p>You may have noticed that our coalescent trees (<code>bvtree</code>
 class) always coalesce “right-to-left”. This is intentional and an
-approach to optimize looping through ancestries to get the ARG. As a
-result, remember that not every intersection is a true node (e.g. lines
-can “jump” over other lines).</p>
+approach to optimize looping through ancestries to get the ARG.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="adding-mutations">Adding Mutations<a class="anchor" aria-label="anchor" href="#adding-mutations"></a>
@@ -286,78 +272,36 @@ can “jump” over other lines).</p>
 <p>Finally, we can layer mutations on to each marginal tree (and the
 overall ARG) based on the total branch length of the coalescent tree and
 the user specified per-recombination block mutation rate.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hapmat</span> <span class="op">&lt;-</span> <span class="fu">polySimIBD</span><span class="fu">::</span><span class="fu"><a href="../reference/layer_mutations_on_ARG.html">layer_mutations_on_ARG</a></span><span class="op">(</span><span class="va">ARG</span>, mutationrate <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
 <span><span class="va">hapmat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span>POS <span class="op">=</span> <span class="va">swfsim</span><span class="op">$</span><span class="va">pos</span>, <span class="va">hapmat</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">hapmat</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"POS"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"parasite"</span>, <span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">hapmat</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">hapmat</span><span class="op">)</span></span></code></pre></div>
-<table style="width:100%;" class="table">
-<colgroup>
-<col width="3%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="9%">
-<col width="9%">
-</colgroup>
+<table class="table">
 <thead><tr class="header">
 <th align="right">POS</th>
 <th align="right">parasite1</th>
 <th align="right">parasite2</th>
 <th align="right">parasite3</th>
 <th align="right">parasite4</th>
-<th align="right">parasite5</th>
-<th align="right">parasite6</th>
-<th align="right">parasite7</th>
-<th align="right">parasite8</th>
-<th align="right">parasite9</th>
-<th align="right">parasite10</th>
-<th align="right">parasite11</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="right">1</td>
 <td align="right">0</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="right">101</td>
 <td align="right">0</td>
 <td align="right">1</td>
 <td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
+<td align="right">2</td>
 </tr>
 <tr class="odd">
 <td align="right">201</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">0</td>
@@ -367,25 +311,11 @@ the user specified per-recombination block mutation rate.</p>
 <td align="right">301</td>
 <td align="right">0</td>
 <td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">1</td>
 <td align="right">0</td>
 <td align="right">1</td>
-<td align="right">3</td>
-<td align="right">0</td>
 </tr>
 <tr class="odd">
 <td align="right">401</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">1</td>
@@ -397,40 +327,19 @@ the user specified per-recombination block mutation rate.</p>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
-<td align="right">3</td>
 </tr>
 <tr class="odd">
 <td align="right">601</td>
 <td align="right">0</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">2</td>
 <td align="right">0</td>
-<td align="right">3</td>
-<td align="right">3</td>
 <td align="right">1</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="right">701</td>
 <td align="right">0</td>
 <td align="right">1</td>
 <td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
@@ -439,27 +348,13 @@ the user specified per-recombination block mutation rate.</p>
 <td align="right">0</td>
 <td align="right">1</td>
 <td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="right">901</td>
-<td align="right">3</td>
-<td align="right">3</td>
-<td align="right">3</td>
-<td align="right">3</td>
-<td align="right">3</td>
-<td align="right">3</td>
-<td align="right">3</td>
-<td align="right">2</td>
-<td align="right">3</td>
-<td align="right">3</td>
-<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
 </tr>
 </tbody>
 </table>

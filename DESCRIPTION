@@ -16,24 +16,24 @@ LazyData: true
 URL: https://github.com/nickbrazeau/polySimIBD
 BugReports: https://github.com/nickbrazeau/polySimIBD/issues
 Imports:
-    tibble,
     ggplot2,
     magrittr,
-    tidyr,
-    dplyr,
     purrr,
-    broom,
-    cowplot,
     Rcpp,
     methods,
-    RColorBrewer
+    RColorBrewer,
+    grDevices,
+    goodegg
 Suggests: 
+    tibble,
+    tidygraph,
+    dplyr,
     knitr,
     rmarkdown,
     covr,
-    testthat,
-    tidygraph,
-    ggraph
+    testthat 
+Remotes:
+    nickbrazeau/goodegg,
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3

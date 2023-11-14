@@ -88,7 +88,7 @@ The output of this function is largely for internal use and is intended to be pa
 Using the ancestry matrices produced above, we can derive the most recent common ancestor (MRCA) and the time of MRCA coalescent event for each parasite (i.e. haplotype) at each discrete loci. As such, we are recreating a marginal tree for each loci and then collectively storing the entire set of marginal trees, termed the ancestral recombination graph. 
 
 ```{r}
-ARG <- get_arg(swfsim)
+ARG <- get_arg(swfsim, host_index = c(1,2))
 ```
 
 The `get_arg` function takes the output from the discrete-loci, discrete-time structured Wright Fisher simulation above and produces `bv_trees`, an S4 class, for each loci.
@@ -100,14 +100,7 @@ The `get_arg` function takes the output from the discrete-loci, discrete-time st
 2. `t`: The timing of the node connection (time to MRCA)
 3. `z`: The order of coalescence for each set of haplotypes
 
-
-# Visualizing the Simulation
-Here, we will use the function `plot_coalescence_trees` to make a plot of the marginal tree for each loci, per the user specifications. Note, users have previously limited the TMRCA with the $t_{lim}$ option, specifying the definition of IBD as recent coalescence.   
-```{r, fig.align = 'center', fig.width = 6, fig.height = 4, fig.retina = 5}
-plot_coalescence_trees(ARG = ARG, loci = 1)
-```
-  
-You may have noticed that our coalescent trees (`bvtree` class) always coalesce "right-to-left". This is intentional and an approach to optimize looping through ancestries to get the ARG. As a result, remember that not every intersection is a true node (e.g. lines can "jump" over other lines).
+You may have noticed that our coalescent trees (`bvtree` class) always coalesce "right-to-left". This is intentional and an approach to optimize looping through ancestries to get the ARG.  
   
 # Adding Mutations 
 Finally, we can layer mutations on to each marginal tree (and the overall ARG) based on the total branch length of the coalescent tree and the user specified per-recombination block mutation rate.

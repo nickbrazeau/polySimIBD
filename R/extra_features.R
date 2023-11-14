@@ -23,7 +23,7 @@ extract_haplotype_matrix <- function(arg){
   return(hap_mat)
 }
 
-#' -------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------
 #' @title Layer Mutations onto the ARG for Each Loci
 #' @inheritParams extract_haplotype_matrix 
 #' @param mutationrate numeric; the genome-wide per-generation mutation rate
@@ -40,8 +40,8 @@ extract_haplotype_matrix <- function(arg){
 layer_mutations_on_ARG <- function(arg, mutationrate){
 
   # assertions
-  assert_numeric(mutationrate)
-  assert_custom_class(ARG[[1]], "bvtree", message  =  "Elements within the %s must inherit from class '%s'")
+  goodegg::assert_numeric(mutationrate)
+  goodegg::assert_class(ARG[[1]], "bvtree", message  =  "Elements within the %s must inherit from class '%s'")
   
   # get haplotype matrix
   hapmat <- polySimIBD::extract_haplotype_matrix(arg = ARG)
@@ -125,7 +125,7 @@ layer_mutations_on_ARG <- function(arg, mutationrate){
 
 
 
-#' -------------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------
 #' @title Simulate biallelic data
 #'
 #' @description Simulate biallelic data from a simple statistical model. Inputs
@@ -187,14 +187,14 @@ sim_biallelic <- function(COIs = c(1,1),
   if (length(coverage) == 1) {
     coverage <- rep(coverage, nrow(haplotypematrix))
   }
-  assert_matrix(haplotypematrix)
-  assert_vector(coverage)
-  assert_pos_int(coverage)
-  assert_single_pos(alpha, zero_allowed = FALSE)
-  assert_single_pos(overdispersion, zero_allowed = TRUE)
-  assert_single_pos(epsilon, zero_allowed = TRUE)
-  assert_bounded(epsilon)
-  assert_eq(x = sum(COIs), y = ncol(haplotypematrix),
+  goodegg::assert_matrix(haplotypematrix)
+  goodegg::assert_vector(coverage)
+  goodegg::assert_pos_int(coverage)
+  goodegg::assert_single_pos(alpha, zero_allowed = FALSE)
+  goodegg::assert_single_pos(overdispersion, zero_allowed = TRUE)
+  goodegg::assert_single_pos(epsilon, zero_allowed = TRUE)
+  goodegg::assert_bounded(epsilon)
+  goodegg::assert_eq(x = sum(COIs), y = ncol(haplotypematrix),
             message = "The COIsum must be equal to the number of columns in your haplotype matrix")
   
   

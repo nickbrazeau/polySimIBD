@@ -18,9 +18,7 @@ test_that("island model returns two islands", {
     tibble::as_tibble(., .name_repair = "minimal") %>% 
     magrittr::set_colnames(c("smpl1", "smpl2")) %>% 
     dplyr::mutate(pairwiseIBD = purrr::map2_dbl(.x = smpl1, .y = smpl2, .f = function(x,  y){
-      polySimIBD:::quiet(
         polySimIBD::get_pairwise_bv_ibd(swf = swf, host_index = c(x,y))
-      )
     }))
   
   # subset to island A for smpl1 and island B for smpl 2

@@ -63,7 +63,7 @@ count and coverage data."><!-- mathjax --><script src="https://cdnjs.cloudflare.
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Simulate biallelic data</h1>
-    <small class="dont-index">Source: <a href="https://github.com/nickbrazeau/polySimIBD/blob/HEAD/R/main.R" class="external-link"><code>R/main.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/nickbrazeau/polySimIBD/blob/HEAD/R/extra_features.R" class="external-link"><code>R/extra_features.R</code></a></small>
     <div class="hidden name"><code>sim_biallelic.Rd</code></div>
     </div>
 
@@ -146,10 +146,10 @@ distribution with probability given by the <code>PLAF</code>.</p></li>
 <li><p>The "true" within-sample allele frequency at every locus is
 obtained by multiplying haplotypes by their strain proportions, and
 summing over haplotypes. Errors are introduced through the equation
-$$wsaf_error = wsaf*(1-e) + (1-wsaf)*e$$ where \(wsaf\) is the WSAF
+$$wsaf_{error} = wsaf*(1-e) + (1-wsaf)*e$$ where \(wsaf\) is the WSAF
 without error and \(e\) is the error parameter <code>epsilon</code>.</p></li>
 <li><p>Final read counts are drawn from a beta-binomial distribution with
-expectation \(w_error\). The raw number of draws is given by the
+expectation \(w_{error}\). The raw number of draws is given by the
 <code>coverage</code>, and the skew of the distribution is given by the
 <code>overdispersion</code> parameter. If <code>overdispersion = 0</code> then the
 distribution is binomial, rather than beta-binomial.</p></li>

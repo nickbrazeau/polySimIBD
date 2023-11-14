@@ -10,11 +10,11 @@
 
 more_colors <- function (n = 5, raw_cols = RColorBrewer::brewer.pal(10, "Paired")) {
   
-  assert_single_pos_int(n, zero_allowed = FALSE)
-  assert_string(raw_cols)
-  assert_vector(raw_cols)
+  goodegg::assert_single_pos_int(n, zero_allowed = FALSE)
+  goodegg::assert_string(raw_cols)
+  goodegg::assert_vector(raw_cols)
   
-  my_palette <- colorRampPalette(raw_cols)
+  my_palette <- grDevices::colorRampPalette(raw_cols)
   if (n <= 2) {
     return(my_palette(3)[1:n])
   }
@@ -30,112 +30,16 @@ more_colors <- function (n = 5, raw_cols = RColorBrewer::brewer.pal(10, "Paired"
   return(ret)
 }
 
-#------------------------------------------------
-#' plot the bvtrees
-#' 
-#' @description Produces a ggplot of bvtrees at every locus.
-#' 
-#' @param ARG S4 object; The ARG object that was created from a structured Wright
-#'        Fisher Simulation via `sim_structured_WF` and then processed with `get_ARG`.
-#' @param loci numeric vector; Loci to plot
-#' 
-#' @import ggplot2
-#' @importFrom tibble tibble
-#' @return ggplot object of geom_segments
-#' @export
-
-plot_coalescence_trees <- function(ARG, loci = NULL){
-  
-  # avoid "no visible binding" note
-  root <- haplotype <- con <- time <- NULL
-  
-  # assertions
-  if(!is.null(loci)){
-    assert_vector(loci)
-    assert_numeric(loci)
-    
-    # subset if not null
-    ARG <- ARG[[loci]]
-  }
-  
-  if (length(ARG) == 1) {
-    assert_custom_class(ARG, "bvtree", message  =  "Elements within the %s must inherit from class '%s'")
-  } else {
-    assert_custom_class(ARG[[1]], "bvtree", message  =  "Elements within the %s must inherit from class '%s'")
-  }
-  
-  # coerce this into a tidy format
-  if (length(ARG) == 1) {
-    ARG.tidy <-  tibble::tibble(
-      loci = loci, 
-      c = ARG@c,
-      t = ARG@t,
-      z = ARG@z
-    ) 
-  } else {
-    loci <- 1:length(ARG)
-    ARG.tidy <- lapply(loci, function(x){
-      ret <- tibble::tibble(
-        loci = x, 
-        c = ARG[[x]]@c,
-        t = ARG[[x]]@t,
-        z = ARG[[x]]@z,
-      )
-      return(ret)
-    }) %>% 
-      dplyr::bind_rows()
-  }
-  
-  # tidy up inputs
-  ARGsimdf <- ARG.tidy %>%
-    dplyr::group_by(loci) %>%
-    dplyr::mutate(time = ifelse(t == -1, max(t) + 5, t),
-                  root = which(t == -1)[1], # pick first root
-                  haplotype = seq(from = 0, to = (length(t)-1), by = 1),
-                  con = ifelse(t == -1, root, c))
-  
-  # take back to mapdf because facet has issue with multiple lines
-  ARGsimdf.plotdf <- ARGsimdf %>%
-    dplyr::group_by(loci) %>%
-    tidyr::nest()
-  
-  make_marginal_tree_plot <- function(x){
-    plotObj <- ggplot(data = x) +
-      geom_segment(aes(x = haplotype, xend = con,
-                       y = time, yend = time), # horizontal lines
-                   size = 1) +
-      geom_segment(aes(x = haplotype, xend = haplotype,
-                       y = 0, yend = time, color = factor(haplotype)),
-                   size = 1) +  # veritical lines
-      xlab("Haplotypes") + ylab("Generations") +
-      theme_bw() +
-      scale_x_continuous(breaks = 1:max(ARGsimdf$haplotype)) +
-      theme(axis.title = element_text(family = "Helvetica", face = "bold", size = 16),
-            axis.text.x = element_blank(),
-            axis.text.y = element_text(family = "Helvetica", face = "bold", size = 16),
-            legend.position = "none",
-            panel.grid = element_blank(),
-            panel.border = element_blank(),
-            axis.line = element_line(color = "#bdbdbd", size = 1.1)
-      )
-    return(plotObj)
-  }
-  
-  ARGsimdf.plotdf$plots <- purrr::map(ARGsimdf.plotdf$data, make_marginal_tree_plot)
-  
-  ret <- cowplot::plot_grid(plotlist = ARGsimdf.plotdf$plots, align = "v")
-  return(ret)
-}
 
 #------------------------------------------------
 #' plot barcodes
 #' 
 #' @description Produces a ggplot of barcode counts, in which width
 #'   indicates the number of times each barcode was seen, and all completely
-#'   unique barcodes (only seen once) are indicated in grey.
+#'   unique barcodes (only seen once) are indicated in grey
 #' 
-#' @param hapmat a matrix of haplotypes.
-#' @param coi a vector of COIs per sample.
+#' @param hapmat matrix; a matrix of haplotypes
+#' @param coi numeric vector; a vector of COIs per sample
 #' 
 #' @importFrom grDevices grey
 #' @export
@@ -146,9 +50,9 @@ plot_barcodes <- function(hapmat, coi) {
   width <- hap_ID <- NULL
   
   # assertions
-  assert_matrix(hapmat)
-  assert_vector(coi)
-  assert_eq(sum(coi), ncol(hapmat))
+  goodegg::assert_matrix(hapmat)
+  goodegg::assert_vector(coi)
+  goodegg::assert_eq(sum(coi), ncol(hapmat))
   
   # give each observed haplotype a unique index and compute the vector of these
   # indices
@@ -188,9 +92,9 @@ plot_barcodes <- function(hapmat, coi) {
   
   # plot
   df_hap %>%
-    ggplot(aes(width = width)) + theme_void() +
-    geom_bar(aes(x = cumsum(width) - width / 2, y = 1, fill = hap_ID),
+    ggplot2::ggplot(aes(width = width)) + ggplot2::theme_void() +
+    ggplot2::geom_bar(aes(x = cumsum(width) - width / 2, y = 1, fill = hap_ID),
              col = "black", stat = "identity") +
-    scale_fill_manual(values = df_hap$col, guide = "none") +
-    ylim(c(-3, 3))
+    ggplot2::scale_fill_manual(values = df_hap$col, guide = "none") +
+    ggplot2::ylim(c(-3, 3))
 }

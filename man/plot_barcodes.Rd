@@ -7,12 +7,12 @@
 plot_barcodes(hapmat, coi)
 }
 \arguments{
-\item{hapmat}{a matrix of haplotypes.}
+\item{hapmat}{matrix; a matrix of haplotypes}
 
-\item{coi}{a vector of COIs per sample.}
+\item{coi}{numeric vector; a vector of COIs per sample}
 }
 \description{
 Produces a ggplot of barcode counts, in which width
 indicates the number of times each barcode was seen, and all completely
-unique barcodes (only seen once) are indicated in grey.
+unique barcodes (only seen once) are indicated in grey
 }

@@ -63,16 +63,29 @@ Pull out the ARG and then calculate the pairwise IBD.
 
 ```{r}
 ARG <- polySimIBD::get_arg(swf)
+```
 
+
+
+Next, calculate pairwise IBD for all combinations. 
+```{r, echo=FALSE}
+# simple accessory function to "sink" the timer call
+quiet <- function(x) { # from Hadley: https://stackoverflow.com/questions/34208564/how-to-hide-or-disable-in-function-printed-message
+  sink(tempfile()) 
+  on.exit(sink()) 
+  invisible(force(x)) 
+}
+```
+```{r}
 # here we are going to get all the pairwise IBD combinations for our hosts
 adj_graph <- t(combn(x = c(1:sum(demesizes)), m = 2)) %>% 
   tibble::as_tibble(., .name_repair = "minimal") %>% 
   magrittr::set_colnames(c("smpl1", "smpl2")) %>% 
   dplyr::mutate(pairwiseIBD = purrr::map2_dbl(.x = smpl1, .y = smpl2, .f = function(x,  y){
-    polySimIBD:::quiet(
-      polySimIBD::get_pairwise_bv_ibd(swf = swf, host_index = c(x,y))
-    )
+      quiet(polySimIBD::get_pairwise_bv_ibd(swf = swf, host_index = c(x,y)
+    ))
   }))
+# N.B. quiet is purely for aesthetic of vignette and is not needed in the above command
 
 ```
 
