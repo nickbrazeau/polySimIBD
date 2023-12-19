@@ -45,14 +45,14 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// calc_between_coi_IBD_cpp
-Rcpp::List calc_between_coi_IBD_cpp(Rcpp::List args);
-RcppExport SEXP _polySimIBD_calc_between_coi_IBD_cpp(SEXP argsSEXP) {
+// get_bvibd_cpp
+Rcpp::List get_bvibd_cpp(Rcpp::List args);
+RcppExport SEXP _polySimIBD_get_bvibd_cpp(SEXP argsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type args(argsSEXP);
-    rcpp_result_gen = Rcpp::wrap(calc_between_coi_IBD_cpp(args));
+    rcpp_result_gen = Rcpp::wrap(get_bvibd_cpp(args));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -61,7 +61,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_polySimIBD_sim_swf_cpp", (DL_FUNC) &_polySimIBD_sim_swf_cpp, 1},
     {"_polySimIBD_get_arg_cpp", (DL_FUNC) &_polySimIBD_get_arg_cpp, 1},
     {"_polySimIBD_subset_bvtree_cpp", (DL_FUNC) &_polySimIBD_subset_bvtree_cpp, 3},
-    {"_polySimIBD_calc_between_coi_IBD_cpp", (DL_FUNC) &_polySimIBD_calc_between_coi_IBD_cpp, 1},
+    {"_polySimIBD_get_bvibd_cpp", (DL_FUNC) &_polySimIBD_get_bvibd_cpp, 1},
     {NULL, NULL, 0}
 };
 

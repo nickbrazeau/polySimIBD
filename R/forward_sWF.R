@@ -104,7 +104,7 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim,
 #' @description Given an object \code{swf}, which is the result of forward
 #'   simulation using the function \code{sim_swf()}, walks backwards through the
 #'   ancestry and calculates the coalescent tree at every locus for the
-#'   specified haplotypes.
+#'   specified hosts and/or haplotypes.
 #'
 #' @param swf result of forwards simulation using the function \code{sim_swf()}
 #' @param host_index a vector of target hosts. Defaults to all hosts
@@ -197,4 +197,48 @@ subset_bvtree <- function(bvtree, s) {
   return(bvtree)
 }
 
+
+#------------------------------------------------
+#' @title Get Between-Host Identity by Descent from forward simulations
+#'
+#' @description Given an object \code{swf}, which is the result of forward
+#'   simulation using the function \code{sim_swf()}, walks backwards through the
+#'   ancestry and calculates the between host identity by descent. Calculation is 
+#'   based on \cite{Verity et. al 2020, Nat Comms, PMC7192906}.    
+#'
+#' @inheritParams get_arg
+#' @importFrom methods new
+#' @export
+
+get_bvibd <- function(swf, host_index = NULL, haplo_index = NULL) {
+  
+  # check inputs and define defaults
+  goodegg::assert_class(swf, "swfsim")
+  if (is.null(host_index)) {
+    host_index <- 1:length(swf$coi)
+  }
+  if (is.null(haplo_index)) {
+    haplo_index <- mapply(function(x) 1:x, swf$coi[host_index], SIMPLIFY = FALSE)
+  }
+  goodegg::assert_vector(host_index)
+  goodegg::assert_pos_int(host_index, zero_allowed = FALSE)
+  goodegg::assert_list(haplo_index)
+  goodegg::assert_same_length(host_index, haplo_index)
+  goodegg::assert_pos_int(unlist(haplo_index), zero_allowed = FALSE)
+  
+  # define arguments
+  args <- c(swf, list(host_index = rep(host_index, mapply(length, haplo_index)) - 1,
+                      haplo_index = unlist(haplo_index) - 1))
+  
+  # pass to efficient C++ function
+  output_raw <- get_bvibd_cpp(args)
+  numerator <- output_raw$ibd_target[-1]
+  
+  # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info - ie burn first loci
+  wi <- diff(swf$pos)/sum(diff(swf$pos))
+  # weighted average (each loci, denom is 1)
+  bv_ibd <- sum( numerator*wi ) 
+  
+  return(bv_ibd)
+}
 
