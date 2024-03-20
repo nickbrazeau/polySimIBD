@@ -14,3 +14,4 @@ testthat::test_that("model runs", {
   ARG <- polySimIBD::get_arg(swf = swf, host_index = c(1,2))
   testthat::expect_gt(length(ARG), 0)
 })
+

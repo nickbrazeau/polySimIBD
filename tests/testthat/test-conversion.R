@@ -6,3 +6,4 @@ testthat::test_that("conversion returns newick string", {
  testthat::expect_equal(out,
                         "(Node0:10,(Node1:1,Node2:1):9);")
 })
+

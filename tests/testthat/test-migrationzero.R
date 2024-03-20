@@ -11,7 +11,7 @@ test_that("migration zero model with 1 deme", {
     tibble::as_tibble(., .name_repair = "minimal") %>% 
     magrittr::set_colnames(c("smpl1", "smpl2")) %>% 
     dplyr::mutate(pairwiseIBD = purrr::map2_dbl(.x = smpl1, .y = smpl2, .f = function(x,  y){
-        polySimIBD::get_pairwise_bv_ibd(swf = swf, host_index = c(x,y))
+        polySimIBD::get_bvibd(swf = swf, host_index = c(x,y))
     }))
   # no migration, no co-mingling of hosts, no ibd sharing
   testthat::expect_equal(unique(adj_graph$pairwiseIBD), 0)
@@ -33,7 +33,7 @@ test_that("migration zero model with multiple demes deme", {
     tibble::as_tibble(., .name_repair = "minimal") %>% 
     magrittr::set_colnames(c("smpl1", "smpl2")) %>% 
     dplyr::mutate(pairwiseIBD = purrr::map2_dbl(.x = smpl1, .y = smpl2, .f = function(x,  y){
-        polySimIBD::get_pairwise_bv_ibd(swf = swf, host_index = c(x,y))
+        polySimIBD::get_bvibd(swf = swf, host_index = c(x,y))
     }))
   # no migration, no co-mingling of hosts, no ibd sharing
   testthat::expect_equal(unique(adj_graph$pairwiseIBD), 0)
