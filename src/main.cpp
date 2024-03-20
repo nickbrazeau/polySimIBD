@@ -281,7 +281,7 @@ Rcpp::List get_bvibd_cpp(Rcpp::List args) {
   vector<int> haplo_index = rcpp_to_vector_int(args["haplo_index"]);
   int L = recomb[0][0][0].size();
   int tlim = recomb.size();
-  int coi1 = host_index[0];
+  int coi1 = coi_final[host_index[0]]; // COI from first host 
   int n = host_index.size(); // number of haplotypes within hosts (cumulative)
 
   // objects for storing results
