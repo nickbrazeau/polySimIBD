@@ -1,4 +1,3 @@
-#------------------------------------------------
 #' @title The Structured Wright Fisher Model for IBD
 #' @param pos vector; the genomic coordinates for chromosome and position of the sites
 #' @param N integer vector; The number of individuals to consider in each deme
@@ -98,7 +97,9 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim,
   return(ret)
 }
 
-#------------------------------------------------
+
+
+
 #' @title Get ancestral recombination graph from forward simulations
 #'
 #' @description Given an object \code{swf}, which is the result of forward
@@ -153,7 +154,9 @@ get_arg <- function(swf, host_index = NULL, haplo_index = NULL) {
   return(ARG)
 }
 
-#------------------------------------------------
+
+
+
 #' @title Subset an object of class bvtree
 #'
 #' @description Given a bvtree and a vector of indices \code{s}, creates a new
@@ -198,7 +201,10 @@ subset_bvtree <- function(bvtree, s) {
 }
 
 
-#------------------------------------------------
+
+
+
+
 #' @title Get Between-Host Identity by Descent from forward simulations
 #'
 #' @description Given an object \code{swf}, which is the result of forward
