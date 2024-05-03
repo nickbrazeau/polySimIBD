@@ -15,8 +15,16 @@ get_effective_coi(swf, host_index = NULL)
 vector of effective COI by loci
 }
 \description{
-TODO
+From a single host in a SWF Simulation, extract the effective COI
+for loci within the ARG. Effective COI is defined as the number of non-coalesced genomes
+at the end of \code{tlim}. For example, if a host contains five strains (i.e. five parasites),
+then at loci 1 we can determine "mini" coalescent trees have occurred. If the effective COI is
+2, then three strains have formed one coalescent tree and two strains have formed a separate
+coalescent tree. Notably, this framework is independent for each recombination event
+(versus loci which are just genetic markers). This means, if loci 10 is located within a different
+recombination block than loci 1 - and therefore is a separate entry in the ARG - we expect the
+effective COI to be (potentially) different.
 }
 \details{
-Only accepts a single host
+Function limited to a single host per "realization"
 }

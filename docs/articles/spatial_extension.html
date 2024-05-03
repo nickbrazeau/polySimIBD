@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">polySimIBD</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
       </span>
     </div>
 
@@ -185,11 +185,11 @@ connections between populations A and B).</p>
 <span>                           migr_mat <span class="op">=</span> <span class="va">migr_dist_mat</span>, </span>
 <span>                           rho <span class="op">=</span> <span class="fl">1e-2</span>, </span>
 <span>                           tlim <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="co">#&gt; completed in 0.000489 seconds</span></span></code></pre></div>
+<span><span class="co">#&gt; completed in 0.000456 seconds</span></span></code></pre></div>
 <p>Pull out the ARG and then calculate the pairwise IBD.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ARG</span> <span class="op">&lt;-</span> <span class="fu">polySimIBD</span><span class="fu">::</span><span class="fu"><a href="../reference/get_arg.html">get_arg</a></span><span class="op">(</span><span class="va">swf</span><span class="op">)</span></span>
-<span><span class="co">#&gt; completed in 0.000296 seconds</span></span></code></pre></div>
+<span><span class="co">#&gt; completed in 0.000401 seconds</span></span></code></pre></div>
 <p>Next, calculate pairwise IBD for all combinations.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># here we are going to get all the pairwise IBD combinations for our hosts</span></span>
@@ -197,9 +197,10 @@ connections between populations A and B).</p>
 <span>  <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="va">.</span>, .name_repair <span class="op">=</span> <span class="st">"minimal"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu">magrittr</span><span class="fu">::</span><span class="fu"><a href="https://magrittr.tidyverse.org/reference/aliases.html" class="external-link">set_colnames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"smpl1"</span>, <span class="st">"smpl2"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pairwiseIBD <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2_dbl</a></span><span class="op">(</span>.x <span class="op">=</span> <span class="va">smpl1</span>, .y <span class="op">=</span> <span class="va">smpl2</span>, .f <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>,  <span class="va">y</span><span class="op">)</span><span class="op">{</span></span>
-<span>      <span class="fu">quiet</span><span class="op">(</span><span class="fu">polySimIBD</span><span class="fu">::</span><span class="fu"><a href="../reference/get_pairwise_bv_ibd.html">get_pairwise_bv_ibd</a></span><span class="op">(</span>swf <span class="op">=</span> <span class="va">swf</span>, host_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span></span>
+<span>      <span class="fu">quiet</span><span class="op">(</span><span class="fu">polySimIBD</span><span class="fu">::</span><span class="fu"><a href="../reference/get_bvibd.html">get_bvibd</a></span><span class="op">(</span>swf <span class="op">=</span> <span class="va">swf</span>, host_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span></span>
 <span>    <span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">}</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># N.B. quiet is purely for aesthetic of vignette and is not needed in the above command</span></span></code></pre></div>
 <p>Let’s visualize our simple scenarios</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">adj_graph</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
