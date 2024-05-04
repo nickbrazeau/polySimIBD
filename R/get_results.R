@@ -55,6 +55,7 @@ get_within_ibd <- function(swf, host_index = NULL) {
   # checks
   goodegg::assert_class(swf, "swfsim")
   goodegg::assert_single_pos_int(host_index)
+  goodegg::assert_gr(swf$coi[[host_index]], 1, message = "Cannot perform within IBD calculation when the host's COI is 1")
   # get ARG from swf and host_index
   # need to call ARG again to make extraction straightforward (eg don't know what user did to ARG upstream)
   arg <- polySimIBD::get_arg(swf = swf, host_index = host_index)
