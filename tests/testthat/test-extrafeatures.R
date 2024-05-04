@@ -19,11 +19,14 @@ testthat::test_that("hapmat extraction returns matrix and it is unique haplotype
   testthat::expect_is(hapmat, "matrix")
   # first column will be 1 (because 1 haplotype)
   # first column of next host will be 2 (because 2 haplotype)
-  testthat::expect_equal(
-    1,
-    unique(hapmat[,sum(swf$coi[c(1,11)])]) -  unique(hapmat[,1]) 
+  testthat::expect_false(
+    identical(unique(hapmat[,sum(swf$coi[c(1,11)])]),  unique(hapmat[,1]))
   )
   
+  # layer mutations on arg for and now are columns will be different
+  muthapmat <- layer_mutations_on_ARG(arg = ARG, mutationrate = 1e-1)
+  testthat::expect_gt(sum(unlist(apply(muthapmat, 2, unique)))- sum(swf$coi[c(1,11)]),
+  0)
 })
 
 
