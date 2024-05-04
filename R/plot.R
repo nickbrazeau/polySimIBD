@@ -1,9 +1,8 @@
-#------------------------------------------------
-# Expand a series of colors by interpolation to produce any number of colors
-# from a given series. The pattern of interpolation is designed so that (n+1)th
-# value contains the nth value plus one more color, rather than being a
-# completely different series. For example, running more_colors(5) and
-# more_colors(4), the first 4 colors will be shared between the two series.
+#' @description Expand a series of colors by interpolation to produce any number of colors
+#'     from a given series. The pattern of interpolation is designed so that (n+1)th
+#'     value contains the nth value plus one more color, rather than being a
+#'     completely different series. For example, running more_colors(5) and
+#'     more_colors(4), the first 4 colors will be shared between the two series.
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom grDevices colorRampPalette
 #' @noRd
@@ -31,16 +30,13 @@ more_colors <- function (n = 5, raw_cols = RColorBrewer::brewer.pal(10, "Paired"
 }
 
 
-#------------------------------------------------
-#' plot barcodes
+#' @title Plot Barcodes
 #' 
 #' @description Produces a ggplot of barcode counts, in which width
 #'   indicates the number of times each barcode was seen, and all completely
 #'   unique barcodes (only seen once) are indicated in grey
-#' 
 #' @param hapmat matrix; a matrix of haplotypes
 #' @param coi numeric vector; a vector of COIs per sample
-#' 
 #' @importFrom grDevices grey
 #' @export
 
@@ -74,14 +70,14 @@ plot_barcodes <- function(hapmat, coi) {
   tab1 <- table(hap_mono)
   tab1 <- sort(tab1, decreasing = TRUE)
   
-  # make plotting data.frame. Unique haplotypes are counted together, but are coloured grey
+  # make plotting data.frame. Unique haplotypes are counted together, but are colored grey
   df_hap <- NULL
   if (any(tab1 > 1)) {
     df_hap <- rbind(df_hap,
                     data.frame(hap_ID = names(tab1)[tab1 > 1],
                                width = as.vector(tab1)[tab1 > 1])
     )
-    df_hap$col <- more_colours(nrow(df_hap))
+    df_hap$col <- more_colors(nrow(df_hap))
   }
   if (any(tab1 == 1)) {
     df_hap <- rbind.data.frame(df_hap,
@@ -92,8 +88,8 @@ plot_barcodes <- function(hapmat, coi) {
   
   # plot
   df_hap %>%
-    ggplot2::ggplot(aes(width = width)) + ggplot2::theme_void() +
-    ggplot2::geom_bar(aes(x = cumsum(width) - width / 2, y = 1, fill = hap_ID),
+    ggplot2::ggplot(ggplot2::aes(width = width)) + ggplot2::theme_void() +
+    ggplot2::geom_bar(ggplot2::aes(x = cumsum(width) - width / 2, y = 1, fill = hap_ID),
              col = "black", stat = "identity") +
     ggplot2::scale_fill_manual(values = df_hap$col, guide = "none") +
     ggplot2::ylim(c(-3, 3))

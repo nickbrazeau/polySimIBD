@@ -1,5 +1,4 @@
 
-#------------------------------------------------
 #' @title Extract haplotypes from ARG
 #' @param arg set of bvtrees
 #' @return hapmat numeric matrix; a matrix of multiallelic haplotypes for each parasite considered. Loci are in
@@ -19,11 +18,10 @@ extract_haplotype_matrix <- function(arg){
       ret[-w] <- ret[ret[-w]+1]
     }
     return(ret)
-  }, ARG))
+  }, arg))
   return(hap_mat)
 }
 
-#-------------------------------------------------------------------------------------------
 #' @title Layer Mutations onto the ARG for Each Loci
 #' @inheritParams extract_haplotype_matrix 
 #' @param mutationrate numeric; the genome-wide per-generation mutation rate
@@ -41,19 +39,19 @@ layer_mutations_on_ARG <- function(arg, mutationrate){
 
   # assertions
   goodegg::assert_numeric(mutationrate)
-  goodegg::assert_class(ARG[[1]], "bvtree", message  =  "Elements within the %s must inherit from class '%s'")
+  goodegg::assert_class(arg[[1]], "bvtree", message  =  "Elements within the %s must inherit from class '%s'")
   
   # get haplotype matrix
-  hapmat <- polySimIBD::extract_haplotype_matrix(arg = ARG)
+  hapmat <- polySimIBD::extract_haplotype_matrix(arg = arg)
   
   
   # NB, to keep alleles unique, we will start counting after the point of the genealogy alleles
   mut_allelestart <- max(hapmat)
   
   # mutate trees for each loci
-  for (t in 1:length(ARG)) { 
+  for (t in 1:length(arg)) { 
     # extract objs
-    coalbvtree <- ARG[[t]]
+    coalbvtree <- arg[[t]]
     
     # init hapmat and gt vector for loci
     gt_l <- rep(NA, length(coalbvtree@t))
@@ -63,7 +61,7 @@ layer_mutations_on_ARG <- function(arg, mutationrate){
     
     # catch if no coalescence (all roots)
     if (max(brnchlngth) == -1 ) {
-      alltreesbrnchlngth <- unlist( purrr::map(ARG, "t") )
+      alltreesbrnchlngth <- unlist( purrr::map(arg, "t") )
       brnchlngth[brnchlngth == -1] <- max(alltreesbrnchlngth) # just set to max time in simulation
     } else {
       brnchlngth[brnchlngth == -1] <- max(brnchlngth) + 1e-5 # plus small bit 
@@ -125,7 +123,6 @@ layer_mutations_on_ARG <- function(arg, mutationrate){
 
 
 
-#-------------------------------------------------------------------------------------------
 #' @title Simulate biallelic data
 #'
 #' @description Simulate biallelic data from a simple statistical model. Inputs

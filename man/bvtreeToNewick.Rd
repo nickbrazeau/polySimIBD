@@ -18,5 +18,7 @@ Newick String
 Recursively converts \code{bvtree} to Newick tree format for compatibility with other downstream packages
 }
 \details{
-Note, the overall TMRCA is set to the \code{tlim}, which in Newick format looks inappropriately rooted
+Note, the overall TMRCA is set to the \code{tlim}, which in Newick format looks inappropriately rooted.
+
+Note, the function does not "know" the original \code{tlim} that was specified in the forward-simulation, and thus must be re-stated by the user.
 }
