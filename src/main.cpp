@@ -281,7 +281,7 @@ Rcpp::List get_bvibd_cpp(Rcpp::List args) {
   vector<int> haplo_index = rcpp_to_vector_int(args["haplo_index"]);
   int L = recomb[0][0][0].size();
   int tlim = recomb.size();
-  int coi1 = coi_final[host_index[0]]; // COI from first host 
+  int coi1 = coi_final[host_index[0]]; // COI from first host
   int n = host_index.size(); // number of haplotypes within hosts (cumulative)
 
   // objects for storing results
@@ -321,23 +321,19 @@ Rcpp::List get_bvibd_cpp(Rcpp::List args) {
           sample_haplo[i] = parent_haplo2[t][this_host][this_haplo];
         }
 
-      }
+      } // end sample loop
 
       // check for between host coalescence
       for (int i = 0; i < coi1; ++i) {
-        if (coalesced[i]) {
-          continue;
-        }
         for (int j = coi1; j < n; ++j) {
-          if (coalesced[j]) {
-            continue;
-          }
-          if (sample_host[j] == sample_host[i]) {
+          if (sample_host[i] == sample_host[j]) {
+            if (sample_haplo[i] == sample_haplo[j]) {
               // ibd event
               ibd_target_store[l] = true;
+            }
           }
-        } // end j loop
-      }  // end i loop
+        } // end j coal loop
+      }  // end i coal loop
 
     }  // end t loop
   }  // end l loop
