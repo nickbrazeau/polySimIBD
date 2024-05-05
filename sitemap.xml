@@ -40,16 +40,10 @@
     <loc>/reference/get_arg.html</loc>
   </url>
   <url>
-    <loc>/reference/get_conn_from_root.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_conn_intervals.html</loc>
+    <loc>/reference/get_bvibd.html</loc>
   </url>
   <url>
     <loc>/reference/get_effective_coi.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_pairwise_bv_ibd.html</loc>
   </url>
   <url>
     <loc>/reference/get_within_ibd.html</loc>
