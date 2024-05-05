@@ -218,7 +218,7 @@ number of generations that we simulate
 <span>                  mean_coi <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>                  migr_mat <span class="op">=</span> <span class="fl">1</span>, <span class="co"># nonspatial</span></span>
 <span>                  tlim <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="co">#&gt; completed in 0.000077 seconds</span></span></code></pre></div>
+<span><span class="co">#&gt; completed in 0.000273 seconds</span></span></code></pre></div>
 <p>The discrete-loci, discrete-time structured Wright Fisher simulation
 outputs six objets: 1. A vector of COIs, where each item in the vector
 is the number of parasites within a given host 2. A list of
@@ -240,7 +240,7 @@ the entire set of marginal trees, termed the ancestral recombination
 graph.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ARG</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_arg.html">get_arg</a></span><span class="op">(</span><span class="va">swfsim</span>, host_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; completed in 0.000041 seconds</span></span></code></pre></div>
+<span><span class="co">#&gt; completed in 0.000132 seconds</span></span></code></pre></div>
 <p>The <code>get_arg</code> function takes the output from the
 discrete-loci, discrete-time structured Wright Fisher simulation above
 and produces <code>bv_trees</code>, an S4 class, for each loci.</p>

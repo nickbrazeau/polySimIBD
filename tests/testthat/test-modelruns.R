@@ -14,7 +14,7 @@ testthat::test_that("model runs", {
   testthat::expect_is(swf, "swfsim")
   # arg test
   ARG <- polySimIBD::get_arg(swf = swf, host_index = c(1,2))
-  testthat::expect_is(swf, "argraph")
+  testthat::expect_is(ARG, "argraph")
   testthat::expect_gt(length(ARG), 0)
   # bv tree sub
   bvsubtree <- subset_bvtree(bvtree = ARG[[1]], s = c(1,2))

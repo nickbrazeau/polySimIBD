@@ -1,7 +1,7 @@
 test_that("more color for plot", {
   # simple vector of colors from Rcolorbrewer
   vec <- polySimIBD:::more_colors()
-  testthat::expect_equal(is.vector(vec))
+  testthat::expect_vector(vec)
 })
 
 
