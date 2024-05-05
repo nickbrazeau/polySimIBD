@@ -1,6 +1,6 @@
 testthat::test_that("conversion returns newick string for a simple tree", {
   # make custom bvtree
-  bvtree_ex <- new("bvtree", "c" = c(-1,-1,1), "t" = c(-1,-1,1), "z" = c(2,0,1))
+  bvtree_ex <- new("bvtree", "c" = c(-1,-1,1), "t" = c(-1,-1,1), "z" = c(2,1,0))
  out <- bvtreeToNewick(bvtree = bvtree_ex, tlim = 10) 
  # make sure liftover is correct
  testthat::expect_equal(out,
