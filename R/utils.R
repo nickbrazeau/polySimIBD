@@ -29,7 +29,7 @@ NULL
 #' The Ancestral Recombination Graph 
 #' This S3 class represents the ARG from the realized simulation
 #' @name argraph
-#' @description A list of \code{\link{bv_tree}} for each discrete-loci, which constitutes the ARG 
+#' @description A list of \code{bv_tree} for each discrete-loci, which constitutes the ARG 
 NULL
 
 
@@ -40,6 +40,6 @@ NULL
 #' @field c vector; the node connection for each haplotype (each haplotype is an element in a vector)
 #' @field t vector; the timing of the node connection (time to MRCA)
 #' @field z vector; the order of coalescence for each set of haplotypes
-#' @description  The \code{\link{bv_tree}} class is a lightweight representation of a marginal tree
+#' @description  The \code{bv_tree} class is a lightweight representation of a marginal tree
 NULL
 

@@ -2,12 +2,10 @@
 % Please edit documentation in R/utils.R
 \name{bvtree}
 \alias{bvtree}
-\title{A Simplified Tree: bvtree}
+\title{A Simplified Tree: bvtree
+This S3 class represents the bvtree which is a simple tree marginal representation}
 \description{
 The \code{bv_tree} class is a lightweight representation of a marginal tree
-}
-\details{
-This S3 class represents the bvtree which is a simple tree marginal representation
 }
 \section{Fields}{
 

@@ -2,13 +2,11 @@
 % Please edit documentation in R/utils.R
 \name{swfsim}
 \alias{swfsim}
-\title{The Structured Wright Fisher Model Output}
+\title{The Structured Wright Fisher Model Output
+This S3 class represents realization of the Discrete-Time Discrete-Loci Spatial Wright Fisher Malaria Model.}
 \description{
 The realization of the Discrete-Time Discrete-Loci Spatial Wright Fisher Malaria Model contains all of the information
 to create the ARG: each generation's parents, the resulting recombination events between parents, and the offspring haplotypes
-}
-\details{
-This S3 class represents realization of the Discrete-Time Discrete-Loci Spatial Wright Fisher Malaria Model.
 }
 \section{Fields}{
 

@@ -2,10 +2,8 @@
 % Please edit documentation in R/utils.R
 \name{argraph}
 \alias{argraph}
-\title{The Ancestral Recombination Graph}
+\title{The Ancestral Recombination Graph
+This S3 class represents the ARG from the realized simulation}
 \description{
-A list of \code{bvtree} for each discrete-loci, which constitutes the ARG
-}
-\details{
-This S3 class represents the ARG from the realized simulation
+A list of \code{bv_tree} for each discrete-loci, which constitutes the ARG
 }
