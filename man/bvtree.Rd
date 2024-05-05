@@ -4,7 +4,7 @@
 \alias{bvtree}
 \title{A Simplified Tree: bvtree}
 \description{
-The \class {bv_tree} class is a lightweight representation of a marginal tree
+The \code{bv_tree} class is a lightweight representation of a marginal tree
 }
 \details{
 This S3 class represents the bvtree which is a simple tree marginal representation

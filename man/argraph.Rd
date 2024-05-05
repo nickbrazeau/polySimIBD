@@ -4,7 +4,7 @@
 \alias{argraph}
 \title{The Ancestral Recombination Graph}
 \description{
-A list of \class{bvtree} for each discrete-loci, which constitutes the ARG
+A list of \code{bvtree} for each discrete-loci, which constitutes the ARG
 }
 \details{
 This S3 class represents the ARG from the realized simulation

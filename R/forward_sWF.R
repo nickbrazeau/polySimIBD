@@ -101,12 +101,10 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim,
 
 
 #' @title Get ancestral recombination graph from forward simulations
-#'
 #' @description Given an object \code{swf}, which is the result of forward
 #'   simulation using the function \code{sim_swf()}, walks backwards through the
 #'   ancestry and calculates the coalescent tree at every locus for the
 #'   specified hosts and/or haplotypes.
-#'
 #' @param swf result of forwards simulation using the function \code{sim_swf()}
 #' @param host_index a vector of target hosts. Defaults to all hosts
 #' @param haplo_index a list of target haplotypes within the hosts specified by
