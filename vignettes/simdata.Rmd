@@ -21,13 +21,10 @@ library(polySimIBD)
 ```
 
 # Overview
-After having reviewed the [Structured DTWF Malaria Model Overview Vignette](https://nickbrazeau.github.io/polySimIBD/articles/modframework_dldtstructuredwf.html) , you are ready to simulate some malaria genetic data! In the previous tutorial, we did not track within-host COI as we were working with at the "parasite-level". Unfortunately, malaria genetic data is usually complicated by polyclonality resulting in convoluted sequencing results. For example, in a polyclonal infection with a COI of 3, some reads will belong to parasite A, some to B, and finally, some to C. Deconvoluting these reads is challenging because MOI is a random variable for each host and there is stochastiticity in NGS platform read depth, read errors, etc. (although recent methodological advances have been made for phasing (see [Zhu et al. 2019](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6684230/) and inferences with unphased data are forthcoming).    
+While the discrete-loci, discrete-time spatial structured Wright Fisher model has its own output format, at times it may be beneficial to work with "traditional" genomic data formats. In this tutorial, we will use the model to simulate a infections - with multiple parasites, or with a COI > 1, in ten hosts. We will then will simulate "reads" from a subset of respective host "samples". Reads will produce allele depths for our variants (i.e. in VCF terminology, the AD and DP fields). For the purpose of this tutorial, we will force all sites to be biallelic.  
 
-Here, we will use the Structured Discrete-Loci, Discrete Time Wright Fisher model to simulate relatedness among parasites. We will then collapse parasites into a single sample with respect to host. Finally, we will simulate "reads" from our sample and extract our the allele depths for our variants (for those of you familiar with VCF terminology, the AD and DP fields). In this tutorial, we will force all sites to be biallelic.  
-
-
-# Simulating Data
-We have tried to make `DLDTsWF` extremely flexible by allowing the user to interact with individual parasites. However, this does require some thought when it comes to combining data within-hosts. Below, we simulate data (as before) for a population of parasites. We then create the ARG for those parasites that are within Host 1 and Host 2. Finally, we collapse the parasite haplotypes from host 1 and 2 into "sequencing read counts", respectively.    
+# Simulating Genomic "Reads" Data and VCFs 
+'polySimiIBD' allows the user to interact with individual parasites. As a result, this requires some thought when it comes to combining data within-hosts. Below, we simulate data (as before) for a population of parasites among ten hosts. We then create the ARG for those parasites that are within Host 1 and Host 2. Finally, we collapse the parasite haplotypes from host 1 and 2 into "sequencing read counts", respectively.    
 
 ```{r}
 set.seed(1)
@@ -119,3 +116,8 @@ newvcfR <- new("vcfR", meta = meta, fix = as.matrix(fix), gt = gt)
 ```
 
 **Reminder**, we leave it to the user to decide how to wrangle and combine this data per their project specifications! 
+
+# Tree Conversions
+Sepearately, `polySimIBD` provides the functionality to convert a \class{bvtree} from the \class{arggraph} into a [Newick tree]() 
+
+

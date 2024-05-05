@@ -1,8 +1,8 @@
 ---
-title: "Structured DTWF Malaria Model Overview"
+title: "DTDLsWF Malaria Model Overview"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Structured DTWF Malaria Model Overview}
+  %\VignetteIndexEntry{Discrete-Time Discrete-Loci Structured Wright Fisher Malaria Model Overview}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -33,7 +33,7 @@ In a similar framework, hosts can then be infected with monoclonal or polyclonal
 2. A single infectious bite transferring multiple haplotypes (Co-Transmission)
 
 <p align="center">
-![Schematic of the DL-DT sWF Malaria Model](https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/cotransmission_superinfxn.png){width=500px}
+![Schematic of the DT-DL sWF Malaria Model](https://raw.githubusercontent.com/nickbrazeau/polySimIBD/master/R_ignore/images/cotransmission_superinfxn.png){width=500px}
 </p>   
   
 
@@ -76,7 +76,7 @@ swfsim <- sim_swf(pos = seq(1, 1e3, 1e2),
 
 ```
   
-The discrete-loci, discrete-time structured Wright Fisher simulation outputs six objets: 
+The discrete-time, discrete-loci structured Wright Fisher simulation outputs six objets: 
 1. A vector of COIs, where each item in the vector is the number of parasites within a given host 
 2. A list of recombination blocks for each generation for each haplotype 
 3. The host and parental assignments for the "maternal" and "paternal" haplotype, respectively. 
@@ -91,7 +91,7 @@ Using the ancestry matrices produced above, we can derive the most recent common
 ARG <- get_arg(swfsim, host_index = c(1,2))
 ```
 
-The `get_arg` function takes the output from the discrete-loci, discrete-time structured Wright Fisher simulation above and produces `bv_trees`, an S4 class, for each loci.
+The `get_arg` function takes the output from the discrete-loci, discrete-time structured Wright Fisher simulation above and produces a  `bv_tree` for each loci.
 
 ### `bv_tree` Class
  The `bv_tree` class is a lightweight representation of a marginal tree. The `bv_tree` class contains three slots: 

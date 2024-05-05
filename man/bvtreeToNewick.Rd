@@ -15,7 +15,7 @@ bvtreeToNewick(bvtree, tlim = 10)
 Newick String
 }
 \description{
-Recursively converts \code{bvtree} to Newick tree format for compatibility with other downstream packages
+Recursively converts \code{bvtree} to Newick tree format for compatibility with other downstream packages. The output format is for all leafs to be named and distances, which are the coalescent times, are preserved. Additonally, clades have the total tree length explicitly stated versus the traditional iterative shorthand of some Newick examples.
 }
 \details{
 Note, the overall TMRCA is set to the \code{tlim}, which in Newick format looks inappropriately rooted.
