@@ -31,6 +31,12 @@
     <loc>/news/index.html</loc>
   </url>
   <url>
+    <loc>/reference/argraph.html</loc>
+  </url>
+  <url>
+    <loc>/reference/bvtree.html</loc>
+  </url>
+  <url>
     <loc>/reference/bvtreeToNewick.html</loc>
   </url>
   <url>
@@ -77,5 +83,8 @@
   </url>
   <url>
     <loc>/reference/subset_bvtree.html</loc>
+  </url>
+  <url>
+    <loc>/reference/swfsim.html</loc>
   </url>
 </urlset>

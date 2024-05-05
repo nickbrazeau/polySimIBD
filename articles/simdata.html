@@ -53,10 +53,10 @@
       <a href="../articles/orig_mod_framework.html">Original Model Framework</a>
     </li>
     <li>
-      <a href="../articles/simdata.html">Simulating Genomic Data</a>
+      <a href="../articles/spatial_extension.html">Spatial Extension</a>
     </li>
     <li>
-      <a href="../articles/spatial_extension.html">Spatial Extension</a>
+      <a href="../articles/simdata.html">Simulating Genomic Data</a>
     </li>
   </ul>
 </li>
@@ -99,37 +99,26 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>After having reviewed the <a href="https://nickbrazeau.github.io/polySimIBD/articles/modframework_dldtstructuredwf.html" class="external-link">Structured
-DTWF Malaria Model Overview Vignette</a> , you are ready to simulate
-some malaria genetic data! In the previous tutorial, we did not track
-within-host COI as we were working with at the “parasite-level”.
-Unfortunately, malaria genetic data is usually complicated by
-polyclonality resulting in convoluted sequencing results. For example,
-in a polyclonal infection with a COI of 3, some reads will belong to
-parasite A, some to B, and finally, some to C. Deconvoluting these reads
-is challenging because MOI is a random variable for each host and there
-is stochastiticity in NGS platform read depth, read errors, etc.
-(although recent methodological advances have been made for phasing (see
-<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6684230/" class="external-link">Zhu et
-al. 2019</a> and inferences with unphased data are forthcoming).</p>
-<p>Here, we will use the Structured Discrete-Loci, Discrete Time Wright
-Fisher model to simulate relatedness among parasites. We will then
-collapse parasites into a single sample with respect to host. Finally,
-we will simulate “reads” from our sample and extract our the allele
-depths for our variants (for those of you familiar with VCF terminology,
-the AD and DP fields). In this tutorial, we will force all sites to be
+<p>While the discrete-loci, discrete-time spatial structured Wright
+Fisher model has its own output format, at times it may be beneficial to
+work with “traditional” genomic data formats. In this tutorial, we will
+use the model to simulate a infections - with multiple parasites, or
+with a COI &gt; 1, in ten hosts. We will then will simulate “reads” from
+a subset of respective host “samples”. Reads will produce allele depths
+for our variants (i.e. in VCF terminology, the AD and DP fields). For
+the purpose of this tutorial, we will force all sites to be
 biallelic.</p>
 </div>
 <div class="section level2">
-<h2 id="simulating-data">Simulating Data<a class="anchor" aria-label="anchor" href="#simulating-data"></a>
+<h2 id="simulating-genomic-reads-data-and-vcfs">Simulating Genomic “Reads” Data and VCFs<a class="anchor" aria-label="anchor" href="#simulating-genomic-reads-data-and-vcfs"></a>
 </h2>
-<p>We have tried to make <code>DLDTsWF</code> extremely flexible by
-allowing the user to interact with individual parasites. However, this
-does require some thought when it comes to combining data within-hosts.
-Below, we simulate data (as before) for a population of parasites. We
-then create the ARG for those parasites that are within Host 1 and Host
-2. Finally, we collapse the parasite haplotypes from host 1 and 2 into
-“sequencing read counts”, respectively.</p>
+<p>‘polySimiIBD’ allows the user to interact with individual parasites.
+As a result, this requires some thought when it comes to combining data
+within-hosts. Below, we simulate data (as before) for a population of
+parasites among ten hosts. We then create the ARG for those parasites
+that are within Host 1 and Host 2. Finally, we collapse the parasite
+haplotypes from host 1 and 2 into “sequencing read counts”,
+respectively.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co"># define some parameters parameters</span></span>
@@ -147,12 +136,12 @@ then create the ARG for those parasites that are within Host 1 and Host
 <span>                              mean_coi <span class="op">=</span> <span class="va">mean_coi</span>,</span>
 <span>                              migr_mat <span class="op">=</span> <span class="fl">1</span>, <span class="co"># nonspatial</span></span>
 <span>                              tlim <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="co">#&gt; completed in 0.000159 seconds</span></span>
+<span><span class="co">#&gt; completed in 0.000183 seconds</span></span>
 <span></span>
 <span></span>
 <span><span class="co"># get ARG</span></span>
 <span><span class="va">ARG</span> <span class="op">&lt;-</span> <span class="fu">polySimIBD</span><span class="fu">::</span><span class="fu"><a href="../reference/get_arg.html">get_arg</a></span><span class="op">(</span><span class="va">swfsim</span><span class="op">)</span></span>
-<span><span class="co">#&gt; completed in 0.000111 seconds</span></span>
+<span><span class="co">#&gt; completed in 0.000109 seconds</span></span>
 <span></span>
 <span><span class="co"># layer on mutations</span></span>
 <span><span class="va">parasite.hapmat</span> <span class="op">&lt;-</span> <span class="fu">polySimIBD</span><span class="fu">::</span><span class="fu"><a href="../reference/layer_mutations_on_ARG.html">layer_mutations_on_ARG</a></span><span class="op">(</span>arg <span class="op">=</span> <span class="va">ARG</span>, mutationrate <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></code></pre></div>
@@ -226,6 +215,12 @@ to note, that we continue in a biallelic SNP framework after using the
 <span><span class="va">newvcfR</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="st">"vcfR"</span>, meta <span class="op">=</span> <span class="va">meta</span>, fix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">fix</span><span class="op">)</span>, gt <span class="op">=</span> <span class="va">gt</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Reminder</strong>, we leave it to the user to decide how to
 wrangle and combine this data per their project specifications!</p>
+</div>
+<div class="section level2">
+<h2 id="tree-conversions">Tree Conversions<a class="anchor" aria-label="anchor" href="#tree-conversions"></a>
+</h2>
+<p>Sepearately, <code>polySimIBD</code> provides the functionality to
+convert a from the into a <a href="">Newick tree</a></p>
 </div>
   </div>
 
