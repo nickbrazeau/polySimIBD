@@ -285,7 +285,7 @@ Rcpp::List get_bvibd_cpp(Rcpp::List args) {
   int n = host_index.size(); // number of haplotypes within hosts (cumulative)
 
   // objects for storing results
-  vector<bool> ibd_target_store(L);
+  vector<bool> ibd_target_store(L, false);
 
   // loop through loci
   for (int l = 0; l < L; ++l) {
@@ -294,19 +294,16 @@ Rcpp::List get_bvibd_cpp(Rcpp::List args) {
     vector<int> sample_host = host_index;
     vector<int> sample_haplo = haplo_index;
 
-    // initialise objects for storing coalescent events
-    vector<bool> coalesced(n, false);
-
     // loop through time from present going backwards
     for (int t = (tlim-1); t >= 1 ; --t) {
+      // skip already have IBD
+      if (ibd_target_store[l]) {
+        continue;
+      }
 
       // loop through samples
       for (int i = 0; i < n; ++i) {
 
-        // skip already coalesced
-        if (coalesced[i]) {
-          continue;
-        }
 
         // define for convenience
         int this_host = sample_host[i];
