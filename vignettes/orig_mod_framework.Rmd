@@ -102,18 +102,17 @@ The `get_arg` function takes the output from the discrete-loci, discrete-time st
 
 You may have noticed that our coalescent trees (`bvtree` class) always coalesce "right-to-left". This is intentional and an approach to optimize looping through ancestries to get the ARG.  
   
-# Adding Mutations 
-Finally, we can layer mutations on to each marginal tree (and the overall ARG) based on the total branch length of the coalescent tree and the user specified per-recombination block mutation rate.
-```{r}
-hapmat <- polySimIBD::layer_mutations_on_ARG(ARG, mutationrate = 0.1)
-hapmat <- cbind(POS = swfsim$pos, hapmat)
-colnames(hapmat) <- c("POS", paste0("parasite", 1:(ncol(hapmat)-1)))
-knitr::kable(hapmat)
+# Tree Conversions
+Separately, `polySimIBD` provides the functionality to convert a `bvtree` from the `arggraph` into a [Newick tree](https://en.wikipedia.org/wiki/Newick_format). This allows use to export results into other packages, such as[`ape`](https://cran.r-project.org/web/packages/ape/index.html). The conversion is limited to a single `bvtree` at a time, but this can easily be leveraged for an ARG with an iterative function. Note, you must manually enter the `tlim`, or the maximum number of generations considered in your simulation.
+```{r, eval=FALSE}
+bvtreeToNewick(bvtree = ARG[[1]], tlim = 10) 
 ```
 
 
 # Conclusion
-Up until this point, we have ignored within host COI and have only analyzed parasites as independent infections. In the next vignette [Simulating Data](https://nickbrazeau.github.io/polySimIBD/articles/simdata.html), we will explore how to convert our marginal tree and forward model into genomic data.   
+Up until this point, we have ignored spatial considerations and migration of parasites between demes. In the next section, we will relax this assumption and analyze how space effects parasite genomic dynamics. 
+
+  
   
 
 

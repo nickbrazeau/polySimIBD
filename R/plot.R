@@ -30,6 +30,28 @@ more_colors <- function (n = 5, raw_cols = RColorBrewer::brewer.pal(10, "Paired"
 }
 
 
+#' @title Extract haplotypes from ARG
+#' @param arg set of bvtrees
+#' @return hapmat numeric matrix, such that each loci is represented by a row and an individual parasite (haplotype) is represented by a column   
+#' @export
+extract_haplotype_matrix <- function(arg){
+  
+  # convert trees into matrix of alleles
+  # each column is therefore a haplotype since we consider parasite by parasite
+  hap_mat <- t(mapply(function(x) {
+    c <- x@c
+    ret <- c
+    ret[ret == -1] <- 1:sum(ret == -1)
+    while (any(c != -1)) {
+      w <- which(c == -1)
+      c[-w] <- c[c[-w]+1]
+      ret[-w] <- ret[ret[-w]+1]
+    }
+    return(ret)
+  }, arg))
+  return(hap_mat)
+}
+
 #' @title Plot Barcodes
 #' 
 #' @description Produces a ggplot of barcode counts, in which width
