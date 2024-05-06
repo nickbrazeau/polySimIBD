@@ -16,9 +16,6 @@
     <loc>/articles/orig_mod_framework.html</loc>
   </url>
   <url>
-    <loc>/articles/simdata.html</loc>
-  </url>
-  <url>
     <loc>/articles/spatial_extension.html</loc>
   </url>
   <url>
@@ -58,9 +55,6 @@
     <loc>/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/layer_mutations_on_ARG.html</loc>
-  </url>
-  <url>
     <loc>/reference/pipe.html</loc>
   </url>
   <url>
@@ -68,15 +62,6 @@
   </url>
   <url>
     <loc>/reference/polySimIBD.html</loc>
-  </url>
-  <url>
-    <loc>/reference/rbetabinom.html</loc>
-  </url>
-  <url>
-    <loc>/reference/rdirichlet.html</loc>
-  </url>
-  <url>
-    <loc>/reference/sim_biallelic.html</loc>
   </url>
   <url>
     <loc>/reference/sim_swf.html</loc>
