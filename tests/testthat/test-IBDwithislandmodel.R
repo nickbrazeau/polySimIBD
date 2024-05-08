@@ -1,4 +1,4 @@
-test_that("island model returns two islands", {
+test_that("Test IBD: island model returns two islands", {
   # vectors must be ordered for population A and B
   demesizes <- c(10, 15)
   coimeans <- c(1.25, 1.25)
@@ -18,7 +18,7 @@ test_that("island model returns two islands", {
     tibble::as_tibble(., .name_repair = "minimal") %>% 
     magrittr::set_colnames(c("smpl1", "smpl2")) %>% 
     dplyr::mutate(pairwiseIBD = purrr::map2_dbl(.x = smpl1, .y = smpl2, .f = function(x,  y){
-        polySimIBD::get_pairwise_bv_ibd(swf = swf, host_index = c(x,y))
+        polySimIBD::get_bvibd(swf = swf, host_index = c(x,y))
     }))
   
   # subset to island A for smpl1 and island B for smpl 2

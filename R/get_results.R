@@ -1,15 +1,22 @@
 
-#------------------------------------------------
 #' internal class
 #' @noRd
 setClass("bvtree",
          slots=list(c="numeric", t="numeric", z="numeric"))
 
-#------------------------------------------------
+
 #' @title Extract Effective COI by Loci from SWF Simulation for a Single Host
 #' @inheritParams get_arg
-#' @details Only accepts a single host 
-#' @description TODO 
+#' @description From a single host in a SWF Simulation, extract the effective COI 
+#'     for loci within the ARG. Effective COI is defined as the number of non-coalesced genomes 
+#'     at the end of \code{tlim}. For example, if a host contains five strains (i.e. five parasites),
+#'     then at loci 1 we can determine "mini" coalescent trees have occurred. If the effective COI is
+#'     2, then three strains have formed one coalescent tree and two strains have formed a separate 
+#'     coalescent tree. Notably, this framework is independent for each recombination event 
+#'     (versus loci which are just genetic markers). This means, if loci 10 is located within a different 
+#'     recombination block than loci 1 - and therefore is a separate entry in the ARG - we expect the 
+#'     effective COI to be (potentially) different.
+#' @details Function limited to a single host per "realization" 
 #' @return vector of effective COI by loci
 #' @export
 get_effective_coi <- function(swf, host_index = NULL) {
@@ -28,17 +35,27 @@ get_effective_coi <- function(swf, host_index = NULL) {
   return(effCOI)
 }
 
-#------------------------------------------------
 #' @title Calculate Within-Host IBD 
 #' @inheritParams get_arg
-#' @details Only accepts a single host 
-#' @description TODO
+#' @description The within-host IBD is calculated as the number of strains that have 
+#'     coalesced within the \code{tlim} at each loci divided by the original (i.e. not effective)
+#'     COI. As an example, consider that there are three strains (i.e. parasites) within a host and
+#'     that the parasite genome has ten equidistant loci with a single recombination breakpoint at loci 5 (i.e.).
+#'     Within this framework, we consider at loci 1:5 if 2/3 strains have coalesced, the 
+#'     within-host IBD for this section is 2/3. Next, for loci 6:10 if no strains have coalesced
+#'     the within-host IBD is 0. Combining these results with-weighting for respective length/portion of the 
+#'     genome (weights here equal and therefore negligible) the overall within-host IBD is: 
+#'     \deqn{\frac{2 + 0}{Host_{COI} - 1}}, where one is subtracted from the Host-COI for self-comparison,
+#'     wwhich gives (3-1) + (3-1) (for each loci). Note, because we consider self comparisons, the 
+#'     denominator is always less than the true COI.
+#' @details Function limited to a single host per "realization" 
 #' @return double of within-host IBD
 #' @export
 get_within_ibd <- function(swf, host_index = NULL) {
   # checks
   goodegg::assert_class(swf, "swfsim")
   goodegg::assert_single_pos_int(host_index)
+  goodegg::assert_gr(swf$coi[[host_index]], 1, message = "Cannot perform within IBD calculation when the host's COI is 1")
   # get ARG from swf and host_index
   # need to call ARG again to make extraction straightforward (eg don't know what user did to ARG upstream)
   arg <- polySimIBD::get_arg(swf = swf, host_index = host_index)
@@ -46,127 +63,9 @@ get_within_ibd <- function(swf, host_index = NULL) {
   conn <- purrr::map(arg, "c")
   # get within host IBD per loci 
   numerator <- sapply(conn, function(x){sum(x != -1)})
-  # -1 here for self comparison
-  denom <-  (swf$coi[[host_index]]-1)
-  # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info
-  wi <- diff(swf$pos)/sum(diff(swf$pos))
+  denom <-  (swf$coi[[host_index]]-1) # -1 here for self comparison
+  wi <- diff(swf$pos)/sum(diff(swf$pos))   # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info
   # out
   wthnIBD <-sum( (numerator[1:(length(numerator) - 1)] / denom) * wi )
   return(wthnIBD)
 }
-
-#------------------------------------------------
-#' @title Calculate Between Host (pairwise) IBD by Interhost Relatedness
-#' @inheritParams get_arg
-#' @description Between host, or pairwise, IBD as presented in 
-#' Verity et al. 2020 (erity realized ibd (PMC7192906). The calculation 
-#' ignores intra-host relatedness and does not account for COI. Instead, 
-#' if there is any recent coalescence between any of the strains between 
-#' host 1 and host 2, the locus is condered to be IBD
-#' @return double of between-host IBD
-#' @export
-get_pairwise_bv_ibd <- function(swf, host_index = NULL) {
-  # check inputs and define defaults
-  goodegg::assert_class(swf, "swfsim")
-  goodegg::assert_vector(host_index)
-  goodegg::assert_noduplicates(host_index)
-  goodegg::assert_pos_int(host_index, zero_allowed = FALSE)
-  if(length(host_index) != 2) {
-    stop("host_index must be of length 2 for pairwise comparison", call. = FALSE)
-  }
-  # get ARG from swf and host_index
-  # need to call ARG again to make extraction straightforward (eg don't know what user did to ARG upstream)
-  arg <- polySimIBD::get_arg(swf = swf, host_index = host_index)
-  # extract connectins 
-  conn <- purrr::map(arg, "c")
-  # subset to unique loci for speed 
-  uniconn <- unique(conn)
-  # find the locations of unique loci locations for later expansion
-  conn_indices <- get_conn_intervals(uniqueconn = uniconn, allconn = conn)
-  
-  # get between connections per locus for pair 
-  # bvtrees point left --  ignring w/in ibd - if any between ibd, then locus is ibd 
-  get_loci_pairwise_ibd <- function(conni, this_coi) {
-    smpl1con <- conni[1:this_coi[1]]
-    smpl2con <- conni[(this_coi[1]+1):(cumsum(this_coi)[2])]
-    # get IBD connections between 1 and 2
-    pwconn <- which(smpl2con %in% 0:(this_coi[1]-1) )
-    # if any, IBD
-    return(sum(pwconn) >= 1)
-  }
-  
-  # iterate through/apply function
-  lociIBD <- purrr::map_dbl(.x = uniconn,
-                            .f = get_loci_pairwise_ibd, this_coi = swf$coi[host_index])
-  # expand out unique loci intervals from above
-  numerator <- lociIBD[conn_indices]
-  
-  # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info - ie burn first loci
-  numerator <- numerator[-1]
-  wi <- diff(swf$pos)/sum(diff(swf$pos))
-  # weighted average (each loci, denom is 1)
-  return( sum( numerator*wi ) )
-  
-}
-
-
-#------------------------------------------------
-#' @title Get Connection Intervals 
-#' @description Index where unique connections are in the entire genome for proper weighting
-#' @details Internal function, not intended for general use
-#' @param uniqueconn unique bvtree connections from the ARG
-#' @param allconn all bvtree connections from the ARG
-#' @export
-
-get_conn_intervals <- function(uniqueconn, allconn){
-  names(uniqueconn) <- 1:length(uniqueconn)
-  intervals <- lapply(uniqueconn,
-                      function(uni){
-                        return(sapply(allconn, function(x){paste(uni, collapse = "") == paste(x, collapse = "")}))})
-  mint <- rep(NA, length(allconn))
-  for(i in 1:length(intervals)) {
-    mint[intervals[[i]]] <- names(intervals)[i]
-  }
-  return(as.numeric(mint))
-}
-
-#------------------------------------------------
-#' @title Identify sub-trees recursively from root 
-#' @param root internal identification of root indices 
-#' @param c connections from bvtree slot
-#' @description Internal function: Recursively loop through tree starting with root to find haplo-indices in the "bvtrees c slot" that are connected
-#' @details Internal function, not intended for general use
-#' @export
-get_conn_from_root <- function(root, c) {
-  # init
-  tree <- newroot <- root
-  #   
-  while(length(newroot) != 0) {
-    newroot <- which(c %in% (newroot-1)) # match c value and update new root 
-    tree <- c(tree, newroot)
-  }
-  # out
-  return(tree)
-}
-
-#------------------------------------------------
-#' @title Find relevant connections for within IBD calculation
-#' @inheritParams bvtree
-#' @description Internal function: subset bvtree "c" slot to haplo-indices that contain a between sample connections and therefore contribute to within-sample IBD in a pairwise comparison 
-#' @noMd
-#' @noRd
-
-get_withinIBD_bvtree_subset <- function(c, coi1, coi2) {
-  # find roots
-  roots <- which(c == -1)
-  # subset to subtree based on roots (ie extract out tree that is based connected to root)
-  subset_trees <- lapply(roots, get_conn_from_root, c = c)
-  # get btwn conn
-  btwnconn <- which(c[(coi1+1):(coi2+coi1)] %in% 0:(coi1-1)) + coi1
-  
-  # drop spmls w/ no btwn 
-  subset_trees <- subset_trees[ sapply(subset_trees, function(x, btwn){any(x %in% btwn)}, btwn = btwnconn) ]
-  # out
-  return(sort(unique(unlist(subset_trees))))
-}
-

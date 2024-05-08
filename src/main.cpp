@@ -105,7 +105,7 @@ Rcpp::List sim_swf_cpp(Rcpp::List args) {
       parent_haplo1[t][i] = vector<int>(this_coi);
       parent_haplo2[t][i] = vector<int>(this_coi);
 
-      // loop through all haplotypes in this individual
+      // loop through all haplotypes in this individual and fill in preallocations
       for (int j = 0; j < this_coi; ++j) {
         recomb[t][i][j] = pop[t][i].haplo_vec[j].parent_vec;
         parent_host1[t][i][j] = pop[t][i].haplo_vec[j].pat_ind;
@@ -259,31 +259,85 @@ Rcpp::List subset_bvtree_cpp(vector<int> c,
 }
 
 
-//------------------------------------------------
-// efficient loop through ARG backwards in time to calculate IBD
-Rcpp::List calc_between_coi_IBD_cpp(Rcpp::List args) {
-  // extract arguments
-  vector<vector<int>> conn = rcpp_to_matrix_int(args["conn"]);
-  vector<int> host_haplo_cnt = rcpp_to_vector_int(args["host_haplo_cnt"]);
-  int haptot = host_haplo_cnt[0] + host_haplo_cnt[1];
-  int L = conn.size(); // loci here are unique from upstream R filtering
 
-  // initialise IBD object for results
-  vector<int> ibd_numerator(L, 0);
+
+
+
+//------------------------------------------------
+// walk back through ancestry, find coalescent events that are summarized to IBD events
+Rcpp::List get_bvibd_cpp(Rcpp::List args) {
+
+  // start timer
+  chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
+
+  // extract arguments
+  vector<int> coi_final = rcpp_to_vector_int(args["coi"]);
+  vector<vector<vector<vector<int>>>> recomb = rcpp_to_4d_int(args["recomb"]);
+  vector<vector<vector<int>>> parent_host1 = rcpp_to_array_int(args["parent_host1"]);
+  vector<vector<vector<int>>> parent_host2 = rcpp_to_array_int(args["parent_host2"]);
+  vector<vector<vector<int>>> parent_haplo1 = rcpp_to_array_int(args["parent_haplo1"]);
+  vector<vector<vector<int>>> parent_haplo2 = rcpp_to_array_int(args["parent_haplo2"]);
+  vector<int> host_index = rcpp_to_vector_int(args["host_index"]);
+  vector<int> haplo_index = rcpp_to_vector_int(args["haplo_index"]);
+  int L = recomb[0][0][0].size();
+  int tlim = recomb.size();
+  int coi1 = coi_final[host_index[0]]; // COI from first host
+  int n = host_index.size(); // number of haplotypes within hosts (cumulative)
+
+  // objects for storing results
+  vector<bool> ibd_target_store(L, false);
 
   // loop through loci
   for (int l = 0; l < L; ++l) {
-    // always only two hosts for between IBD comparison
-    // NB default only looks right to left
-    for (int b = host_haplo_cnt[0]; b < haptot; ++b) { // loop through sample two
-      for (int a = 0; a < host_haplo_cnt[0]; ++a) { // to determine if connectin in smpl 1 (c = 0:(COI[1]-1))
-        if (a == conn[l][b]) {
-          ibd_numerator[l] = +1;
-        }
+
+    // initialise ancestry tracking
+    vector<int> sample_host = host_index;
+    vector<int> sample_haplo = haplo_index;
+
+    // loop through time from present going backwards
+    for (int t = (tlim-1); t >= 1 ; --t) {
+      // skip already have IBD
+      if (ibd_target_store[l]) {
+        continue;
       }
-    } // end pairwise compare loop
-  } // end loci loop 
+
+      // loop through samples
+      for (int i = 0; i < n; ++i) {
+
+
+        // define for convenience
+        int this_host = sample_host[i];
+        int this_haplo = sample_haplo[i];
+
+        // update ancestry tracking for all (easier/faster)
+        if (recomb[t][this_host][this_haplo][l]) {
+          sample_host[i] = parent_host1[t][this_host][this_haplo];
+          sample_haplo[i] = parent_haplo1[t][this_host][this_haplo];
+        } else {
+          sample_host[i] = parent_host2[t][this_host][this_haplo];
+          sample_haplo[i] = parent_haplo2[t][this_host][this_haplo];
+        }
+
+      } // end sample loop
+
+      // check for between host coalescence
+      for (int i = 0; i < coi1; ++i) {
+        for (int j = coi1; j < n; ++j) {
+          if (sample_host[i] == sample_host[j]) {
+            if (sample_haplo[i] == sample_haplo[j]) {
+              // ibd event
+              ibd_target_store[l] = true;
+            }
+          }
+        } // end j coal loop
+      }  // end i coal loop
+
+    }  // end t loop
+  }  // end l loop
+
+  // end timer
+  chrono_timer(t1);
 
   // return as list
-  return Rcpp::List::create(Rcpp::Named("ibd_numerator") = ibd_numerator);
+  return Rcpp::List::create(Rcpp::Named("ibd_target") = ibd_target_store);
 }

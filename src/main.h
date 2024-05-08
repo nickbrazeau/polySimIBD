@@ -19,4 +19,4 @@ Rcpp::List subset_bvtree_cpp(std::vector<int> c,
 
 //------------------------------------------------
 // [[Rcpp::export]]
-Rcpp::List calc_between_coi_IBD_cpp(Rcpp::List args);
+Rcpp::List get_bvibd_cpp(Rcpp::List args);
