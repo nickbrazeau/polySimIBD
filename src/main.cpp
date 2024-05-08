@@ -296,7 +296,7 @@ Rcpp::List get_bvibd_cpp(Rcpp::List args) {
 
     // loop through time from present going backwards
     for (int t = (tlim-1); t >= 1 ; --t) {
-      // skip already have IBD
+      // skip already have IBD - bv ibd says any IBD at any time point between any pairs
       if (ibd_target_store[l]) {
         continue;
       }
