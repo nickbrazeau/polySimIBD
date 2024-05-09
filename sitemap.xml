@@ -37,9 +37,6 @@
     <loc>/reference/bvtreeToNewick.html</loc>
   </url>
   <url>
-    <loc>/reference/extract_haplotype_matrix.html</loc>
-  </url>
-  <url>
     <loc>/reference/get_arg.html</loc>
   </url>
   <url>
@@ -56,9 +53,6 @@
   </url>
   <url>
     <loc>/reference/pipe.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plot_barcodes.html</loc>
   </url>
   <url>
     <loc>/reference/polySimIBD.html</loc>
