@@ -8,7 +8,7 @@ test_that("more color for plot", {
 test_that("check plot of barcodes from hapmat", {
   # ISLAND MODEL
   demesizes <- c(10, 15)
-  coimeans <- c(1, 1)
+  coimeans <- c(5, 5)
   m <- c(0.25, 0.25)
   migr_dist_mat <- matrix(0, ncol = 2, nrow = 2)
   diag(migr_dist_mat) <- 100
