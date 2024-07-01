@@ -1,9 +1,9 @@
 #------------------------------------------------
-#' @title Structured Wright Fisher Simulator for Malarai Genetics
+#' @title Structured Wright Fisher Simulator for Malaria Genetics
 #'
 #' @description Unique features of the malaria life-cycle and transmission
 #'   dynamics requires extensions of typical population genetic simulators.
-#'   Using a discrete-loci, discrete-time structured Wright Fisher framework, we
+#'   Using a spatial discrete-loci, discrete-time structured Wright Fisher model, we
 #'   simulate malaria population genetics forwards in time. Users are then able
 #'   to capture the full Ancestral Recombination Graph.
 #'

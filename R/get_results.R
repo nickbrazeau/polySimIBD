@@ -9,13 +9,8 @@ setClass("bvtree",
 #' @inheritParams get_arg
 #' @description From a single host in a SWF Simulation, extract the effective COI 
 #'     for loci within the ARG. Effective COI is defined as the number of non-coalesced genomes 
-#'     at the end of \code{tlim}. For example, if a host contains five strains (i.e. five parasites),
-#'     then at loci 1 we can determine "mini" coalescent trees have occurred. If the effective COI is
-#'     2, then three strains have formed one coalescent tree and two strains have formed a separate 
-#'     coalescent tree. Notably, this framework is independent for each recombination event 
-#'     (versus loci which are just genetic markers). This means, if loci 10 is located within a different 
-#'     recombination block than loci 1 - and therefore is a separate entry in the ARG - we expect the 
-#'     effective COI to be (potentially) different.
+#'     at the end of \code{tlim}. Note, this framework is an independent process for each recombination event 
+#'     and thus will vary along the simulated genome (but not necessarily by locus).  
 #' @details Function limited to a single host per "realization" 
 #' @return vector of effective COI by loci
 #' @export
@@ -44,9 +39,9 @@ get_effective_coi <- function(swf, host_index = NULL) {
 #'     Within this framework, we consider at loci 1:5 if 2/3 strains have coalesced, the 
 #'     within-host IBD for this section is 2/3. Next, for loci 6:10 if no strains have coalesced
 #'     the within-host IBD is 0. Combining these results with-weighting for respective length/portion of the 
-#'     genome (weights here equal and therefore negligible) the overall within-host IBD is: 
+#'     genome (weights here are equal and therefore negligible) the overall within-host IBD is: 
 #'     \deqn{\frac{2 + 0}{Host_{COI} - 1}}, where one is subtracted from the Host-COI for self-comparison,
-#'     wwhich gives (3-1) + (3-1) (for each loci). Note, because we consider self comparisons, the 
+#'     which gives (3-1) + (3-1) (for each loci). Note, because we consider self comparisons, the 
 #'     denominator is always less than the true COI.
 #' @details Function limited to a single host per "realization" 
 #' @return double of within-host IBD

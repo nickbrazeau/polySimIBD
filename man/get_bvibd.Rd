@@ -12,11 +12,15 @@ get_bvibd(swf, host_index = NULL, haplo_index = NULL)
 \item{host_index}{a vector of target hosts. Defaults to all hosts}
 
 \item{haplo_index}{a list of target haplotypes within the hosts specified by
-\code{host_index}. Defaults to all haplotypes within the specified hosts}
+\code{host_index}. Defaults to all haplotypes within the specified hosts.}
 }
 \description{
 Given an object \code{swf}, which is the result of forward
 simulation using the function \code{sim_swf()}, walks backwards through the
-ancestry and calculates the between host identity by descent. Calculation is
-based on \cite{Verity et. al 2020, Nat Comms, PMC7192906}.
+ancestry and calculate the between host identity by descent. The IBD
+calculation is based on \cite{Verity et. al 2020, Nat Comms, PMC7192906} and
+assumes relatedness if there are any IBD among the haplotypes between hosts
+at a given loci (i.e. a loci is considered to be in IBD if there is any between
+host IBD among the strains, regardless of COI. This means that as COI increases,
+IBD may be overestimated, which has been shown to be a conservative estimand).
 }

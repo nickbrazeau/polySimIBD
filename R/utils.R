@@ -12,7 +12,7 @@ NULL
 
 
 #' The Structured Wright Fisher Model Output
-#' This S3 class represents realization of the Discrete-Time Discrete-Loci Spatial Wright Fisher Malaria Model.
+#' This S3 class represents realization of the Spatial Discrete-Time Discrete-Loci Structured Wright Fisher Malaria Model.
 #' @name swfsim
 #' @field pos vector; the genomic coordinates for chromosome and position of the sites
 #' @field coi vector; the COI of each host 
@@ -35,7 +35,7 @@ NULL
 
 
 #' A Simplified Tree: bvtree 
-#' This S3 class represents the bvtree which is a simple tree marginal representation  
+#' This S3 class represents the bvtree which is a simple marginal tree representation  
 #' @name bvtree
 #' @field c vector; the node connection for each haplotype (each haplotype is an element in a vector)
 #' @field t vector; the timing of the node connection (time to MRCA)

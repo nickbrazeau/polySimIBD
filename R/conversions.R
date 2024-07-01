@@ -1,8 +1,8 @@
 #' @title Convert `bvtree` to Newick Tree Format
 #' @param bvtree S3 class; internal class for the `polySimIBD`: package \code{bvtree}
 #' @inheritParams sim_swf
-#' @description Recursively converts \code{bvtree} to Newick tree format for compatibility with other downstream packages. The output format is for all leafs to be named and distances, which are the coalescent times, are preserved. Additonally, clades have the total tree length explicitly stated versus the traditional iterative shorthand of some Newick examples. 
-#' @details Note, the overall TMRCA is set to the \code{tlim}, which in Newick format looks inappropriately rooted.
+#' @description Recursively converts \code{bvtree} to Newick tree format for compatibility with other downstream packages. The output format named leafs with distances that correspond to coalescent times. Additionally, clades have the total tree length explicitly (versus the acceptable Newick shorthand without total length). 
+#' @details Note, the overall time to the most recent common ancestor (TMRCA) is set to the \code{tlim}, which in Newick format looks inappropriately rooted.
 #' @details Note, the function does not "know" the original \code{tlim} that was specified in the forward-simulation, and thus must be re-stated by the user.
 #' @returns Newick String 
 #' @export

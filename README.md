@@ -4,11 +4,13 @@
 [![R-CMD-check](https://github.com/nickbrazeau/polySimIBD/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/nickbrazeau/polySimIBD/actions/workflows/R-CMD-check.yaml)
 [![Code Coverage](https://github.com/nickbrazeau/polySimIBD/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/nickbrazeau/polySimIBD/actions/workflows/test-coverage.yaml)
 <!-- badges: end -->
+
+
 The goal of `polySimIBD` is to perform forwards in-time simulation of malaria population genetics. The model uses a spatial discrete-time, discrete-loci structured Wright Fisher approximation to account for (simplified) malaria transmission dynamics.   
 
 
 ## Development
-:warning: This project is under active development. As a result, parameter names and behaviors as well as output file formats may change. Releases will be noted in the "News" with any lack of backwards compatibility indicated by a full [version number change](https://r-pkgs.org/release.html#release-version).
+:warning: This project is under active development. As a result, parameter names and behaviors as well as output file formats may change. Releases will be noted in the "News" [version number change](https://r-pkgs.org/release.html#release-version).
 
 
 ## Installation & Use
