@@ -2,6 +2,7 @@
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/nickbrazeau/polySimIBD/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/nickbrazeau/polySimIBD/actions/workflows/R-CMD-check.yaml)
+[![CodeFactor](https://www.codefactor.io/repository/github/nickbrazeau/polysimibd/badge/master)](https://www.codefactor.io/repository/github/nickbrazeau/polysimibd/overview/master)
 [![Code Coverage](https://github.com/nickbrazeau/polySimIBD/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/nickbrazeau/polySimIBD/actions/workflows/test-coverage.yaml)
 <!-- badges: end -->
 
