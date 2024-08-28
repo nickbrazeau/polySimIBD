@@ -21,7 +21,7 @@ void Host::init(double mean_coi, int L) {
 }
 
 //------------------------------------------------
-// draws parents of every haplotype 
+// draws parents of every haplotype
 void Host::draw(int i, int Ntot,
                 double m, const vector<Host> &prev_pop,
                 const vector<double> &odd_prob, int L,
@@ -32,7 +32,7 @@ void Host::draw(int i, int Ntot,
   for (int j = 0; j < coi; ++j) {
 
     // draw deme to sample parental host and haplotypes
-    int this_deme = sample1(mig_mat_prob);
+    int this_deme = sample1(mig_mat_prob,1.0);
 
     // index demes to properly account for which host in N we are considering
     int deme_start = 0;
