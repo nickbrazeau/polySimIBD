@@ -1,69 +1,25 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/articles/installation.html</loc>
-  </url>
-  <url>
-    <loc>/articles/orig_mod_framework.html</loc>
-  </url>
-  <url>
-    <loc>/articles/spatial_extension.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/news/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/argraph.html</loc>
-  </url>
-  <url>
-    <loc>/reference/bvtree.html</loc>
-  </url>
-  <url>
-    <loc>/reference/bvtreeToNewick.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_arg.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_bvibd.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_effective_coi.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_within_ibd.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/pipe.html</loc>
-  </url>
-  <url>
-    <loc>/reference/polySimIBD.html</loc>
-  </url>
-  <url>
-    <loc>/reference/sim_swf.html</loc>
-  </url>
-  <url>
-    <loc>/reference/subset_bvtree.html</loc>
-  </url>
-  <url>
-    <loc>/reference/swfsim.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/LICENSE-text.html</loc></url>
+<url><loc>/articles/index.html</loc></url>
+<url><loc>/articles/installation.html</loc></url>
+<url><loc>/articles/orig_mod_framework.html</loc></url>
+<url><loc>/articles/spatial_extension.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/news/index.html</loc></url>
+<url><loc>/reference/argraph.html</loc></url>
+<url><loc>/reference/bvtree.html</loc></url>
+<url><loc>/reference/bvtreeToNewick.html</loc></url>
+<url><loc>/reference/get_arg.html</loc></url>
+<url><loc>/reference/get_bvibd.html</loc></url>
+<url><loc>/reference/get_effective_coi.html</loc></url>
+<url><loc>/reference/get_within_ibd.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/pipe.html</loc></url>
+<url><loc>/reference/polySimIBD.html</loc></url>
+<url><loc>/reference/sim_swf.html</loc></url>
+<url><loc>/reference/subset_bvtree.html</loc></url>
+<url><loc>/reference/swfsim.html</loc></url>
 </urlset>
+

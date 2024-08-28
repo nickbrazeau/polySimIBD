@@ -12,14 +12,13 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Extension of Structured Model for Spacee">
-<meta property="og:description" content="polySimIBD">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -42,7 +41,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Vignettes
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -68,7 +67,7 @@
 <li>
   <a href="https://github.com/nickbrazeau/polySimIBD" class="external-link">
     <span class="fa fa-github"></span>
-     
+
   </a>
 </li>
       </ul>
@@ -79,7 +78,7 @@
 </div>
 <!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
@@ -87,7 +86,7 @@
       <h1 data-toc-skip>Extension of Structured Model for Spacee</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/nickbrazeau/polySimIBD/blob/HEAD/vignettes/spatial_extension.Rmd" class="external-link"><code>vignettes/spatial_extension.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nickbrazeau/polySimIBD/blob/master/vignettes/spatial_extension.Rmd" class="external-link"><code>vignettes/spatial_extension.Rmd</code></a></small>
       <div class="hidden name"><code>spatial_extension.Rmd</code></div>
 
     </div>
@@ -124,27 +123,43 @@ Aydemir, Brazeau <em>et al.</em> Nat Comms 2020 (PMC7192906)</a>. The
 spatial extension to the model is described in <a href="">Brazeau <em>et
 al.</em> Biorxiv</a>.</p>
 <p>In brief, we assume that each deme (<em>hereafter</em> macrodeme) is
-a subpopulation within a very large population (<span class="math inline">\(\iota \in \nu\)</span>, where <span class="math inline">\(\iota\)</span> is an individual macrodeme and
-<span class="math inline">\(\nu\)</span> is the total number of
-macrodemes in the entire population) and that each macrodeme represents
-a collection of individual hosts. Then, as before, let each individual
-host be represented by a deme within a given macrodeme (<span class="math inline">\(i \in N_{\iota}\)</span>, where <span class="math inline">\(i\)</span> is an individual host and <span class="math inline">\(N_{\iota}\)</span> is the total host population
-for that macrodeme).</p>
-<p>We then allow the <span class="math inline">\(j\)</span> parasites
-(that reside within the host deme) to mate at random with the previous
-generation of parasites (<span class="math inline">\(t_{1-}\)</span>)
+a subpopulation within a very large population
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ι</mi><mo>∈</mo><mi>ν</mi></mrow><annotation encoding="application/x-tex">\iota \in \nu</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ι</mi><annotation encoding="application/x-tex">\iota</annotation></semantics></math>
+is an individual macrodeme and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ν</mi><annotation encoding="application/x-tex">\nu</annotation></semantics></math>
+is the total number of macrodemes in the entire population) and that
+each macrodeme represents a collection of individual hosts. Then, as
+before, let each individual host be represented by a deme within a given
+macrodeme
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>∈</mo><msub><mi>N</mi><mi>ι</mi></msub></mrow><annotation encoding="application/x-tex">i \in N_{\iota}</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+is an individual host and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>ι</mi></msub><annotation encoding="application/x-tex">N_{\iota}</annotation></semantics></math>
+is the total host population for that macrodeme).</p>
+<p>We then allow the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+parasites (that reside within the host deme) to mate at random with the
+previous generation of parasites
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>t</mi><mrow><mn>1</mn><mo>−</mo></mrow></msub><annotation encoding="application/x-tex">t_{1-}</annotation></semantics></math>)
 and produce a large number of parasite progeny. During mating, genetic
 recombination has the potential to occur based on the length of the
-genome and the recombination rate, <span class="math inline">\(\rho\)</span>. Progeny are then allowed to move to
-a new macrodeme or stay in the current macrodeme based on the migration
-matrix, <span class="math inline">\(\mathbf{M}\)</span>. Within a given
-macrodeme, the progeny are then allowed migrate to a new host or stay
-within the same host with a probability of <span class="math inline">\(\frac{m}{N_{\iota}}\)</span>. Finally - as before
-- progeny are culled down to a smaller number of parasites per host by
-drawing from a Poisson distribution with a mean COI. This process
-produces the next generation of parasites within hosts at given discrete
-locations. In essence, the non-spatial and spatial simulator only differ
-by an additional hierarchical level of spatial “macrodemes”.</p>
+genome and the recombination rate,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ρ</mi><annotation encoding="application/x-tex">\rho</annotation></semantics></math>.
+Progeny are then allowed to move to a new macrodeme or stay in the
+current macrodeme based on the migration matrix,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐌</mi><annotation encoding="application/x-tex">\mathbf{M}</annotation></semantics></math>.
+Within a given macrodeme, the progeny are then allowed migrate to a new
+host or stay within the same host with a probability of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>m</mi><msub><mi>N</mi><mi>ι</mi></msub></mfrac><annotation encoding="application/x-tex">\frac{m}{N_{\iota}}</annotation></semantics></math>.
+Finally - as before - progeny are culled down to a smaller number of
+parasites per host by drawing from a Poisson distribution with a mean
+COI. This process produces the next generation of parasites within hosts
+at given discrete locations. In essence, the non-spatial and spatial
+simulator only differ by an additional hierarchical level of spatial
+“macrodemes”.</p>
 <div class="section level4">
 <h4 id="a-note-on-the-migration-matrix">A Note on the Migration Matrix<a class="anchor" aria-label="anchor" href="#a-note-on-the-migration-matrix"></a>
 </h4>
@@ -184,11 +199,11 @@ connections between populations A and B).</p>
 <span>                           migr_mat <span class="op">=</span> <span class="va">migr_dist_mat</span>, </span>
 <span>                           rho <span class="op">=</span> <span class="fl">1e-2</span>, </span>
 <span>                           tlim <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="co">#&gt; completed in 0.000618 seconds</span></span></code></pre></div>
+<span><span class="co">#&gt; completed in 0.000600 seconds</span></span></code></pre></div>
 <p>Pull out the ARG and then calculate the pairwise IBD.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ARG</span> <span class="op">&lt;-</span> <span class="fu">polySimIBD</span><span class="fu">::</span><span class="fu"><a href="../reference/get_arg.html">get_arg</a></span><span class="op">(</span><span class="va">swf</span><span class="op">)</span></span>
-<span><span class="co">#&gt; completed in 0.000555 seconds</span></span></code></pre></div>
+<span><span class="co">#&gt; completed in 0.000524 seconds</span></span></code></pre></div>
 <p>Next, calculate pairwise IBD for all combinations.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># here we are going to get all the pairwise IBD combinations for our hosts</span></span>
@@ -225,9 +240,7 @@ be considered.</p>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 
@@ -240,16 +253,16 @@ be considered.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
       </footer>
 </div>
 
-  
 
 
-  
+
+
 
   </body>
 </html>
