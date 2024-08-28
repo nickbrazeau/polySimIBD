@@ -16,6 +16,7 @@ LazyData: true
 URL: https://github.com/nickbrazeau/polySimIBD
 BugReports: https://github.com/nickbrazeau/polySimIBD/issues
 Imports:
+    ggplot2, 
     magrittr,
     purrr,
     Rcpp,
