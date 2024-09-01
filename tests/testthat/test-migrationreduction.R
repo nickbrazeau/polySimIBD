@@ -12,7 +12,7 @@ test_that("Migration with only within host migration reduces back to original mo
   pos <- list(sort(sample(pflen, 1e3)))
   mean_coi <- 1.666424e-07 # from optim lamnbda
   # small N for convenience
-  N <- 10
+  N <- 20
   m <- seq(0.05, 0.95, by = 0.3)
   #............................................................
   # run for basic model
@@ -37,53 +37,69 @@ test_that("Migration with only within host migration reduces back to original mo
     dplyr::mutate(meanIBD = purrr::map_dbl(ibdcalc, mean)) %>%
     dplyr::select(c("rep", "meanIBD"))
   
-  
-  
   #............................................................
   # now with migration  matrix
   #...........................................................
-  migr_mat <- matrix(data = 0, nrow = 2, ncol = 2)
+  migr_mat <- matrix(data = 0, nrow = 5, ncol = 5)
   diag(migr_mat) <- 1
   # lift over prev sims
   dblmt <- tidyr::expand_grid(rep, pos, N, m, mean_coi, rho, tlim)
   dblmt <- dblmt %>%
-    dplyr::mutate(N = purrr::map(N, function(x) rep(x,2)),
-                  m = purrr::map(m, function(x) rep(x,2)),
-                  mean_coi = purrr::map(mean_coi, function(x) rep(x,2)))
+    dplyr::mutate(N = purrr::map(N, function(x) rep(x,5)),
+                  m = purrr::map(m, function(x) rep(x,5)),
+                  mean_coi = purrr::map(mean_coi, function(x) rep(x,5)))
   dblmt <- dblmt %>%
     dplyr::mutate(migr_mat = purrr::map(rep, function(x) return(migr_mat)))
   
   dblmt$swfsim <- purrr::pmap(dblmt[2:ncol(dblmt)], polySimIBD::sim_swf)
   
   
-  wrapibdcalc <- function(swfsim, migr_mat){
-    # expand hosts
-    comb_hosts_df <- t(combn(N*nrow(migr_mat), 2))
+  wrapibdcalc <- function(swfsim, migr_mat, dwnsmplnum, N) {
+    # get start and end ind counts for each deme (ie account for when deme size varies)
+    # remember, host index is counted as 1:sum(N)
+    inds <- lapply(N, function(x){seq(1, x, by = 1)}) # list of inds by deme
+    end <- cumsum(sapply(inds, max))
+    start <- end + 1 # next start is end + 1, except for last individual
+    start <- c(1, start[1:(length(start)-1)])
+    # downsample to "N" individuals per deme
+    dwnsmpl <- mapply(function(x,y){sample(x:y, size = dwnsmplnum, replace = F)},
+                      x = start, y = end, SIMPLIFY = F)
+    dwnsmpl <- sort(unlist(dwnsmpl))
+    # get combinations
+    comb_hosts_df <- t(combn(dwnsmpl, 2))
     comb_hosts_list <- split(comb_hosts_df, 1:nrow(comb_hosts_df))
     # get pairwise IBD
     ibdmig <- purrr::map_dbl(comb_hosts_list, function(hosts, swf) {
       return(polySimIBD::get_bvibd(swf = swf, host_index = hosts))
     }, swf = swfsim)
     # tidyout
-    j1 <- tibble::tibble(smpl1 = 1:(N*nrow(migr_mat)),
-                         deme1 = sort(rep(1:nrow(migr_mat), N)))
-    j2 <- tibble::tibble(smpl2 = 1:(N*nrow(migr_mat)),
-                         deme2 = sort(rep(1:nrow(migr_mat), N)))
-    comb_hosts_df <- tibble::as_tibble(comb_hosts_df, .name_repair = "minimal")
-    colnames(comb_hosts_df) <- c("smpl1", "smpl2")
-    comb_hosts_df <- comb_hosts_df %>%
-      dplyr::left_join(., j1) %>%
-      dplyr::left_join(., j2) %>%
-      dplyr::mutate(ibd = ibdmig)
-    return(comb_hosts_df)
+    ret <- tibble::as_tibble(comb_hosts_df, .name_repair = "minimal") %>%
+      magrittr::set_colnames(c("smpl1", "smpl2")) %>%
+      dplyr::mutate(gendist = as.vector(unlist(ibdmig)))
+    
+    # apply demes
+    dms <- as.numeric( cut(dwnsmpl, breaks = c(1,cumsum(N))) ) #intelligent coercion of factor to numeric to represent demes
+    demeliftoverx <- tibble::tibble(smpl1 = dwnsmpl,
+                                    deme1 = dms)
+    demeliftovery <- tibble::tibble(smpl2 = dwnsmpl,
+                                    deme2 = dms)
+    #......................
+    # bring together
+    #......................
+    ret <- ret %>%
+      dplyr::left_join(., demeliftoverx, by = "smpl1") %>%
+      dplyr::left_join(., demeliftovery, by = "smpl2")
+    return(ret)
   }
   # get ibd
-  dblmt$ibdcalc <- purrr::pmap(dblmt[,c("swfsim", "migr_mat")], wrapibdcalc)
+  dblmt$ibdcalc <- purrr::pmap(dblmt[,c("swfsim", "migr_mat", "N")], 
+                               wrapibdcalc, 
+                               dwnsmplnum = 5)
   
   getmeanmig <- function(ibdcalc){
     ibdcalc %>%
       dplyr::filter(deme1 == deme2) %>% 
-      dplyr::summarise(meanibd = mean(ibd)) %>% 
+      dplyr::summarise(meanibd = mean(gendist)) %>% 
       dplyr::pull(meanibd)
   }
   # summarize
@@ -102,9 +118,9 @@ test_that("Migration with only within host migration reduces back to original mo
   
   ret_comb <- dplyr::bind_rows(snglmt_ret, dblmt_ret)
   
-  # ggplot() + 
-  #   geom_histogram(data = ret_comb, aes(x = meanIBD, fill = state), alpha = 0.5) + 
-  #   scale_fill_viridis_d()
+   # ggplot() + 
+   #   geom_histogram(data = ret_comb, aes(x = meanIBD, fill = state), alpha = 0.5) + 
+   #   scale_fill_viridis_d()
   
   # KW test to ensure that it is from the same distribution 
   checksame <- kruskal.test(ret_comb$meanIBD, g = factor(ret_comb$state))
