@@ -61,10 +61,17 @@ get_within_ibd <- function(swf, host_index = NULL, weight_loci = NULL) {
   numerator <- sapply(conn, function(x){sum(x != -1)})
   denom <-  (swf$coi[[host_index]]-1) # -1 here for self comparison
   denom <- rep (denom, length(numerator))
+  
   # out
-  wthnIBD <- sum( numerator / denom )
-  if (weight_loci != 1) {
-    wthnIBD <- sum(wthnIBD*weight_loci) /  sum(weight_loci)
+  if (!is.null(weight_loci)) { # weighted average (on loci presumambly by segment length)
+    goodegg::assert_numeric(weight_loci)
+    goodegg::assert_eq(length(weight_loci), length(numerator),
+                       message = paste(c("Loci weights and IBD loci must be of same length. You current IBD loci length is: ", length(numerator)))
+    )
+    wthnIBD <- sum((numerator / denom) * weight_loci) / sum(weight_loci)
+  } else {
+    wthnIBD <- sum(numerator / denom)  # default of equal weights 
   }
+  
   return(wthnIBD)
 }

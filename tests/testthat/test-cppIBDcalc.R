@@ -7,9 +7,10 @@ test_that("test Cpp IBD calculation by hand", {
                              mean_coi = 1, 
                              migr_mat = 1, 
                              rho = 1e-2, 
-                             tlim = 2)
+                             tlim = 25)
   # call bvibd
-  wi <- diff(swf$pos)/sum(diff(swf$pos))
+  wi <- c(min(swf$pos), diff(swf$pos))
+  wi <- wi/sum(wi)
   bvIBD <- polySimIBD::get_bvibd(swf = swf, host_index = c(1,2), weight_loci = wi)
   
   
@@ -26,9 +27,10 @@ test_that("test Cpp IBD calculation by hand", {
   h2 <- any( bvtree2[(coi[1]+1):sum(coi)] %in% (1:coi[1] - 1) ) 
   h3 <- any( bvtree3[(coi[1]+1):sum(coi)] %in% (1:coi[1] - 1) ) 
   # under SNP vs PSMC (Li/Durbin model)  
-  wi <- diff(swf$pos)/sum(diff(swf$pos))
+  wi <- c(min(swf$pos), diff(swf$pos))
+  wi <- wi/sum(wi)
   # weighted average (each loci, denom is 1)
-  handIBD <- sum(c(h1,h2,h3) * wi) # 3 loci, equidistant and weighted thus
+  handIBD <- sum(c(h1,h2,h3) * wi[2:4]) # 3 loci, equidistant and weighted thus
   
   
   # confirm

@@ -238,7 +238,7 @@ subset_bvtree <- function(bvtree, s) {
 #'   host IBD among the strains, regardless of COI. This means that as COI increases,
 #'   IBD may be overestimated, which has been shown to be a conservative estimand).     
 #' @inheritParams get_arg
-#'  @param weight_loci numeric vector; weights for loci to consider IBD weight average (i.e. consider segment length)
+#' @param weight_loci numeric vector; weights for loci to consider IBD weight average (i.e. consider segment length)
 #' @importFrom methods new
 #' @export
 
@@ -264,11 +264,18 @@ get_bvibd <- function(swf, host_index = NULL, haplo_index = NULL, weight_loci = 
   
   # pass to efficient C++ function
   output_raw <- get_bvibd_cpp(args)
-  numerator <- output_raw$ibd_target[-1]
-  
 
-  # weighted average (each loci, denom is 1)
-  bv_ibd <- sum( numerator * weight_loci) / sum(weight_loci)
+  # out
+  if (!is.null(weight_loci)) { # weighted average (on loci presumambly by segment length)
+    goodegg::assert_numeric(weight_loci)
+    goodegg::assert_eq(length(weight_loci), length(output_raw$ibd_target),
+                       message = paste(c("Loci weights and IBD loci must be of same length. You current IBD loci length is: ", length(output_raw$ibd_target)))
+                       )
+    bv_ibd <- sum(output_raw$ibd_target * weight_loci) / sum(weight_loci)
+  } else {
+    #D
+    bv_ibd <- mean(output_raw$ibd_target) # default of equal weights 
+  }
   
   return(bv_ibd)
 }
