@@ -91,7 +91,7 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim,
     } 
     # ensure for Cpp that psum is 1 (this is needed for `sample1` fxn) and that above worked correctly 
     if (is.matrix(migr_mat)) {
-      if ( any(round(rowSums(migr_mat), 4) != 1) ) { # add small margine of tolerance
+      if ( any(abs(rowSums(migr_mat) - 1) > 1e-4) ) { # add small margine of tolerance
         stop("Migration Matrix must sum to 1 to be properly passed to internal Cpp `sample` fxn for psum argument")
       }
     }
@@ -238,10 +238,11 @@ subset_bvtree <- function(bvtree, s) {
 #'   host IBD among the strains, regardless of COI. This means that as COI increases,
 #'   IBD may be overestimated, which has been shown to be a conservative estimand).     
 #' @inheritParams get_arg
+#'  @param weight_loci numeric vector; weights for loci to consider IBD weight average (i.e. consider segment length)
 #' @importFrom methods new
 #' @export
 
-get_bvibd <- function(swf, host_index = NULL, haplo_index = NULL, weight_loci = 1) {
+get_bvibd <- function(swf, host_index = NULL, haplo_index = NULL, weight_loci = NULL) {
   
   # check inputs and define defaults
   goodegg::assert_class(swf, "swfsim")

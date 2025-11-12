@@ -1,8 +1,6 @@
 test_that("test Cpp IBD calculation by hand", {
   # NB, cpp IBD calculation already checked in migration matrix form multiple times
   # here handwriting ARG to confirm IBD
-  # NB, cpp IBD calculation already checked in migration matrix form multiple times
-  # here handwriting ARG to confirm IBD
   swf <- polySimIBD::sim_swf(pos = c(0,1001,2001,3001), 
                              N = 2, 
                              m = 0.5, 

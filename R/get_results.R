@@ -47,7 +47,7 @@ get_effective_coi <- function(swf, host_index = NULL) {
 #' @details Function limited to a single host per "realization" 
 #' @return double of within-host IBD
 #' @export
-get_within_ibd <- function(swf, host_index = NULL, weight_loci = 1) {
+get_within_ibd <- function(swf, host_index = NULL, weight_loci = NULL) {
   # checks
   goodegg::assert_class(swf, "swfsim")
   goodegg::assert_single_pos_int(host_index)
@@ -60,11 +60,11 @@ get_within_ibd <- function(swf, host_index = NULL, weight_loci = 1) {
   # get within host IBD per loci 
   numerator <- sapply(conn, function(x){sum(x != -1)})
   denom <-  (swf$coi[[host_index]]-1) # -1 here for self comparison
+  denom <- rep (denom, length(numerator))
   # out
-  if (weight_loci == 1) {
-    wthnIBD <- sum( numerator / denom )
-  } else {
-    wthnIBD <- sum( (numerator*wi) / denom )
+  wthnIBD <- sum( numerator / denom )
+  if (weight_loci != 1) {
+    wthnIBD <- sum(wthnIBD*weight_loci) /  sum(weight_loci)
   }
   return(wthnIBD)
 }

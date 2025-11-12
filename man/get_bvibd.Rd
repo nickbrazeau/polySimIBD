@@ -4,7 +4,7 @@
 \alias{get_bvibd}
 \title{Get Between-Host Identity by Descent from forward simulations}
 \usage{
-get_bvibd(swf, host_index = NULL, haplo_index = NULL)
+get_bvibd(swf, host_index = NULL, haplo_index = NULL, weight_loci = NULL)
 }
 \arguments{
 \item{swf}{result of forwards simulation using the function \code{sim_swf()}}

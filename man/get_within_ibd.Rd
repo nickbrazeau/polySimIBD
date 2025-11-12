@@ -4,12 +4,14 @@
 \alias{get_within_ibd}
 \title{Calculate Within-Host IBD}
 \usage{
-get_within_ibd(swf, host_index = NULL)
+get_within_ibd(swf, host_index = NULL, weight_loci = NULL)
 }
 \arguments{
 \item{swf}{result of forwards simulation using the function \code{sim_swf()}}
 
 \item{host_index}{a vector of target hosts. Defaults to all hosts}
+
+\item{weight_loci}{numeric vector; weights for each loci to create a weighted IBD average}
 }
 \value{
 double of within-host IBD
