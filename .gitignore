@@ -11,6 +11,7 @@ R_ignore/NatComms_VerityAB2019_Sims/results/
 *.svg
 simulations/*.html
 Meta
+ignore/*
 
 # mac files
 .DS_Store
