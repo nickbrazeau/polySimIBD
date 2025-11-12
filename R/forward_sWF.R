@@ -17,13 +17,13 @@
 #' @param tlim numeric; the maximum number of generations to consider before 
 #' exiting gracefully if all samples have not coalesced
 #' @param verbose boolean
-#' @return Returns a list of length six that contains \enumerate{
+#' @return Returns a list of length seven that contains \enumerate{
 #'  \item pos: The simulated genetic coordinates 
 #'  \item coi: The COI of each individual
 #'  \item recomb: A recombination list of length of tlim where each element contains 
 #'  the recombination block -- as a boolean -- of the two parental haplotypes.   
 #'  \item parent_host1: the parental host assignments for the "paternal" haplotype  
-#'  \item parent_host1: the parental host assignments for the "maternal" haplotype
+#'  \item parent_host2: the parental host assignments for the "maternal" haplotype
 #'  \item parent_haplo1 "paternal" haplotype assigment (as above)
 #'  \item parent_haplo2 "maternal" haplotype assigment (as above)
 #'  }
@@ -241,7 +241,7 @@ subset_bvtree <- function(bvtree, s) {
 #' @importFrom methods new
 #' @export
 
-get_bvibd <- function(swf, host_index = NULL, haplo_index = NULL) {
+get_bvibd <- function(swf, host_index = NULL, haplo_index = NULL, weight_loci = 1) {
   
   # check inputs and define defaults
   goodegg::assert_class(swf, "swfsim")
@@ -265,10 +265,9 @@ get_bvibd <- function(swf, host_index = NULL, haplo_index = NULL) {
   output_raw <- get_bvibd_cpp(args)
   numerator <- output_raw$ibd_target[-1]
   
-  # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info - ie burn first loci
-  wi <- diff(swf$pos)/sum(diff(swf$pos))
+
   # weighted average (each loci, denom is 1)
-  bv_ibd <- sum( numerator*wi ) 
+  bv_ibd <- sum( numerator * weight_loci) / sum(weight_loci)
   
   return(bv_ibd)
 }

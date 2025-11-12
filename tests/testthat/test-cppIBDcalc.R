@@ -11,7 +11,8 @@ test_that("test Cpp IBD calculation by hand", {
                              rho = 1e-2, 
                              tlim = 2)
   # call bvibd
-  bvIBD <- polySimIBD::get_bvibd(swf = swf, host_index = c(1,2))
+  wi <- diff(swf$pos)/sum(diff(swf$pos))
+  bvIBD <- polySimIBD::get_bvibd(swf = swf, host_index = c(1,2), weight_loci = wi)
   
   
   # calculate by hand from ARG
@@ -26,7 +27,7 @@ test_that("test Cpp IBD calculation by hand", {
   h1 <- any( bvtree1[(coi[1]+1):sum(coi)] %in% (1:coi[1] - 1) ) 
   h2 <- any( bvtree2[(coi[1]+1):sum(coi)] %in% (1:coi[1] - 1) ) 
   h3 <- any( bvtree3[(coi[1]+1):sum(coi)] %in% (1:coi[1] - 1) ) 
-  # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info - ie burn first loci
+  # under SNP vs PSMC (Li/Durbin model)  
   wi <- diff(swf$pos)/sum(diff(swf$pos))
   # weighted average (each loci, denom is 1)
   handIBD <- sum(c(h1,h2,h3) * wi) # 3 loci, equidistant and weighted thus
