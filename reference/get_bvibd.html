@@ -83,7 +83,7 @@ IBD may be overestimated, which has been shown to be a conservative estimand).</
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_bvibd</span><span class="op">(</span><span class="va">swf</span>, host_index <span class="op">=</span> <span class="cn">NULL</span>, haplo_index <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_bvibd</span><span class="op">(</span><span class="va">swf</span>, host_index <span class="op">=</span> <span class="cn">NULL</span>, haplo_index <span class="op">=</span> <span class="cn">NULL</span>, weight_loci <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -101,6 +101,10 @@ IBD may be overestimated, which has been shown to be a conservative estimand).</
 <dt id="arg-haplo-index">haplo_index<a class="anchor" aria-label="anchor" href="#arg-haplo-index"></a></dt>
 <dd><p>a list of target haplotypes within the hosts specified by
 <code>host_index</code>. Defaults to all haplotypes within the specified hosts.</p></dd>
+
+
+<dt id="arg-weight-loci">weight_loci<a class="anchor" aria-label="anchor" href="#arg-weight-loci"></a></dt>
+<dd><p>numeric vector; weights for loci to consider IBD weight average (i.e. consider segment length)</p></dd>
 
 </dl></div>
 
