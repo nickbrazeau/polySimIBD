@@ -3,7 +3,7 @@
 \name{swfsim}
 \alias{swfsim}
 \title{The Structured Wright Fisher Model Output
-This S3 class represents realization of the Discrete-Time Discrete-Loci Spatial Wright Fisher Malaria Model.}
+This S3 class represents realization of the Spatial Discrete-Time Discrete-Loci Structured Wright Fisher Malaria Model.}
 \description{
 The realization of the Discrete-Time Discrete-Loci Spatial Wright Fisher Malaria Model contains all of the information
 to create the ARG: each generation's parents, the resulting recombination events between parents, and the offspring haplotypes

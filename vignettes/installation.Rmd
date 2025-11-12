@@ -39,7 +39,7 @@ remotes::install_github("nickbrazeau/polySimIBD")
     ```
 
 
-If you have any problems installing then please [raise an issue](https://github.com/nickbrazeau/polySimIBD/issues) on github.
+If you have any problems installing then please [raise an issue](https://github.com/nickbrazeau/polySimIBD/issues) on Github.
 
 Assuming everything installed correctly, you can now load the package:
 
@@ -48,3 +48,4 @@ library(polySimIBD)
 ```
 
 
+Separately, after installing, if you identify any bugs, please [raise an issue](https://github.com/nickbrazeau/polySimIBD/issues) on Github so they can be addressed.

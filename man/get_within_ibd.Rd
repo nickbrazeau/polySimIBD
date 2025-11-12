@@ -22,9 +22,9 @@ that the parasite genome has ten equidistant loci with a single recombination br
 Within this framework, we consider at loci 1:5 if 2/3 strains have coalesced, the
 within-host IBD for this section is 2/3. Next, for loci 6:10 if no strains have coalesced
 the within-host IBD is 0. Combining these results with-weighting for respective length/portion of the
-genome (weights here equal and therefore negligible) the overall within-host IBD is:
+genome (weights here are equal and therefore negligible) the overall within-host IBD is:
 \deqn{\frac{2 + 0}{Host_{COI} - 1}}, where one is subtracted from the Host-COI for self-comparison,
-wwhich gives (3-1) + (3-1) (for each loci). Note, because we consider self comparisons, the
+which gives (3-1) + (3-1) (for each loci). Note, because we consider self comparisons, the
 denominator is always less than the true COI.
 }
 \details{

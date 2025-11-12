@@ -12,11 +12,11 @@ get_arg(swf, host_index = NULL, haplo_index = NULL)
 \item{host_index}{a vector of target hosts. Defaults to all hosts}
 
 \item{haplo_index}{a list of target haplotypes within the hosts specified by
-\code{host_index}. Defaults to all haplotypes within the specified hosts}
+\code{host_index}. Defaults to all haplotypes within the specified hosts.}
 }
 \description{
 Given an object \code{swf}, which is the result of forward
-simulation using the function \code{sim_swf()}, walks backwards through the
-ancestry and calculates the coalescent tree at every locus for the
+simulation using the function \code{sim_swf()}, walk backwards through the
+ancestry and calculate the coalescent tree at every locus for the
 specified hosts and/or haplotypes.
 }

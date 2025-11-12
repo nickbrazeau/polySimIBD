@@ -1,23 +1,45 @@
 #' @title The Structured Wright Fisher Model for IBD
 #' @param pos vector; the genomic coordinates for chromosome and position of the sites
 #' @param N integer vector; The number of individuals to consider in each deme
-#' @param m numeric numeric; Probability of internal migration where m represents the probability of moving from host_{origin} to host_{new} by m*(1-1/N) of each deme
-#' @param mean_coi numeric vector; The lambda of a right-shifted Poisson process, 1 + Pos(lambda) representing the average COI of each deme
-#' @param migr_mat numeric matrix; Migrations rates or probabilities between destination and origin. Note, because this is a Wright-Fisher model, we are drawing parents and therefore migration matrix is parameterized towards "where one came from" versus "where one is headed": origin specified as columns and destination in rows Default value of 1 indicates non-spatial model. Note, if probability matrix, rows must sum to 1 (valid marginal probability); otherwise, values will be assumed to be rates and converted to probabilities
+#' @param m numeric numeric; Probability of internal migration where m represents 
+#' the probability of moving from host_{origin} to host_{new} by m*(1-1/N) of each deme
+#' @param mean_coi numeric vector; The lambda of a right-shifted Poisson process, 
+#' 1 + Pos(lambda) representing the average COI of each deme
+#' @param migr_mat numeric matrix; Migrations rates or probabilities between 
+#' destination and origin. Note, because this is a Wright-Fisher model, we are 
+#' drawing parents and therefore migration matrix is parameterized towards 
+#' "where one came from" versus "where one is headed": origin specified as 
+#' columns and destination in rows. Default value of 1 indicates non-spatial 
+#' model. Note, if using a probability matrix, rows must sum to 1 
+#' (valid marginal probability); otherwise, values will be assumed to be rates 
+#' and converted to probabilities.
 #' @param rho numeric; expected recombination rate
-#' @param tlim numeric; the maximum number of generations to consider before exiting gracefully if all samples have not coalesced
+#' @param tlim numeric; the maximum number of generations to consider before 
+#' exiting gracefully if all samples have not coalesced
 #' @param verbose boolean
-#' @return Returns a list of length six that contains the COI of each individual. A recombination list of length of tlim
-#' where each element contains the recombination block -- as a boolean -- of the two parental haplotypes.   
-#'  (the number of generations it took for all lineages to coalesce). Finally, there are lists for the parental host 
-#'  and parental haplotype assignments for the "paternal" and "maternal" haplotypes (1 and 2), respectively. 
-#' @description Simulate a population forwards with recombination that approximates the Structured Wright Fisher Process
-#' and tracks haplotype identity by descent where individuals represent demes, such that within
-#' a deme individual-level COI is considered.
-#' @details Demes are assumed to be ordered throughout (i.e. the order needs to be consistent between N, m, mean_coi, and the rows and columns of the migration matrix).
-#' @details Migration matrix is assumed to be a distance matrix that is either a rate or a probability. The program
-#'          will coerce the matrix into a probability distribution between origin and destination based on the row-sums. 
-#' @details This function is intended to be fed into the [polySimIBD::get_arg] function for interpretability. 
+#' @return Returns a list of length six that contains \enumerate{
+#'  \item pos: The simulated genetic coordinates 
+#'  \item coi: The COI of each individual
+#'  \item recomb: A recombination list of length of tlim where each element contains 
+#'  the recombination block -- as a boolean -- of the two parental haplotypes.   
+#'  \item parent_host1: the parental host assignments for the "paternal" haplotype  
+#'  \item parent_host1: the parental host assignments for the "maternal" haplotype
+#'  \item parent_haplo1 "paternal" haplotype assigment (as above)
+#'  \item parent_haplo2 "maternal" haplotype assigment (as above)
+#'  }
+#'  
+#' @description Simulate a population forwards with recombination that approximates 
+#' the Structured Wright Fisher Process and tracks haplotype identity by descent 
+#' where individuals represent demes, such that within a deme individual-level COI is 
+#' considered. The model is also extended to consider spatial demes that individual hosts 
+#' can move between. 
+#' @details Demes are assumed to be ordered throughout (i.e. the order needs to be 
+#' consistent between N, m, mean_coi, and the rows and columns of the migration matrix).
+#' @details The migration matrix is assumed to be a distance matrix that is either 
+#' a rate or a probability. The program will coerce the matrix into a probability 
+#' distribution between origin and destination based on the row-sums. 
+#' @details This function is intended to be fed into the [polySimIBD::get_arg] 
+#' function to summarize the simulation results, 
 #'
 #' @export
 
@@ -67,6 +89,12 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim,
       migr_mat <- 1 - exp(-migr_mat)
       migr_mat <- migr_mat/rowSums(migr_mat)
     } 
+    # ensure for Cpp that psum is 1 (this is needed for `sample1` fxn) and that above worked correctly 
+    if (is.matrix(migr_mat)) {
+      if ( any(round(rowSums(migr_mat), 4) != 1) ) { # add small margine of tolerance
+        stop("Migration Matrix must sum to 1 to be properly passed to internal Cpp `sample` fxn for psum argument")
+      }
+    }
     
     # split out for cpp import
     migr_mat <- split(migr_mat, 1:nrow(migr_mat))
@@ -102,13 +130,13 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim,
 
 #' @title Get ancestral recombination graph from forward simulations
 #' @description Given an object \code{swf}, which is the result of forward
-#'   simulation using the function \code{sim_swf()}, walks backwards through the
-#'   ancestry and calculates the coalescent tree at every locus for the
+#'   simulation using the function \code{sim_swf()}, walk backwards through the
+#'   ancestry and calculate the coalescent tree at every locus for the
 #'   specified hosts and/or haplotypes.
 #' @param swf result of forwards simulation using the function \code{sim_swf()}
 #' @param host_index a vector of target hosts. Defaults to all hosts
 #' @param haplo_index a list of target haplotypes within the hosts specified by
-#'   \code{host_index}. Defaults to all haplotypes within the specified hosts
+#'   \code{host_index}. Defaults to all haplotypes within the specified hosts.
 #' @importFrom methods new
 #' @export
 
@@ -156,14 +184,11 @@ get_arg <- function(swf, host_index = NULL, haplo_index = NULL) {
 
 
 #' @title Subset an object of class bvtree
-#'
 #' @description Given a bvtree and a vector of indices \code{s}, creates a new
 #'   tree which is a subset of the original tree focusing only on the elements
 #'   \code{s}.
-#'
 #' @param bvtree an object of class "bvtree"
 #' @param s a vector specifying which elements in the bvtree to focus on
-#'
 #' @export
 
 subset_bvtree <- function(bvtree, s) {
@@ -204,12 +229,14 @@ subset_bvtree <- function(bvtree, s) {
 
 
 #' @title Get Between-Host Identity by Descent from forward simulations
-#'
 #' @description Given an object \code{swf}, which is the result of forward
 #'   simulation using the function \code{sim_swf()}, walks backwards through the
-#'   ancestry and calculates the between host identity by descent. Calculation is 
-#'   based on \cite{Verity et. al 2020, Nat Comms, PMC7192906}.    
-#'
+#'   ancestry and calculate the between host identity by descent. The IBD 
+#'   calculation is based on \cite{Verity et. al 2020, Nat Comms, PMC7192906} and 
+#'   assumes relatedness if there are any IBD among the haplotypes between hosts
+#'   at a given loci (i.e. a loci is considered to be in IBD if there is any between
+#'   host IBD among the strains, regardless of COI. This means that as COI increases,
+#'   IBD may be overestimated, which has been shown to be a conservative estimand).     
 #' @inheritParams get_arg
 #' @importFrom methods new
 #' @export
