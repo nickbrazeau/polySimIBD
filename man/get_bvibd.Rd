@@ -4,7 +4,7 @@
 \alias{get_bvibd}
 \title{Get Between-Host Identity by Descent from forward simulations}
 \usage{
-get_bvibd(swf, host_index = NULL, haplo_index = NULL)
+get_bvibd(swf, host_index = NULL, haplo_index = NULL, weight_loci = NULL)
 }
 \arguments{
 \item{swf}{result of forwards simulation using the function \code{sim_swf()}}
@@ -13,6 +13,8 @@ get_bvibd(swf, host_index = NULL, haplo_index = NULL)
 
 \item{haplo_index}{a list of target haplotypes within the hosts specified by
 \code{host_index}. Defaults to all haplotypes within the specified hosts.}
+
+\item{weight_loci}{numeric vector; weights for loci to consider IBD weight average (i.e. consider segment length)}
 }
 \description{
 Given an object \code{swf}, which is the result of forward

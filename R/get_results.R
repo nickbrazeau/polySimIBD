@@ -32,6 +32,7 @@ get_effective_coi <- function(swf, host_index = NULL) {
 
 #' @title Calculate Within-Host IBD 
 #' @inheritParams get_arg
+#' @param weight_loci numeric vector; weights for each loci to create a weighted IBD average 
 #' @description The within-host IBD is calculated as the number of strains that have 
 #'     coalesced within the \code{tlim} at each loci divided by the original (i.e. not effective)
 #'     COI. As an example, consider that there are three strains (i.e. parasites) within a host and
@@ -46,7 +47,7 @@ get_effective_coi <- function(swf, host_index = NULL) {
 #' @details Function limited to a single host per "realization" 
 #' @return double of within-host IBD
 #' @export
-get_within_ibd <- function(swf, host_index = NULL) {
+get_within_ibd <- function(swf, host_index = NULL, weight_loci = NULL) {
   # checks
   goodegg::assert_class(swf, "swfsim")
   goodegg::assert_single_pos_int(host_index)
@@ -59,8 +60,18 @@ get_within_ibd <- function(swf, host_index = NULL) {
   # get within host IBD per loci 
   numerator <- sapply(conn, function(x){sum(x != -1)})
   denom <-  (swf$coi[[host_index]]-1) # -1 here for self comparison
-  wi <- diff(swf$pos)/sum(diff(swf$pos))   # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info
+  denom <- rep (denom, length(numerator))
+  
   # out
-  wthnIBD <-sum( (numerator[1:(length(numerator) - 1)] / denom) * wi )
+  if (!is.null(weight_loci)) { # weighted average (on loci presumambly by segment length)
+    goodegg::assert_numeric(weight_loci)
+    goodegg::assert_eq(length(weight_loci), length(numerator),
+                       message = paste(c("Loci weights and IBD loci must be of same length. You current IBD loci length is: ", length(numerator)))
+    )
+    wthnIBD <- sum((numerator / denom) * weight_loci) / sum(weight_loci)
+  } else {
+    wthnIBD <- sum(numerator / denom)  # default of equal weights 
+  }
+  
   return(wthnIBD)
 }

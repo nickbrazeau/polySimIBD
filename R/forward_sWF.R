@@ -17,13 +17,13 @@
 #' @param tlim numeric; the maximum number of generations to consider before 
 #' exiting gracefully if all samples have not coalesced
 #' @param verbose boolean
-#' @return Returns a list of length six that contains \enumerate{
+#' @return Returns a list of length seven that contains \enumerate{
 #'  \item pos: The simulated genetic coordinates 
 #'  \item coi: The COI of each individual
 #'  \item recomb: A recombination list of length of tlim where each element contains 
 #'  the recombination block -- as a boolean -- of the two parental haplotypes.   
 #'  \item parent_host1: the parental host assignments for the "paternal" haplotype  
-#'  \item parent_host1: the parental host assignments for the "maternal" haplotype
+#'  \item parent_host2: the parental host assignments for the "maternal" haplotype
 #'  \item parent_haplo1 "paternal" haplotype assigment (as above)
 #'  \item parent_haplo2 "maternal" haplotype assigment (as above)
 #'  }
@@ -91,7 +91,7 @@ sim_swf <- function(pos, N, m, rho, mean_coi, tlim,
     } 
     # ensure for Cpp that psum is 1 (this is needed for `sample1` fxn) and that above worked correctly 
     if (is.matrix(migr_mat)) {
-      if ( any(round(rowSums(migr_mat), 4) != 1) ) { # add small margine of tolerance
+      if ( any(abs(rowSums(migr_mat) - 1) > 1e-4) ) { # add small margine of tolerance
         stop("Migration Matrix must sum to 1 to be properly passed to internal Cpp `sample` fxn for psum argument")
       }
     }
@@ -238,10 +238,11 @@ subset_bvtree <- function(bvtree, s) {
 #'   host IBD among the strains, regardless of COI. This means that as COI increases,
 #'   IBD may be overestimated, which has been shown to be a conservative estimand).     
 #' @inheritParams get_arg
+#' @param weight_loci numeric vector; weights for loci to consider IBD weight average (i.e. consider segment length)
 #' @importFrom methods new
 #' @export
 
-get_bvibd <- function(swf, host_index = NULL, haplo_index = NULL) {
+get_bvibd <- function(swf, host_index = NULL, haplo_index = NULL, weight_loci = NULL) {
   
   # check inputs and define defaults
   goodegg::assert_class(swf, "swfsim")
@@ -263,12 +264,18 @@ get_bvibd <- function(swf, host_index = NULL, haplo_index = NULL) {
   
   # pass to efficient C++ function
   output_raw <- get_bvibd_cpp(args)
-  numerator <- output_raw$ibd_target[-1]
-  
-  # under SNP vs PSMC (Li/Durbin model) don't know begin and end, so treat as missing info - ie burn first loci
-  wi <- diff(swf$pos)/sum(diff(swf$pos))
-  # weighted average (each loci, denom is 1)
-  bv_ibd <- sum( numerator*wi ) 
+
+  # out
+  if (!is.null(weight_loci)) { # weighted average (on loci presumambly by segment length)
+    goodegg::assert_numeric(weight_loci)
+    goodegg::assert_eq(length(weight_loci), length(output_raw$ibd_target),
+                       message = paste(c("Loci weights and IBD loci must be of same length. You current IBD loci length is: ", length(output_raw$ibd_target)))
+                       )
+    bv_ibd <- sum(output_raw$ibd_target * weight_loci) / sum(weight_loci)
+  } else {
+    #D
+    bv_ibd <- mean(output_raw$ibd_target) # default of equal weights 
+  }
   
   return(bv_ibd)
 }

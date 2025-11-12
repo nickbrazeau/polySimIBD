@@ -17,7 +17,7 @@ testthat::test_that("model runs", {
   testthat::expect_is(ARG, "argraph")
   testthat::expect_gt(length(ARG), 0)
   # bv tree sub
-  bvsubtree <- subset_bvtree(bvtree = ARG[[1]], s = c(1,2))
+  bvsubtree <- polySimIBD::subset_bvtree(bvtree = ARG[[1]], s = c(1,2))
   testthat::expect_is(bvsubtree, "bvtree")
 })
 

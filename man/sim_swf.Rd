@@ -34,13 +34,13 @@ and converted to probabilities.}
 \item{verbose}{boolean}
 }
 \value{
-Returns a list of length six that contains \enumerate{
+Returns a list of length seven that contains \enumerate{
 \item pos: The simulated genetic coordinates
 \item coi: The COI of each individual
 \item recomb: A recombination list of length of tlim where each element contains
 the recombination block -- as a boolean -- of the two parental haplotypes.
 \item parent_host1: the parental host assignments for the "paternal" haplotype
-\item parent_host1: the parental host assignments for the "maternal" haplotype
+\item parent_host2: the parental host assignments for the "maternal" haplotype
 \item parent_haplo1 "paternal" haplotype assigment (as above)
 \item parent_haplo2 "maternal" haplotype assigment (as above)
 }
